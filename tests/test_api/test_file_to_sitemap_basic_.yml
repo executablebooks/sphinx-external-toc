@@ -1,0 +1,37 @@
+_root: intro
+doc1:
+  docname: doc1
+  parts: []
+  title: null
+doc2:
+  docname: doc2
+  parts: []
+  title: null
+doc3:
+  docname: doc3
+  parts:
+  - caption: null
+    numbered: true
+    reversed: false
+    sections:
+    - doc4
+    - title: null
+      url: https://example.com
+    titlesonly: true
+  title: null
+doc4:
+  docname: doc4
+  parts: []
+  title: null
+intro:
+  docname: intro
+  parts:
+  - caption: Part Caption
+    numbered: true
+    reversed: false
+    sections:
+    - doc1
+    - doc2
+    - doc3
+    titlesonly: true
+  title: Introduction

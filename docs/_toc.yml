@@ -1,0 +1,19 @@
+defaults:
+  # numbered: true
+  titlesonly: false
+main:
+  doc: intro
+  title: Introduction
+  sections:
+  - doc: doc1
+  - doc: doc2
+    # sections:
+    # - doc: subfolder/doc3
+    # - url: https://example.com
+    #   title: Example Link
+    parts:
+    - numbered: true
+      sections:
+      - doc: subfolder/doc3
+      - url: https://example.com
+        title: Example Link
