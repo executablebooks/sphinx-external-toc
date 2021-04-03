@@ -33,3 +33,4 @@ def create_site(toc_file, path, extension, overwrite):
     create_site_from_toc(
         toc_file, root_path=path, default_ext="." + extension, overwrite=overwrite
     )
+    # TODO option to add basic conf.py?

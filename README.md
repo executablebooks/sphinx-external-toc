@@ -146,6 +146,22 @@ intro:
   title: Introduction
 ```
 
+## Command-line
+
+This package comes with the `sphinx-etoc` command-line program, with some additional tools.
+
+To see all options:
+
+```shell
+$ sphinx-etoc --help
+```
+
+To build a template site from only a ToC file:
+
+```shell
+$ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
+```
+
 ## Development Notes
 
 Want to have a built-in CLI including commands:
