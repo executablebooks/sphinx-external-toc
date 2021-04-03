@@ -26,6 +26,7 @@ class TocItem:
     )
     caption: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
     numbered: Union[bool, int] = attr.ib(False, validator=instance_of((bool, int)))
+    # TODO in jupyter-book titlesonly default is True, but why
     titlesonly: bool = attr.ib(True, validator=instance_of(bool))
     reversed: bool = attr.ib(False, validator=instance_of(bool))
 
@@ -120,7 +121,7 @@ def _parse_doc_item(
     if "doc" not in data:
         raise MalformedError(f"'doc' key not found: '{path}'")
     if "sections" in data:
-        # this is a shorthand for defining a a single part
+        # this is a shorthand for defining a single part
         if "parts" in data:
             raise MalformedError(f"Both 'sections' and 'parts' found: '{path}'")
         parts_data = [{"sections": data["sections"]}]
@@ -130,25 +131,42 @@ def _parse_doc_item(
     if not isinstance(parts_data, Sequence):
         raise MalformedError(f"'parts' not a sequence: '{path}'")
 
-    # TODO more validation (and path)
+    _known_link_keys = {"url", "doc"}
+
     parts = []
-    for idx, part in enumerate(parts_data):
+    for part_idx, part in enumerate(parts_data):
+
+        # generate sections list
+        sections: List[Union[str, UrlItem]] = []
+        for sect_idx, section in enumerate(part["sections"]):
+            link_keys = _known_link_keys.intersection(section)
+            if not link_keys:
+                raise MalformedError(
+                    "toctree section does not contain one of "
+                    f"{_known_link_keys!r}: {path}{part_idx}/{sect_idx}"
+                )
+            if not len(link_keys) == 1:
+                raise MalformedError(
+                    "toctree section contains incompatible keys "
+                    f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
+                )
+            if link_keys == {"url"}:
+                sections.append(UrlItem(section["url"], section.get("title")))
+            else:
+                sections.append(section["doc"])
+
+        # generate toc key-word arguments
+        keywords = {}
+        for key in ("caption", "numbered", "titlesonly", "reversed"):
+            if key in part:
+                keywords[key] = part[key]
+            elif key in defaults:
+                keywords[key] = defaults[key]
+
         try:
-            toc_item = TocItem(
-                sections=[
-                    UrlItem(section["url"], section.get("title"))
-                    if "url" in section
-                    else section["doc"]
-                    # assert not url and doc
-                    for section in part["sections"]
-                ],
-                caption=part.get("caption"),
-                numbered=part.get("numbered", defaults.get("numbered", False)),
-                titlesonly=part.get("titlesonly", defaults.get("titlesonly", True)),
-                reversed=part.get("reversed", defaults.get("reversed", False)),
-            )
+            toc_item = TocItem(sections=sections, **keywords)
         except TypeError as exc:
-            raise MalformedError(f"toctree validation: {path}{idx}") from exc
+            raise MalformedError(f"toctree validation: {path}{part_idx}") from exc
         parts.append(toc_item)
 
     try:
