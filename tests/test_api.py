@@ -4,7 +4,7 @@ import pytest
 
 from sphinx_external_toc.api import parse_toc_file
 
-TOC_FILES = list(Path(__file__).parent.joinpath("toc_files").glob("*.yml"))
+TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
 
 
 @pytest.mark.parametrize(

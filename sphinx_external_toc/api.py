@@ -163,6 +163,12 @@ def _parse_doc_item(
             elif key in defaults:
                 keywords[key] = defaults[key]
 
+        # TODO this is a hacky fix for the fact that sphinx logs a warning
+        # for nested toctrees, see:
+        # sphinx/environment/collectors/toctree.py::TocTreeCollector::assign_section_numbers::_walk_toctree
+        if keywords.get("numbered") and path != "main/":
+            keywords.pop("numbered")
+
         try:
             toc_item = TocItem(sections=sections, **keywords)
         except TypeError as exc:

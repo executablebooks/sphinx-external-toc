@@ -10,6 +10,15 @@ The path to the toc file can be defined with `external_toc_path` (default: `_toc
 
 ## User Guide
 
+### Sphinx Configuration
+
+Add to your `conf.py`:
+
+```python
+extensions = ["sphinx_external_toc"]
+external_toc_path = "_toc.yml"  # optional
+```
+
 ### Basic Structure
 
 A minimal ToC defines the top level `main` key, and a single root document page:
@@ -137,6 +146,22 @@ intro:
   title: Introduction
 ```
 
+## Command-line
+
+This package comes with the `sphinx-etoc` command-line program, with some additional tools.
+
+To see all options:
+
+```shell
+$ sphinx-etoc --help
+```
+
+To build a template site from only a ToC file:
+
+```shell
+$ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
+```
+
 ## Development Notes
 
 Want to have a built-in CLI including commands:
@@ -160,5 +185,7 @@ Questions / TODOs:
 - warn if `master_doc` specified and different to landing page.
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
-- Handle globbing in sections (seperate `glob` key?)
+- Handle globbing in sections (separate `glob` key?), also deal with in `create_site_from_toc`
 - Add additional top-level keys, e.g. `appendices` and `bibliography`
+- testing against Windows
+- option to add files not in toc to `ignore_paths` (including glob)
