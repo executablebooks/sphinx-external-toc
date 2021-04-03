@@ -1,5 +1,9 @@
 # sphinx-external-toc [IN-DEVELOPMENT]
 
+[![Github-CI][github-ci]][github-link]
+[![Coverage Status][codecov-badge]][codecov-link]
+[![Code style: black][black-badge]][black-link]
+
 A sphinx extension that allows the documentation toctree to be defined in a single file.
 
 In normal Sphinx documentation, the documentation structure is defined *via* a bottom-up approach - adding [`toctree` directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) within pages of the documentation.
@@ -189,3 +193,11 @@ Questions / TODOs:
 - Add additional top-level keys, e.g. `appendices` and `bibliography`
 - testing against Windows
 - option to add files not in toc to `ignore_paths` (including glob)
+
+
+[github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
+[github-link]: https://github.com/executablebooks/sphinx-external-toc
+[codecov-badge]: https://codecov.io/gh/executablebooks/sphinx-external-toc/branch/main/graph/badge.svg
+[codecov-link]: https://codecov.io/gh/executablebooks/sphinx-external-toc
+[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
+[black-link]: https://github.com/ambv/black
