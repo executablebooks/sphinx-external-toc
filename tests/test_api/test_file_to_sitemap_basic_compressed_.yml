@@ -11,7 +11,7 @@ doc3:
   docname: doc3
   parts:
   - caption: null
-    numbered: true
+    numbered: false
     reversed: false
     sections:
     - doc4

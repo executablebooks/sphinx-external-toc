@@ -44,6 +44,9 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
         subnode["includefiles"] = []
         subnode["maxdepth"] = -1
         subnode["caption"] = toctree.caption
+        # TODO this wasn't in the original code,
+        # but alabaster theme intermittently raised `KeyError('rawcaption')`
+        subnode["rawcaption"] = toctree.caption or ""
         subnode["glob"] = False
         subnode["hidden"] = True
         subnode["includehidden"] = False
