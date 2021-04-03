@@ -40,10 +40,10 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install .[testing]
+        pip install -e .[testing]
     - name: Run pytest
       run: |
-        pytest --cov=sphinx_toctree --cov-report=xml --cov-report=term-missing
+        pytest --cov=sphinx_external_toc --cov-report=xml --cov-report=term-missing
     - name: Upload to Codecov
       if: matrix.python-version == 3.8
       uses: codecov/codecov-action@v1
