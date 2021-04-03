@@ -156,13 +156,13 @@ This package comes with the `sphinx-etoc` command-line program, with some additi
 
 To see all options:
 
-```shell
+```console
 $ sphinx-etoc --help
 ```
 
 To build a template site from only a ToC file:
 
-```shell
+```console
 $ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
 ```
 
