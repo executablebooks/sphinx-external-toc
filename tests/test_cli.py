@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from click.testing import CliRunner
 
-from sphinx_external_toc.cli import main
+from sphinx_external_toc.cli import main, parse_toc
 from sphinx_external_toc import __version__
 
 import pytest
+
+
+# TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
 
 
 @pytest.fixture()
@@ -20,6 +25,12 @@ def invoke_cli():
     yield _func
 
 
-def test_cli_version(invoke_cli):
+def test_version(invoke_cli):
     result = invoke_cli(main, "--version")
     assert __version__ in result.output
+
+
+def test_parse_toc(invoke_cli):
+    path = Path(__file__).parent.joinpath("_toc_files", "basic.yml").resolve()
+    result = invoke_cli(parse_toc, str(path))
+    assert "intro" in result.output
