@@ -7,6 +7,7 @@ from sphinx.addnodes import toctree as toctree_node
 from sphinx.application import Sphinx
 from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
+from sphinx.errors import ExtensionError
 from sphinx.transforms import SphinxTransform
 from sphinx.util import logging
 from sphinx.util.matching import Matcher
@@ -18,10 +19,12 @@ logger = logging.getLogger(__name__)
 
 def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     """Parse the external toc file and store it in the Sphinx environment."""
-    # TODO convert exceptions to sphinx error (particularly MalformedError)
-    site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
+    try:
+        site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
+    except Exception as exc:
+        raise ExtensionError(f"External ToC: {exc}") from exc
     config.external_site_map = site_map
-    # Update the master_doc to the root doc
+    # Update the master_doc to the root doc of the site map
     if config["master_doc"] != site_map.root.docname:
         logger.info("External ToC: Changing master_doc to '%s'", site_map.root.docname)
     config["master_doc"] = site_map.root.docname
