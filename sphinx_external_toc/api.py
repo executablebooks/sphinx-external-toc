@@ -154,8 +154,8 @@ def _parse_doc_item(
     data: Dict[str, Any], defaults: Dict[str, Any], path: str
 ) -> Tuple[DocItem, Sequence[Dict[str, Any]]]:
     """Parse a single doc item."""
-    if "doc" not in data:
-        raise MalformedError(f"'doc' key not found: '{path}'")
+    if "file" not in data:
+        raise MalformedError(f"'file' key not found: '{path}'")
     if "sections" in data:
         # this is a shorthand for defining a single part
         if "parts" in data:
@@ -167,7 +167,7 @@ def _parse_doc_item(
     if not isinstance(parts_data, Sequence):
         raise MalformedError(f"'parts' not a sequence: '{path}'")
 
-    _known_link_keys = {"url", "doc", "glob"}
+    _known_link_keys = {"file", "glob", "url"}
 
     parts = []
     for part_idx, part in enumerate(parts_data):
@@ -186,8 +186,8 @@ def _parse_doc_item(
                     "toctree section contains incompatible keys "
                     f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
                 )
-            if link_keys == {"doc"}:
-                sections.append(RefItem(section["doc"]))
+            if link_keys == {"file"}:
+                sections.append(RefItem(section["file"]))
             elif link_keys == {"glob"}:
                 sections.append(GlobItem(section["glob"]))
             elif link_keys == {"url"}:
@@ -214,7 +214,7 @@ def _parse_doc_item(
         parts.append(toc_item)
 
     try:
-        doc_item = DocItem(docname=data["doc"], title=data.get("title"), parts=parts)
+        doc_item = DocItem(docname=data["file"], title=data.get("title"), parts=parts)
     except TypeError as exc:
         raise MalformedError(f"doc validation: {path}") from exc
 
@@ -222,7 +222,7 @@ def _parse_doc_item(
         section
         for part in parts_data
         for section in part["sections"]
-        if "doc" in section
+        if "file" in section
     ]
 
     return (
@@ -239,9 +239,9 @@ def _parse_docs_list(
 ):
     """Parse a list of docs."""
     for doc_data in docs_list:
-        docname = doc_data["doc"]
+        docname = doc_data["file"]
         if docname in site_map:
-            raise MalformedError(f"document used multiple times: {docname}")
+            raise MalformedError(f"document file used multiple times: {docname}")
         child_path = f"{path}{docname}/"
         child_item, child_docs_list = _parse_doc_item(doc_data, defaults, child_path)
         site_map[docname] = child_item

@@ -1,15 +1,15 @@
 defaults:
   numbered: true
 main:
-  doc: intro
+  file: intro
   title: Introduction
   parts:
     - caption: Part Caption
       sections:
-      - doc: doc1
-      - doc: doc2
-      - doc: doc3
+      - file: doc1
+      - file: doc2
+      - file: doc3
         parts:
         - sections:
-          - doc: doc4
+          - file: doc4
           - url: https://example.com

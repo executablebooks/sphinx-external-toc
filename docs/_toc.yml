@@ -1,19 +1,13 @@
 defaults:
-  # numbered: true
+  numbered: 3
   titlesonly: false
 main:
-  doc: intro
+  file: intro
   title: Introduction
   sections:
-  - doc: doc1
-  - doc: doc2
-    # sections:
-    # - doc: subfolder/doc3
-    # - url: https://example.com
-    #   title: Example Link
-    parts:
-    - numbered: true
-      sections:
-      - doc: subfolder/doc3
-      - url: https://example.com
-        title: Example Link
+  - file: doc1
+  - file: doc2
+    sections:
+    - file: subfolder/doc3
+    - url: https://example.com
+      title: Example Link
