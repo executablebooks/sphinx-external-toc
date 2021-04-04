@@ -185,8 +185,6 @@ Process:
 Questions / TODOs:
 
 - What if toctree directive found in file? (raise incompatibility error/warnings)
-- How to deal with changes in toctree, i.e. invalidating pages if there children change
-- warn if `master_doc` specified and different to landing page.
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
 - Handle globbing in sections (separate `glob` key?), also deal with in `create_site_from_toc`
