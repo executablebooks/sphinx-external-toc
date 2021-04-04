@@ -75,7 +75,8 @@ main:
 
 ### Titles and Captions
 
-By default, ToCs will use the initial header within a document as its title
+By default, ToCs will use the initial header within a document as its title.
+
 With the `title` key you can set an alternative title for a document or URL.
 Each part can also have a `caption`, e.g. for use in ToC side-bars:
 
