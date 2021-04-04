@@ -1,3 +1,4 @@
+from itertools import chain
 from pathlib import Path, PurePosixPath
 from os import linesep
 from typing import Union
@@ -15,6 +16,9 @@ def create_site_from_toc(
 ) -> Path:
     """Create the files defined in the external toc file.
 
+    Additional files can also be created by defining them in
+    `meta`/`create_additional` of the toc
+
     :param toc_path: Path to ToC.
     :param root_path: The root directory , or use ToC file directory.
     :param default_ext: The default file extension to use.
@@ -28,7 +32,7 @@ def create_site_from_toc(
 
     root_path = Path(toc_path).parent if root_path is None else Path(root_path)
 
-    for docname in site_map:
+    for docname in chain(site_map, site_map.meta.get("create_additional", [])):
         if not any(docname.endswith(ext) for ext in {".rst", ".md"}):
             docname += default_ext
         docpath = root_path.joinpath(PurePosixPath(docname))

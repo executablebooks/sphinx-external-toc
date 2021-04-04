@@ -38,7 +38,12 @@ The value of the `doc` key will be a path to a file (relative to the `conf.py`) 
 Each document can only occur once in the ToC!
 ```
 
-Documents can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list child documents/URLs.
+Document pages can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list of children links, that are one of: `doc`, `url` or `glob`:
+
+- `doc`: relating to a single document page (as above)
+- `glob`: relating to one or more document pages *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
+- `url`: relating to an external URL (`http` or `https`)
+
 This can proceed recursively to any depth.
 
 ```yaml
@@ -51,6 +56,7 @@ main:
       - sections:
         - doc: doc2
         - url: https://example.com
+        - glob: other*
 ```
 
 As a shorthand, the `sections` key can be at the same level as the `doc`, which denotes a document with a single `part`.
@@ -64,6 +70,7 @@ main:
     sections:
     - doc: doc2
     - url: https://example.com
+    - glob: other*
 ```
 
 ### Titles and Captions
@@ -166,6 +173,20 @@ To build a template site from only a ToC file:
 $ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
 ```
 
+Note, when using `glob` you can also add additional files in `meta`/`create_additional`, e.g.
+
+```yaml
+main:
+  doc: intro
+  sections:
+  - glob: doc*
+meta:
+  create_additional:
+  - doc1
+  - doc2
+  - doc3
+```
+
 ## Development Notes
 
 Want to have a built-in CLI including commands:
@@ -187,11 +208,10 @@ Questions / TODOs:
 - What if toctree directive found in file? (raise incompatibility error/warnings)
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
-- Handle globbing in sections (separate `glob` key?), also deal with in `create_site_from_toc`
 - Add additional top-level keys, e.g. `appendices` and `bibliography`
 - testing against Windows
 - option to add files not in toc to `ignore_paths` (including glob)
-
+- Add tests for "bad" toc files
 
 [github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
 [github-link]: https://github.com/executablebooks/sphinx-external-toc

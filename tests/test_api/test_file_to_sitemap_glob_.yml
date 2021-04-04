@@ -1,0 +1,16 @@
+_meta:
+  create_additional:
+  - doc1
+  - doc2
+  - doc3
+_root: intro
+intro:
+  docname: intro
+  parts:
+  - caption: null
+    numbered: false
+    reversed: false
+    sections:
+    - doc*
+    titlesonly: true
+  title: Introduction

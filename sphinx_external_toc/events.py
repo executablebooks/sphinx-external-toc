@@ -9,10 +9,10 @@ from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
 from sphinx.errors import ExtensionError
 from sphinx.transforms import SphinxTransform
-from sphinx.util import logging
-from sphinx.util.matching import Matcher
+from sphinx.util import docname_join, logging
+from sphinx.util.matching import Matcher, patfilter
 
-from .api import DocItem, SiteMap, UrlItem, parse_toc_file
+from .api import DocItem, GlobItem, RefItem, SiteMap, UrlItem, parse_toc_file
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,10 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
     if doc_item is None or not doc_item.parts:
         return
 
+    # initial variables
     suffixes = app.config.source_suffix
+    all_docnames = app.env.found_docs.copy()
+    all_docnames.remove(app.env.docname)  # remove current document
     excluded = Matcher(app.config.exclude_patterns)
 
     for toctree in doc_item.parts:
@@ -79,7 +82,7 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
         # TODO this wasn't in the original code,
         # but alabaster theme intermittently raised `KeyError('rawcaption')`
         subnode["rawcaption"] = toctree.caption or ""
-        subnode["glob"] = False
+        subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.sections)
         subnode["hidden"] = True
         subnode["includehidden"] = False
         subnode["numbered"] = toctree.numbered
@@ -92,33 +95,46 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
         for entry in toctree.sections:
 
             if isinstance(entry, UrlItem):
+
                 subnode["entries"].append((entry.title, entry.url))
-                continue
 
-            child_doc_item = site_map[entry]
+            elif isinstance(entry, RefItem):
 
-            docname = child_doc_item.docname
-            title = child_doc_item.title
+                child_doc_item = site_map[entry]
+                docname = docname_join(app.env.docname, str(entry))
+                title = child_doc_item.title
 
-            # remove any suffixes
-            for suffix in suffixes:
-                if docname.endswith(suffix):
-                    docname = docname[: -len(suffix)]
-                    break
+                # remove any suffixes
+                for suffix in suffixes:
+                    if docname.endswith(suffix):
+                        docname = docname[: -len(suffix)]
+                        break
 
-            if docname not in app.env.found_docs:
-                if excluded(app.env.doc2path(docname, None)):
-                    message = (
-                        f"toctree contains reference to excluded document {docname!r}"
-                    )
+                if docname not in app.env.found_docs:
+                    if excluded(app.env.doc2path(docname, None)):
+                        message = f"toctree contains reference to excluded document {docname!r}"
+                    else:
+                        message = f"toctree contains reference to nonexisting document {docname!r}"
+
+                    node_list.append(doctree.reporter.warning(message))
+                    app.env.note_reread()
                 else:
-                    message = f"toctree contains reference to nonexisting document {docname!r}"
+                    subnode["entries"].append((title, docname))
+                    subnode["includefiles"].append(docname)
 
-                node_list.append(doctree.reporter.warning(message))
-                app.env.note_reread()
-            else:
-                subnode["entries"].append((title, docname))
-                subnode["includefiles"].append(docname)
+            elif isinstance(entry, GlobItem):
+                patname = docname_join(app.env.docname, str(entry))
+                docnames = sorted(patfilter(all_docnames, patname))
+                for docname in docnames:
+                    all_docnames.remove(docname)  # don't include it again
+                    subnode["entries"].append((None, docname))
+                    subnode["includefiles"].append(docname)
+                if not docnames:
+                    node_list.append(
+                        doctree.reporter.warning(
+                            f"toctree glob pattern '{entry}' didn't match any documents"
+                        )
+                    )
 
         # reversing entries can be useful when globbing
         if toctree.reversed:

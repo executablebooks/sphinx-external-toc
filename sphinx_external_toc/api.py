@@ -8,6 +8,14 @@ from attr.validators import instance_of, deep_iterable, optional
 import yaml
 
 
+class RefItem(str):
+    """A document name in a toctree list."""
+
+
+class GlobItem(str):
+    """A document glob in a toctree list."""
+
+
 @attr.s(slots=True)
 class UrlItem:
     """A URL in a toctree."""
@@ -21,8 +29,10 @@ class TocItem:
     """An individual toctree within a document."""
 
     # TODO validate uniqueness of docnames (at least one item)
-    sections: List[Union[str, UrlItem]] = attr.ib(
-        validator=deep_iterable(instance_of((str, UrlItem)), instance_of(list))
+    sections: List[Union[GlobItem, RefItem, UrlItem]] = attr.ib(
+        validator=deep_iterable(
+            instance_of((GlobItem, RefItem, UrlItem)), instance_of(list)
+        )
     )
     caption: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
     numbered: Union[bool, int] = attr.ib(False, validator=instance_of((bool, int)))
@@ -31,7 +41,7 @@ class TocItem:
     reversed: bool = attr.ib(False, validator=instance_of(bool))
 
     def docnames(self) -> List[str]:
-        return [section for section in self.sections if isinstance(section, str)]
+        return [section for section in self.sections if isinstance(section, RefItem)]
 
 
 @attr.s(slots=True)
@@ -53,14 +63,21 @@ class DocItem:
 class SiteMap(MutableMapping):
     """A mapping of documents to their toctrees (or None if terminal)."""
 
-    def __init__(self, root: DocItem) -> None:
+    def __init__(self, root: DocItem, meta: Optional[Dict[str, Any]] = None) -> None:
         self._docs: Dict[str, DocItem] = {}
         self[root.docname] = root
         self._root: DocItem = root
+        self._meta: Dict[str, Any] = meta or {}
 
     @property
     def root(self) -> DocItem:
+        """Return the root document."""
         return self._root
+
+    @property
+    def meta(self) -> Dict[str, Any]:
+        """Return the site-map metadata."""
+        return self._meta
 
     def __getitem__(self, docname: str) -> DocItem:
         return self._docs[docname]
@@ -80,10 +97,29 @@ class SiteMap(MutableMapping):
     def __len__(self) -> int:
         return len(self._docs)
 
-    def as_json(self, root_key: str = "_root") -> Dict[str, Any]:
-        dct = {k: attr.asdict(v) if v else v for k, v in self._docs.items()}
+    @staticmethod
+    def _serializer(inst: Any, field: attr.Attribute, value: Any) -> Any:
+        """Serialize to JSON compatible value.
+
+        (parsed to ``attr.asdict``)
+        """
+        if isinstance(value, (GlobItem, RefItem)):
+            return str(value)
+        return value
+
+    def as_json(
+        self, root_key: str = "_root", meta_key: str = "_meta"
+    ) -> Dict[str, Any]:
+        """Return JSON serialized site-map representation."""
+        dct = {
+            k: attr.asdict(v, value_serializer=self._serializer) if v else v
+            for k, v in self._docs.items()
+        }
         assert root_key not in dct
         dct[root_key] = self.root.docname
+        if self.meta:
+            assert meta_key not in dct
+            dct[meta_key] = self.meta
         return dct
 
 
@@ -107,7 +143,7 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
 
     doc_item, docs_list = _parse_doc_item(data["main"], defaults, "main/")
 
-    site_map = SiteMap(root=doc_item)
+    site_map = SiteMap(root=doc_item, meta=data.get("meta"))
 
     _parse_docs_list(docs_list, site_map, defaults, "main/")
 
@@ -131,13 +167,13 @@ def _parse_doc_item(
     if not isinstance(parts_data, Sequence):
         raise MalformedError(f"'parts' not a sequence: '{path}'")
 
-    _known_link_keys = {"url", "doc"}
+    _known_link_keys = {"url", "doc", "glob"}
 
     parts = []
     for part_idx, part in enumerate(parts_data):
 
         # generate sections list
-        sections: List[Union[str, UrlItem]] = []
+        sections: List[Union[GlobItem, RefItem, UrlItem]] = []
         for sect_idx, section in enumerate(part["sections"]):
             link_keys = _known_link_keys.intersection(section)
             if not link_keys:
@@ -150,10 +186,12 @@ def _parse_doc_item(
                     "toctree section contains incompatible keys "
                     f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
                 )
-            if link_keys == {"url"}:
+            if link_keys == {"doc"}:
+                sections.append(RefItem(section["doc"]))
+            elif link_keys == {"glob"}:
+                sections.append(GlobItem(section["glob"]))
+            elif link_keys == {"url"}:
                 sections.append(UrlItem(section["url"], section.get("title")))
-            else:
-                sections.append(section["doc"])
 
         # generate toc key-word arguments
         keywords = {}
