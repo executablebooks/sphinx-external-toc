@@ -25,50 +25,50 @@ external_toc_path = "_toc.yml"  # optional
 
 ### Basic Structure
 
-A minimal ToC defines the top level `main` key, and a single root document page:
+A minimal ToC defines the top level `main` key, and a single root document file:
 
 ```yaml
 main:
-  doc: intro
+  file: intro
 ```
 
-The value of the `doc` key will be a path to a file (relative to the `conf.py`) with or without the file extension.
+The value of the `file` key will be a path to a file (relative to the `conf.py`) with or without the file extension.
 
 ```{important}
-Each document can only occur once in the ToC!
+Each document file can only occur once in the ToC!
 ```
 
-Document pages can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list of children links, that are one of: `doc`, `url` or `glob`:
+Document files can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list of children links, that are one of: `file`, `url` or `glob`:
 
-- `doc`: relating to a single document page (as above)
-- `glob`: relating to one or more document pages *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
-- `url`: relating to an external URL (`http` or `https`)
+- `file`: relating to a single document file
+- `glob`: relating to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
+- `url`: relating to an external URL (e.g. `http` or `https`)
 
 This can proceed recursively to any depth.
 
 ```yaml
 main:
-  doc: intro
+  file: intro
   parts:
   - sections:
-    - doc: doc1
+    - file: doc1
       parts:
       - sections:
-        - doc: doc2
+        - file: doc2
         - url: https://example.com
         - glob: other*
 ```
 
-As a shorthand, the `sections` key can be at the same level as the `doc`, which denotes a document with a single `part`.
+As a shorthand, the `sections` key can be at the same level as the `file`, which denotes a document with a single `part`.
 For example, this file is exactly equivalent to the one above:
 
 ```yaml
 main:
-  doc: intro
+  file: intro
   sections:
-  - doc: doc1
+  - file: doc1
     sections:
-    - doc: doc2
+    - file: doc2
     - url: https://example.com
     - glob: other*
 ```
@@ -81,12 +81,12 @@ Each part can also have a `caption`, e.g. for use in ToC side-bars:
 
 ```yaml
 main:
-  doc: intro
+  file: intro
   title: Introduction
   parts:
   - caption: Part Caption
     sections:
-    - doc: doc1
+    - file: doc1
     - url: https://example.com
       title: Example Site
 ```
@@ -97,12 +97,12 @@ You can automatically add numbers to all docs with a part by adding the `numbere
 
 ```yaml
 main:
-  doc: intro
+  file: intro
   parts:
   - numbered: true
     sections:
-    - doc: doc1
-    - doc: doc2
+    - file: doc1
+    - file: doc2
 ```
 
 You can also **limit the TOC numbering depth** by setting the `numbered` flag to an integer instead of `true`, e.g., `numbered: 3`.
@@ -115,15 +115,45 @@ To have e.g. `numbered` added to all toctrees, set it in under a `defaults` top-
 defaults:
   numbered: true
 main:
-  doc: intro
+  file: intro
   sections:
-  - doc: doc1
+  - file: doc1
     sections:
-    - doc: doc2
+    - file: doc2
     - url: https://example.com
 ```
 
 Available keys: `numbered`, `titlesonly`, `reversed`
+
+## Command-line
+
+This package comes with the `sphinx-etoc` command-line program, with some additional tools.
+
+To see all options:
+
+```console
+$ sphinx-etoc --help
+```
+
+To build a template site from only a ToC file:
+
+```console
+$ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
+```
+
+Note, when using `glob` you can also add additional files in `meta`/`create_additional`, e.g.
+
+```yaml
+main:
+  file: intro
+  sections:
+  - glob: doc*
+meta:
+  create_additional:
+  - doc1
+  - doc2
+  - doc3
+```
 
 ## API
 
@@ -155,36 +185,6 @@ intro:
     - doc1
     titlesonly: true
   title: Introduction
-```
-
-## Command-line
-
-This package comes with the `sphinx-etoc` command-line program, with some additional tools.
-
-To see all options:
-
-```console
-$ sphinx-etoc --help
-```
-
-To build a template site from only a ToC file:
-
-```console
-$ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
-```
-
-Note, when using `glob` you can also add additional files in `meta`/`create_additional`, e.g.
-
-```yaml
-main:
-  doc: intro
-  sections:
-  - glob: doc*
-meta:
-  create_additional:
-  - doc1
-  - doc2
-  - doc3
 ```
 
 ## Development Notes

@@ -1,5 +1,5 @@
 main:
-  doc: intro
+  file: intro
   title: Introduction
   sections:
   - glob: doc*
