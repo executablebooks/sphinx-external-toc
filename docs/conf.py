@@ -6,7 +6,8 @@ author = "Executable Book Project"
 
 extensions = ["myst_parser", "sphinx_external_toc"]
 
-master_doc = "intro"
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
 html_theme = "sphinx_book_theme"
 html_theme_options = {
     "home_page_in_toc": True,

@@ -11,11 +11,13 @@ if TYPE_CHECKING:
 
 def setup(app: "Sphinx") -> dict:
     """Initialize the Sphinx extension."""
-    from .events import append_toctrees, parse_toc_to_env
+    from .events import add_changed_toctrees, append_toctrees, parse_toc_to_env
 
     app.add_config_value("external_toc_path", "_toc.yml", "env")
-    app.connect("builder-inited", parse_toc_to_env)
-    # TODO add docs with changed toctrees to changed in event.env-get-outdated
+    # Note: this cannot be a builder-inited event, since
+    # if we change the master_doc it will always re-build everything
+    app.connect("config-inited", parse_toc_to_env)
+    app.connect("env-get-outdated", add_changed_toctrees)
     # Note, this needs to occur before `TocTreeCollector.process_doc` (default priority 500)
     app.connect("doctree-read", append_toctrees, priority=100)
 
