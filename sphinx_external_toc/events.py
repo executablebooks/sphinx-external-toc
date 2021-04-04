@@ -1,24 +1,56 @@
 """Sphinx event functions."""
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Set
 
 from docutils.nodes import document, compound as compound_node
 from sphinx.addnodes import toctree as toctree_node
 from sphinx.application import Sphinx
+from sphinx.config import Config
+from sphinx.environment import BuildEnvironment
+from sphinx.errors import ExtensionError
 from sphinx.transforms import SphinxTransform
+from sphinx.util import logging
 from sphinx.util.matching import Matcher
 
 from .api import DocItem, SiteMap, UrlItem, parse_toc_file
 
+logger = logging.getLogger(__name__)
 
-def parse_toc_to_env(app: Sphinx) -> None:
+
+def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     """Parse the external toc file and store it in the Sphinx environment."""
-    # TODO convert exceptions to sphinx warnings (particularly MalformedError)
-    site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
-    # TODO check if already external_site_map exists and compare to identify changed tocs/docs
-    app.env.external_site_map = site_map
-    # Update the master_doc to the root doc  # TODO warn if different?
-    app.config["master_doc"] = site_map.root.docname
+    try:
+        site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
+    except Exception as exc:
+        raise ExtensionError(f"External ToC: {exc}") from exc
+    config.external_site_map = site_map
+    # Update the master_doc to the root doc of the site map
+    if config["master_doc"] != site_map.root.docname:
+        logger.info("External ToC: Changing master_doc to '%s'", site_map.root.docname)
+    config["master_doc"] = site_map.root.docname
+
+
+def add_changed_toctrees(
+    app: Sphinx,
+    env: BuildEnvironment,
+    added: Set[str],
+    changed: Set[str],
+    removed: Set[str],
+) -> Set[str]:
+    """Add docs with new or changed toctrees to changed list."""
+    previous_map = getattr(app.env, "external_site_map", None)
+    # move external_site_map from config to env
+    app.env.external_site_map = site_map = app.config.external_site_map
+    # Compare to previous map, to record docnames with new or changed toctrees
+    changed_docs = set()
+    if previous_map:
+        for docname in site_map:
+            if (
+                docname not in previous_map
+                or site_map[docname] != previous_map[docname]
+            ):
+                changed_docs.add(docname)
+    return changed_docs
 
 
 def append_toctrees(app: Sphinx, doctree: document) -> None:
