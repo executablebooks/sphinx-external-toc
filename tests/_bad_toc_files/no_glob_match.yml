@@ -1,0 +1,6 @@
+main:
+  file: intro
+  sections:
+  - glob: doc*
+meta:
+  expected_warning: toctree glob pattern

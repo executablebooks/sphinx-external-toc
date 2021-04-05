@@ -76,3 +76,17 @@ def test_contains_toctree(tmp_path: Path, sphinx_build_factory):
     builder = sphinx_build_factory(src_dir)
     builder.build(assert_pass=False)
     assert sitemap.meta["expected_warning"] in builder.warnings
+
+
+def test_no_glob_match(tmp_path: Path, sphinx_build_factory):
+    """Test for warning if glob pattern does not match any files."""
+    path = Path(__file__).parent.joinpath("_bad_toc_files", "no_glob_match.yml")
+    src_dir = tmp_path / "srcdir"
+    # write document files
+    sitemap = create_site_from_toc(path, root_path=src_dir)
+    # write conf.py
+    src_dir.joinpath("conf.py").write_text(CONF_CONTENT, encoding="utf8")
+    # run sphinx
+    builder = sphinx_build_factory(src_dir)
+    builder.build(assert_pass=False)
+    assert sitemap.meta["expected_warning"] in builder.warnings
