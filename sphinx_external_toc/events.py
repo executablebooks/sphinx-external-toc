@@ -1,8 +1,8 @@
 """Sphinx event functions."""
 from pathlib import Path
-from typing import Optional, Set
+from typing import List, Optional, Set
 
-from docutils.nodes import document, compound as compound_node
+from docutils import nodes
 from sphinx.addnodes import toctree as toctree_node
 from sphinx.application import Sphinx
 from sphinx.config import Config
@@ -15,6 +15,32 @@ from sphinx.util.matching import Matcher, patfilter
 from .api import DocItem, GlobItem, RefItem, SiteMap, UrlItem, parse_toc_file
 
 logger = logging.getLogger(__name__)
+
+
+def create_warning(
+    app: Sphinx,
+    doctree: nodes.document,
+    category: str,
+    message: str,
+    *,
+    line: Optional[int] = None,
+    append_to: Optional[nodes.Element] = None,
+    wtype: str = "etoc",
+) -> Optional[nodes.system_message]:
+    """Generate a warning, logging it if necessary.
+
+    If the warning type is listed in the ``suppress_warnings`` configuration,
+    then ``None`` will be returned and no warning logged.
+    """
+    message = f"{message} [{wtype}.{category}]"
+    kwargs = {"line": line} if line is not None else {}
+
+    if not logging.is_suppressed_warning(wtype, category, app.config.suppress_warnings):
+        msg_node = doctree.reporter.warning(message, **kwargs)
+        if append_to is not None:
+            append_to.append(msg_node)
+        return msg_node
+    return None
 
 
 def parse_toc_to_env(app: Sphinx, config: Config) -> None:
@@ -53,11 +79,21 @@ def add_changed_toctrees(
     return changed_docs
 
 
-def append_toctrees(app: Sphinx, doctree: document) -> None:
+def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     """Create the toctree nodes and add it to the document.
 
     Adapted from `sphinx/directives/other.py::TocTree`
     """
+    # check for existing toctrees and raise warning
+    for node in doctree.traverse(toctree_node):
+        create_warning(
+            app,
+            doctree,
+            "toctree",
+            "toctree directive not expected with external-toc",
+            line=node.line,
+        )
+
     site_map: SiteMap = app.env.external_site_map
     doc_item: Optional[DocItem] = site_map.get(app.env.docname)
 
@@ -87,10 +123,10 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
         subnode["includehidden"] = False
         subnode["numbered"] = toctree.numbered
         subnode["titlesonly"] = toctree.titlesonly
-        wrappernode = compound_node(classes=["toctree-wrapper"])
+        wrappernode = nodes.compound(classes=["toctree-wrapper"])
         wrappernode.append(subnode)
 
-        node_list = []
+        node_list: List[nodes.Element] = []
 
         for entry in toctree.sections:
 
@@ -116,7 +152,7 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
                     else:
                         message = f"toctree contains reference to nonexisting document {docname!r}"
 
-                    node_list.append(doctree.reporter.warning(message))
+                    create_warning(app, doctree, "ref", message, append_to=node_list)
                     app.env.note_reread()
                 else:
                     subnode["entries"].append((title, docname))
@@ -130,11 +166,10 @@ def append_toctrees(app: Sphinx, doctree: document) -> None:
                     subnode["entries"].append((None, docname))
                     subnode["includefiles"].append(docname)
                 if not docnames:
-                    node_list.append(
-                        doctree.reporter.warning(
-                            f"toctree glob pattern '{entry}' didn't match any documents"
-                        )
+                    message = (
+                        f"toctree glob pattern '{entry}' didn't match any documents"
                     )
+                    create_warning(app, doctree, "glob", message, append_to=node_list)
 
         # reversing entries can be useful when globbing
         if toctree.reversed:
