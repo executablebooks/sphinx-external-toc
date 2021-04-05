@@ -143,7 +143,7 @@ To build a template site from only a ToC file:
 $ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
 ```
 
-Note, when using `glob` you can also add additional files in `meta`/`create_additional`, e.g.
+Note, you can also add additional files in `meta`/`create_files` amd append text to the end of files with `meta`/`create_append`, e.g.
 
 ```yaml
 main:
@@ -151,7 +151,11 @@ main:
   sections:
   - glob: doc*
 meta:
-  create_additional:
+  create_append:
+    intro: |
+      This is some
+      extra text
+  create_files:
   - doc1
   - doc2
   - doc3

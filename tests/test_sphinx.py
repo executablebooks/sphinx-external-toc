@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-import shutil
 
 import pytest
 from sphinx.testing.util import SphinxTestApp
@@ -24,7 +23,8 @@ class SphinxBuild:
 
     def build(self, assert_pass=True):
         self.app.build()
-        assert self.warnings == "", self.status
+        if assert_pass:
+            assert self.warnings == "", self.status
         return self
 
     @property
@@ -52,15 +52,27 @@ def sphinx_build_factory(make_app):
 @pytest.mark.parametrize(
     "path", TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES]
 )
-def test_sphinx_build(path: Path, tmp_path: Path, sphinx_build_factory):
+def test_success(path: Path, tmp_path: Path, sphinx_build_factory):
+    """Test successful builds."""
     src_dir = tmp_path / "srcdir"
-    src_dir.mkdir()
-    # copy toc to temp
-    shutil.copyfile(path, src_dir / "_toc.yml")
-    # write conf.py
-    src_dir.joinpath("conf.py").write_text(CONF_CONTENT, encoding="utf8")
     # write document files
     create_site_from_toc(path, root_path=src_dir)
+    # write conf.py
+    src_dir.joinpath("conf.py").write_text(CONF_CONTENT, encoding="utf8")
     # run sphinx
     builder = sphinx_build_factory(src_dir)
     builder.build()
+
+
+def test_contains_toctree(tmp_path: Path, sphinx_build_factory):
+    """Test for warning if ``toctree`` directive in file."""
+    path = Path(__file__).parent.joinpath("_bad_toc_files", "contains_toctree.yml")
+    src_dir = tmp_path / "srcdir"
+    # write document files
+    sitemap = create_site_from_toc(path, root_path=src_dir)
+    # write conf.py
+    src_dir.joinpath("conf.py").write_text(CONF_CONTENT, encoding="utf8")
+    # run sphinx
+    builder = sphinx_build_factory(src_dir)
+    builder.build(assert_pass=False)
+    assert sitemap.meta["expected_warning"] in builder.warnings

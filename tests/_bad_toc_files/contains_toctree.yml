@@ -1,0 +1,11 @@
+main:
+  file: intro
+meta:
+  create_files:
+  - doc1
+  create_append:
+    intro: |
+      .. toctree::
+
+         doc1
+  expected_warning: toctree directive not expected
