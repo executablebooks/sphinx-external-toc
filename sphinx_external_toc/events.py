@@ -8,7 +8,6 @@ from sphinx.application import Sphinx
 from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
 from sphinx.errors import ExtensionError
-from sphinx.transforms import SphinxTransform
 from sphinx.util import docname_join, logging
 from sphinx.util.matching import Matcher, patfilter
 
@@ -182,34 +181,3 @@ def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         # since `TocTreeCollector.process_doc` expects it in a section
         # TODO check if there is this is always ok
         doctree.children[-1].extend(node_list)
-
-
-# other implementations that can eventually be deleted.
-
-
-class _AppendToctrees(SphinxTransform):
-    """This is not used and would be an alternate route,
-    to using the 'doctree-read' event, via`app.add_transform(_AppendToctrees)`
-    """
-
-    default_priority = 100
-
-    def apply(self, **kwargs) -> None:
-        append_toctrees(self.app, self.document)
-
-
-def _modify_source(app, docname, source):
-    """This is not used, but would be the implementation if using:
-    app.connect("source-read", _modify_source)
-    """
-    site_map = app.env.external_site_map
-    doc_item = site_map.get(app.env.docname)
-
-    if doc_item is None or not doc_item.parts:
-        return
-
-    for toctree in doc_item.parts:
-        entries = "\n".join(
-            entry for entry in toctree.sections if isinstance(entry, str)
-        )
-        source[0] += f"```{{toctree}}\n{entries}\n```\n"
