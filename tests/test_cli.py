@@ -30,6 +30,8 @@ def test_version(invoke_cli):
 
 def test_parse_toc(invoke_cli):
     print(list(Path(__file__).parent.glob("*")))
+    print(list(Path(__file__).parent.joinpath("_toc_files").glob("*")))
+    print(Path(__file__).parent.joinpath("_toc_files", "basic.yml").exists())
     path = os.path.abspath(Path(__file__).parent.joinpath("_toc_files", "basic.yml"))
     result = invoke_cli(parse_toc, path)
     assert "intro" in result.output
