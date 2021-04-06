@@ -1,6 +1,5 @@
 from itertools import chain
 from pathlib import Path, PurePosixPath
-from os import linesep
 import shutil
 from typing import Mapping, Optional, Sequence, Union
 
@@ -73,6 +72,8 @@ def create_site_from_toc(
         if extra_lines:
             content.extend(extra_lines + [""])
 
-        docpath.write_text(linesep.join(content), encoding=encoding)
+        # note \n works when writing for all platforms:
+        # https://docs.python.org/3/library/os.html#os.linesep
+        docpath.write_text("\n".join(content), encoding=encoding)
 
     return site_map

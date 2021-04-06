@@ -11,5 +11,5 @@ main:
       - file: doc3
         parts:
         - sections:
-          - file: doc4
+          - file: subfolder/doc4
           - url: https://example.com

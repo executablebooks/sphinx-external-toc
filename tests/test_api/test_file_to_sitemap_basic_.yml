@@ -14,14 +14,10 @@ doc3:
     numbered: false
     reversed: false
     sections:
-    - doc4
+    - subfolder/doc4
     - title: null
       url: https://example.com
     titlesonly: true
-  title: null
-doc4:
-  docname: doc4
-  parts: []
   title: null
 intro:
   docname: intro
@@ -35,3 +31,7 @@ intro:
     - doc3
     titlesonly: true
   title: Introduction
+subfolder/doc4:
+  docname: subfolder/doc4
+  parts: []
+  title: null

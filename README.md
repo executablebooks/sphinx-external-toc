@@ -228,14 +228,13 @@ Process:
 - Read toc ("builder-inited" event), error if toc not found
   - Note, in jupyter-book: if index page does not exist, works out first page from toc and creates an index page that just redirects to it)
 - adds toctree node to page doctree after it is parsed ("doctree-read" event)
-  - Note, in jupyter-book this was done by physically addingto the text before parsing ("source-read" event), but this is not as robust.
+  - Note, in jupyter-book this was done by physically adding to the text before parsing ("source-read" event), but this is not as robust.
 
 Questions / TODOs:
 
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
 - Add additional top-level keys, e.g. `appendices` and `bibliography`
-- testing against Windows (including toc with subfolders)
 - Add tests for "bad" toc files
 - Using `external_toc_exclude_missing` to exclude a certain file suffix:
   currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,
