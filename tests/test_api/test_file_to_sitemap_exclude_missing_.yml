@@ -1,0 +1,21 @@
+_meta:
+  create_files:
+  - doc2
+  - subfolder/other1
+  exclude_missing: true
+_root: intro
+doc1:
+  docname: doc1
+  parts: []
+  title: null
+intro:
+  docname: intro
+  parts:
+  - caption: null
+    numbered: false
+    reversed: false
+    sections:
+    - doc1
+    - subfolder/other*
+    titlesonly: true
+  title: null

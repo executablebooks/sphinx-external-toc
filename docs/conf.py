@@ -7,6 +7,7 @@ author = "Executable Book Project"
 extensions = ["myst_parser", "sphinx_external_toc"]
 
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+external_toc_exclude_missing = True
 
 html_theme = "sphinx_book_theme"
 html_theme_options = {

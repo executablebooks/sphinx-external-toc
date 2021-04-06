@@ -13,12 +13,16 @@ def setup(app: "Sphinx") -> dict:
     """Initialize the Sphinx extension."""
     from .events import add_changed_toctrees, append_toctrees, parse_toc_to_env
 
+    # variables
     app.add_config_value("external_toc_path", "_toc.yml", "env")
-    # Note: this cannot be a builder-inited event, since
-    # if we change the master_doc it will always re-build everything
-    app.connect("config-inited", parse_toc_to_env)
+    app.add_config_value("external_toc_exclude_missing", False, "env")
+
+    # Note: this needs to occur after merge_source_suffix event (priority 800)
+    # this cannot be a builder-inited event, since if we change the master_doc
+    # it will always mark the config as changed in the env setup and re-build everything
+    app.connect("config-inited", parse_toc_to_env, priority=900)
     app.connect("env-get-outdated", add_changed_toctrees)
-    # Note, this needs to occur before `TocTreeCollector.process_doc` (default priority 500)
+    # Note: this needs to occur before `TocTreeCollector.process_doc` (default priority 500)
     app.connect("doctree-read", append_toctrees, priority=100)
 
     return {"version": __version__, "parallel_read_safe": True}

@@ -1,15 +1,20 @@
 """ """
 from collections.abc import MutableMapping
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Union
 
 import attr
 from attr.validators import instance_of, deep_iterable, optional
 import yaml
 
 
-class RefItem(str):
-    """A document name in a toctree list."""
+class FileItem(str):
+    """A document path in a toctree list.
+
+    This should be in Posix format (folders split by ``/``),
+    relative to the source directory,
+    and can be with or without extension.
+    """
 
 
 class GlobItem(str):
@@ -29,9 +34,9 @@ class TocItem:
     """An individual toctree within a document."""
 
     # TODO validate uniqueness of docnames (at least one item)
-    sections: List[Union[GlobItem, RefItem, UrlItem]] = attr.ib(
+    sections: List[Union[GlobItem, FileItem, UrlItem]] = attr.ib(
         validator=deep_iterable(
-            instance_of((GlobItem, RefItem, UrlItem)), instance_of(list)
+            instance_of((GlobItem, FileItem, UrlItem)), instance_of(list)
         )
     )
     caption: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
@@ -40,8 +45,15 @@ class TocItem:
     titlesonly: bool = attr.ib(True, validator=instance_of(bool))
     reversed: bool = attr.ib(False, validator=instance_of(bool))
 
-    def docnames(self) -> List[str]:
-        return [section for section in self.sections if isinstance(section, RefItem)]
+    def files(self) -> List[str]:
+        return [
+            str(section) for section in self.sections if isinstance(section, FileItem)
+        ]
+
+    def globs(self) -> List[str]:
+        return [
+            str(section) for section in self.sections if isinstance(section, GlobItem)
+        ]
 
 
 @attr.s(slots=True)
@@ -55,9 +67,13 @@ class DocItem:
         factory=list, validator=deep_iterable(instance_of(TocItem), instance_of(list))
     )
 
-    def children(self) -> List[str]:
-        """Return all children docs."""
-        return [name for part in self.parts for name in part.docnames()]
+    def child_files(self) -> List[str]:
+        """Return all children files."""
+        return [name for part in self.parts for name in part.files()]
+
+    def child_globs(self) -> List[str]:
+        """Return all children globs."""
+        return [name for part in self.parts for name in part.globs()]
 
 
 class SiteMap(MutableMapping):
@@ -78,6 +94,10 @@ class SiteMap(MutableMapping):
     def meta(self) -> Dict[str, Any]:
         """Return the site-map metadata."""
         return self._meta
+
+    def globs(self) -> Set[str]:
+        """Return set of all globs present across all toctrees."""
+        return {glob for item in self._docs.values() for glob in item.child_globs()}
 
     def __getitem__(self, docname: str) -> DocItem:
         return self._docs[docname]
@@ -103,7 +123,7 @@ class SiteMap(MutableMapping):
 
         (parsed to ``attr.asdict``)
         """
-        if isinstance(value, (GlobItem, RefItem)):
+        if isinstance(value, (GlobItem, FileItem)):
             return str(value)
         return value
 
@@ -173,7 +193,7 @@ def _parse_doc_item(
     for part_idx, part in enumerate(parts_data):
 
         # generate sections list
-        sections: List[Union[GlobItem, RefItem, UrlItem]] = []
+        sections: List[Union[GlobItem, FileItem, UrlItem]] = []
         for sect_idx, section in enumerate(part["sections"]):
             link_keys = _known_link_keys.intersection(section)
             if not link_keys:
@@ -187,7 +207,7 @@ def _parse_doc_item(
                     f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
                 )
             if link_keys == {"file"}:
-                sections.append(RefItem(section["file"]))
+                sections.append(FileItem(section["file"]))
             elif link_keys == {"glob"}:
                 sections.append(GlobItem(section["glob"]))
             elif link_keys == {"url"}:

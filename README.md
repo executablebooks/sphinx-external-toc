@@ -8,7 +8,7 @@ A sphinx extension that allows the documentation toctree to be defined in a sing
 
 In normal Sphinx documentation, the documentation structure is defined *via* a bottom-up approach - adding [`toctree` directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) within pages of the documentation.
 
-This extension facilitates a **top-down** approach to defining the Table of Contents (ToC) structure, within a single file that is external to the documentation.
+This extension facilitates a **top-down** approach to defining the Table of Contents (ToC) structure, within a single YAML file that is external to the documentation.
 
 ## User Guide
 
@@ -19,6 +19,7 @@ Add to your `conf.py`:
 ```python
 extensions = ["sphinx_external_toc"]
 external_toc_path = "_toc.yml"  # optional, default: _toc.yml
+external_toc_exclude_missing = False  # optional, default: False
 ```
 
 ### Basic Structure
@@ -30,17 +31,21 @@ main:
   file: intro
 ```
 
-The value of the `file` key will be a path to a file (relative to the `conf.py`) with or without the file extension.
+The value of the `file` key will be a path to a file, in Unix format (folders split by `/`), relative to the source directory, and can be with or without the file extension.
 
-:::{important}
-Each document file can only occur once in the ToC!
+:::{note}
+This root file will be set as the [`master_doc`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-master_doc).
 :::
 
 Document files can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list of children links, that are one of: `file`, `url` or `glob`:
 
-- `file`: relating to a single document file
+- `file`: relating to a single document file (see above)
 - `glob`: relating to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
 - `url`: relating to an external URL (e.g. `http` or `https`)
+
+:::{important}
+Each document file can only occur once in the ToC!
+:::
 
 This can proceed recursively to any depth.
 
@@ -54,11 +59,11 @@ main:
       - sections:
         - file: doc2
         - url: https://example.com
-        - glob: other*
+        - glob: subfolder/other*
 ```
 
 This is equivalent to having a single `toctree` directive in `intro`, containing `doc1`,
-and a single `toctree` directive in `doc1`, with the `:glob:` flag and containing `doc2`, `https://example.com` and `other*`.
+and a single `toctree` directive in `doc1`, with the `:glob:` flag and containing `doc2`, `https://example.com` and `subfolder/other*`.
 
 As a shorthand, the `sections` key can be at the same level as the `file`, which denotes a document with a single `part`.
 For example, this file is exactly equivalent to the one above:
@@ -71,7 +76,7 @@ main:
     sections:
     - file: doc2
     - url: https://example.com
-    - glob: other*
+    - glob: subfolder/other*
 ```
 
 ### Titles and Captions
@@ -111,7 +116,7 @@ You can also **limit the TOC numbering depth** by setting the `numbered` flag to
 
 ### Defaults
 
-To have e.g. `numbered` added to all toctrees, set it in under a `defaults` top-level key:
+To have e.g. `numbered` added to all toctrees, set it under a `defaults` top-level key:
 
 ```yaml
 defaults:
@@ -126,6 +131,22 @@ main:
 ```
 
 Available keys: `numbered`, `titlesonly`, `reversed`
+
+## Excluding files not in ToC
+
+By default, Sphinx will build all document files, regardless of whether they are specified in the Table of Contents, if they:
+
+1. Have a file extension relating to a loaded parser (e.g. `.rst` or `.md`)
+2. Do not match a pattern in [`exclude_patterns`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-exclude_patterns)
+
+To automatically add any document files that do not match a `file` or `glob` in the ToC to the `exclude_patterns` list, add to your `conf.py`:
+
+```python
+external_toc_exclude_missing = True
+```
+
+Note that, for performance, files that are in *hidden folders* (e.g. in `.tox` or `.venv`) will not be added to `exclude_patterns` even if they are not specified in the ToC.
+You should exclude these folders explicitly.
 
 ## Command-line
 
@@ -215,8 +236,13 @@ Questions / TODOs:
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
 - Add additional top-level keys, e.g. `appendices` and `bibliography`
 - testing against Windows (including toc with subfolders)
-- option to add files not in toc to `ignore_paths` (including glob)
 - Add tests for "bad" toc files
+- Using `external_toc_exclude_missing` to exclude a certain file suffix:
+  currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,
+  it will add `doc.rst` to the excluded patterns but then, when looking for `doc.md`,
+  will still select `doc.rst` (since it is first in `source_suffix`).
+  Maybe open an issue on sphinx, that `doc2path` should respect exclude patterns.
+
 
 [github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
 [github-link]: https://github.com/executablebooks/sphinx-external-toc
