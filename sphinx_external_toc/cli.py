@@ -13,7 +13,7 @@ def main():
 
 
 @main.command("parse-toc")
-@click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
+@click.argument("toc_file", type=click.Path(exists=False, file_okay=True))
 def parse_toc(toc_file):
     """Parse a ToC file to a site-map YAML."""
     site_map = parse_toc_file(toc_file)
@@ -21,7 +21,7 @@ def parse_toc(toc_file):
 
 
 @main.command("create-site")
-@click.argument("toc_file", type=click.Path(exists=False, file_okay=True))
+@click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
 @click.option(
     "-p",
     "--path",
