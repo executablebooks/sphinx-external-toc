@@ -228,7 +228,7 @@ Process:
 - Read toc ("builder-inited" event), error if toc not found
   - Note, in jupyter-book: if index page does not exist, works out first page from toc and creates an index page that just redirects to it)
 - adds toctree node to page doctree after it is parsed ("doctree-read" event)
-  - Note, in jupyter-book this was done by physically addingto the text before parsing ("source-read" event), but this is not as robust.
+  - Note, in jupyter-book this was done by physically adding to the text before parsing ("source-read" event), but this is not as robust.
 
 Questions / TODOs:
 
