@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from click.testing import CliRunner
@@ -31,6 +32,6 @@ def test_version(invoke_cli):
 
 
 def test_parse_toc(invoke_cli):
-    path = Path(__file__).parent.joinpath("_toc_files", "basic.yml").resolve()
+    path = os.path.abspath(Path(__file__).parent.joinpath("_toc_files", "basic.yml"))
     result = invoke_cli(parse_toc, str(path))
     assert "intro" in result.output
