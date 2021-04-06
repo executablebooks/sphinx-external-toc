@@ -73,6 +73,9 @@ def create_site_from_toc(
         if extra_lines:
             content.extend(extra_lines + [""])
 
+        print(linesep.join(content))
+        print()
+
         docpath.write_text(linesep.join(content), encoding=encoding)
 
     return site_map
