@@ -9,9 +9,6 @@ from sphinx_external_toc import __version__
 import pytest
 
 
-# TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
-
-
 @pytest.fixture()
 def invoke_cli():
     """Run CLI and do standard checks."""
@@ -33,5 +30,5 @@ def test_version(invoke_cli):
 
 def test_parse_toc(invoke_cli):
     path = os.path.abspath(Path(__file__).parent.joinpath("_toc_files", "basic.yml"))
-    result = invoke_cli(parse_toc, str(path))
+    result = invoke_cli(parse_toc, path)
     assert "intro" in result.output

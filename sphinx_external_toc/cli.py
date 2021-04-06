@@ -21,7 +21,7 @@ def parse_toc(toc_file):
 
 
 @main.command("create-site")
-@click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
+@click.argument("toc_file", type=click.Path(exists=False, file_okay=True))
 @click.option(
     "-p",
     "--path",
