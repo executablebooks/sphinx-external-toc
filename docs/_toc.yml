@@ -11,3 +11,4 @@ main:
     - file: subfolder/doc3
     - url: https://example.com
       title: Example Link
+  - glob: subglobs/glob*

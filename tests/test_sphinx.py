@@ -8,11 +8,15 @@ from sphinx.testing.path import path as sphinx_path
 from sphinx_external_toc.tools import create_site_from_toc
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
+TOC_FILES_WARN = list(
+    Path(__file__).parent.joinpath("_warning_toc_files").glob("*.yml")
+)
 
 
 CONF_CONTENT = """
 extensions = ["sphinx_external_toc"]
 external_toc_path = "_toc.yml"
+
 """
 
 
@@ -56,31 +60,27 @@ def test_success(path: Path, tmp_path: Path, sphinx_build_factory):
     """Test successful builds."""
     src_dir = tmp_path / "srcdir"
     # write document files
-    create_site_from_toc(path, root_path=src_dir)
+    site_map = create_site_from_toc(path, root_path=src_dir)
+    print(list(src_dir.glob("**/*")))
     # write conf.py
-    src_dir.joinpath("conf.py").write_text(CONF_CONTENT, encoding="utf8")
+    src_dir.joinpath("conf.py").write_text(
+        CONF_CONTENT
+        + (
+            "external_toc_exclude_missing = True"
+            if site_map.meta.get("exclude_missing") is True
+            else ""
+        ),
+        encoding="utf8",
+    )
     # run sphinx
     builder = sphinx_build_factory(src_dir)
     builder.build()
 
 
-def test_contains_toctree(tmp_path: Path, sphinx_build_factory):
-    """Test for warning if ``toctree`` directive in file."""
-    path = Path(__file__).parent.joinpath("_bad_toc_files", "contains_toctree.yml")
-    src_dir = tmp_path / "srcdir"
-    # write document files
-    sitemap = create_site_from_toc(path, root_path=src_dir)
-    # write conf.py
-    src_dir.joinpath("conf.py").write_text(CONF_CONTENT, encoding="utf8")
-    # run sphinx
-    builder = sphinx_build_factory(src_dir)
-    builder.build(assert_pass=False)
-    assert sitemap.meta["expected_warning"] in builder.warnings
-
-
-def test_no_glob_match(tmp_path: Path, sphinx_build_factory):
-    """Test for warning if glob pattern does not match any files."""
-    path = Path(__file__).parent.joinpath("_bad_toc_files", "no_glob_match.yml")
+@pytest.mark.parametrize(
+    "path", TOC_FILES_WARN, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES_WARN]
+)
+def test_warning(path: Path, tmp_path: Path, sphinx_build_factory):
     src_dir = tmp_path / "srcdir"
     # write document files
     sitemap = create_site_from_toc(path, root_path=src_dir)

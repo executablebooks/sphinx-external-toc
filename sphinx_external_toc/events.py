@@ -1,4 +1,5 @@
 """Sphinx event functions."""
+import glob
 from pathlib import Path
 from typing import List, Optional, Set
 
@@ -9,9 +10,9 @@ from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
 from sphinx.errors import ExtensionError
 from sphinx.util import docname_join, logging
-from sphinx.util.matching import Matcher, patfilter
+from sphinx.util.matching import Matcher, patfilter, patmatch
 
-from .api import DocItem, GlobItem, RefItem, SiteMap, UrlItem, parse_toc_file
+from .api import DocItem, GlobItem, FileItem, SiteMap, UrlItem, parse_toc_file
 
 logger = logging.getLogger(__name__)
 
@@ -43,16 +44,55 @@ def create_warning(
 
 
 def parse_toc_to_env(app: Sphinx, config: Config) -> None:
-    """Parse the external toc file and store it in the Sphinx environment."""
+    """Parse the external toc file and store it in the Sphinx environment.
+
+    Also, change the ``master_doc`` and add to ``exclude_patterns`` if necessary.
+    """
+    print(config["exclude_patterns"])
     try:
         site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
     except Exception as exc:
-        raise ExtensionError(f"External ToC: {exc}") from exc
+        raise ExtensionError(f"[etoc] {exc}") from exc
     config.external_site_map = site_map
+
     # Update the master_doc to the root doc of the site map
     if config["master_doc"] != site_map.root.docname:
-        logger.info("External ToC: Changing master_doc to '%s'", site_map.root.docname)
+        logger.info("[etoc] Changing master_doc to '%s'", site_map.root.docname)
     config["master_doc"] = site_map.root.docname
+
+    if config["external_toc_exclude_missing"]:
+        # add files not specified in ToC file to exclude list
+        new_excluded: List[str] = []
+        already_excluded = Matcher(config["exclude_patterns"])
+        for suffix in config["source_suffix"]:
+            # recurse files in source directory, with this suffix, note
+            # we do not use `Path.glob` here, since it does not ignore hidden files:
+            # https://stackoverflow.com/questions/49862648/why-do-glob-glob-and-pathlib-path-glob-treat-hidden-files-differently
+            for path_str in glob.iglob(
+                str(Path(app.srcdir) / "**" / f"*[{suffix}]"), recursive=True
+            ):
+                path = Path(path_str)
+                if not path.is_file():
+                    continue
+                posix = path.relative_to(app.srcdir).as_posix()
+                possix_no_suffix = posix[: -len(suffix)]
+                if not (
+                    # files can be stored with or without suffixes
+                    posix in site_map
+                    or possix_no_suffix in site_map
+                    # ignore anything already excluded
+                    or already_excluded(posix)
+                    # don't exclude docnames matching globs
+                    or any(patmatch(possix_no_suffix, pat) for pat in site_map.globs())
+                ):
+                    new_excluded.append(posix)
+        if new_excluded:
+            logger.info(
+                "[etoc] Excluded %s extra file(s) not in toc", len(new_excluded)
+            )
+            logger.debug("[etoc] Excluded extra file(s) not in toc: %r", new_excluded)
+            # Note, don't `extend` list, as it alters the default `Config.config_values`
+            config["exclude_patterns"] = config["exclude_patterns"] + new_excluded
 
 
 def add_changed_toctrees(
@@ -133,7 +173,7 @@ def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
                 subnode["entries"].append((entry.title, entry.url))
 
-            elif isinstance(entry, RefItem):
+            elif isinstance(entry, FileItem):
 
                 child_doc_item = site_map[entry]
                 docname = docname_join(app.env.docname, str(entry))
