@@ -1,0 +1,7 @@
+main:
+  file: intro
+meta:
+  create_append:
+    intro: |
+      .. tableofcontents::
+  expected_warning: tableofcontents directive in document with no descendants

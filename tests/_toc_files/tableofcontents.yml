@@ -1,0 +1,12 @@
+main:
+  file: intro
+  parts:
+  - sections:
+    - file: doc1
+  - sections:
+    - file: doc2
+meta:
+  create_append:
+    intro: |
+      .. tableofcontents::
+  regress: intro

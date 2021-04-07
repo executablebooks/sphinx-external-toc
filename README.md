@@ -241,7 +241,7 @@ Questions / TODOs:
   it will add `doc.rst` to the excluded patterns but then, when looking for `doc.md`,
   will still select `doc.rst` (since it is first in `source_suffix`).
   Maybe open an issue on sphinx, that `doc2path` should respect exclude patterns.
-
+- Intergrate https://github.com/executablebooks/sphinx-multitoc-numbering into this extension? (or upstream PR)
 
 [github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
 [github-link]: https://github.com/executablebooks/sphinx-external-toc

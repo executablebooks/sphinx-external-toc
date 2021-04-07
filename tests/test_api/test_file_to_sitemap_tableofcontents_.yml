@@ -1,4 +1,8 @@
 _meta:
+  create_append:
+    intro: '.. tableofcontents::
+
+      '
   regress: intro
 _root: intro
 doc1:
@@ -9,31 +13,19 @@ doc2:
   docname: doc2
   parts: []
   title: null
-doc3:
-  docname: doc3
+intro:
+  docname: intro
   parts:
   - caption: null
     numbered: false
     reversed: false
     sections:
-    - doc4
-    - title: null
-      url: https://example.com
+    - doc1
     titlesonly: true
-  title: null
-doc4:
-  docname: doc4
-  parts: []
-  title: null
-intro:
-  docname: intro
-  parts:
   - caption: null
-    numbered: true
+    numbered: false
     reversed: false
     sections:
-    - doc1
     - doc2
-    - doc3
     titlesonly: true
-  title: Introduction
+  title: null

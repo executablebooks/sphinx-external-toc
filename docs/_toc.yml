@@ -4,11 +4,13 @@ defaults:
 main:
   file: intro
   title: Introduction
-  sections:
-  - file: doc1
-  - file: doc2
-    sections:
-    - file: subfolder/doc3
-    - url: https://example.com
-      title: Example Link
-  - glob: subglobs/glob*
+  parts:
+  - sections:
+    - file: doc1
+    - file: doc2
+      sections:
+      - file: subfolder/doc3
+      - url: https://example.com
+        title: Example Link
+  - sections:
+    - glob: subglobs/glob*

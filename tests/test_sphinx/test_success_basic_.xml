@@ -1,0 +1,6 @@
+<document source="intro">
+    <section ids="heading-intro-rst" names="heading:\ intro.rst">
+        <title>
+            Heading: intro.rst
+        <compound classes="toctree-wrapper">
+            <toctree caption="Part Caption" entries="(None,\ 'doc1') (None,\ 'doc2') (None,\ 'doc3')" glob="False" hidden="True" includefiles="doc1 doc2 doc3" includehidden="False" maxdepth="-1" numbered="True" parent="intro" rawcaption="Part Caption" titlesonly="True">
