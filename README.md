@@ -114,6 +114,11 @@ main:
 
 You can also **limit the TOC numbering depth** by setting the `numbered` flag to an integer instead of `true`, e.g., `numbered: 3`.
 
+:::{note}
+By default, section numbering restarts for each `part`.
+If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
+:::
+
 ### Defaults
 
 To have e.g. `numbered` added to all toctrees, set it under a `defaults` top-level key:
@@ -131,6 +136,26 @@ main:
 ```
 
 Available keys: `numbered`, `titlesonly`, `reversed`
+
+## Add a ToC to a page's content
+
+By default, the `toctree` generated per document (one per `part`) are appended to the end of the document and hidden (then, for example, most HTML themes show them in a side-bar).
+But if you would like them to be visible at a certain place within the document body, you may do so by using the `tableofcontents` directive:
+
+ReStructuredText:
+
+```restructuredtext
+.. tableofcontents::
+```
+
+MyST Markdown:
+
+````md
+```{tableofcontents}
+```
+````
+
+Currently, only one `tableofcontents` should be used per page (all `toctree` will be added here), and only if it is a page with child/descendant documents.
 
 ## Excluding files not in ToC
 
