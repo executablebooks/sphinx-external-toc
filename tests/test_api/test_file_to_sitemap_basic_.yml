@@ -32,7 +32,7 @@ intro:
     - doc2
     - doc3
     titlesonly: true
-  title: Introduction
+  title: null
 subfolder/doc4:
   docname: subfolder/doc4
   parts: []

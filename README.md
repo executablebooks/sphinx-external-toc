@@ -4,11 +4,11 @@
 [![Coverage Status][codecov-badge]][codecov-link]
 [![Code style: black][black-badge]][black-link]
 
-A sphinx extension that allows the documentation toctree to be defined in a single file.
+A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
 
-In normal Sphinx documentation, the documentation structure is defined *via* a bottom-up approach - adding [`toctree` directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) within pages of the documentation.
+In normal Sphinx documentation, the documentation site-map is defined *via* a bottom-up approach - adding [`toctree` directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) within pages of the documentation.
 
-This extension facilitates a **top-down** approach to defining the Table of Contents (ToC) structure, within a single YAML file that is external to the documentation.
+This extension facilitates a **top-down** approach to defining the site-map structure, within a single YAML file.
 
 ## User Guide
 
@@ -24,14 +24,13 @@ external_toc_exclude_missing = False  # optional, default: False
 
 ### Basic Structure
 
-A minimal ToC defines the top level `main` key, and a single root document file:
+A minimal ToC defines the top level `root` key, for a single root document file:
 
 ```yaml
-main:
-  file: intro
+root: intro
 ```
 
-The value of the `file` key will be a path to a file, in Unix format (folders split by `/`), relative to the source directory, and can be with or without the file extension.
+The value of the `root` key will be a path to a file, in Unix format (folders split by `/`), relative to the source directory, and can be with or without the file extension.
 
 :::{note}
 This root file will be set as the [`master_doc`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-master_doc).
@@ -39,9 +38,9 @@ This root file will be set as the [`master_doc`](https://www.sphinx-doc.org/en/m
 
 Document files can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list of children links, that are one of: `file`, `url` or `glob`:
 
-- `file`: relating to a single document file (see above)
-- `glob`: relating to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
-- `url`: relating to an external URL (e.g. `http` or `https`)
+- `file`: path to a single document file in Unix format,  with or without the file extension (as for `root`)
+- `glob`: path to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
+- `url`: path for an external URL (starting e.g. `http` or `https`)
 
 :::{important}
 Each document file can only occur once in the ToC!
@@ -50,16 +49,18 @@ Each document file can only occur once in the ToC!
 This can proceed recursively to any depth.
 
 ```yaml
-main:
-  file: intro
-  parts:
-  - sections:
-    - file: doc1
-      parts:
-      - sections:
-        - file: doc2
-        - url: https://example.com
-        - glob: subfolder/other*
+root: intro
+parts:
+- sections:
+  - file: doc1
+    parts:
+    - sections:
+      - file: doc2
+        parts:
+        - sections:
+          - file: doc3
+  - url: https://example.com
+  - glob: subfolder/other*
 ```
 
 This is equivalent to having a single `toctree` directive in `intro`, containing `doc1`,
@@ -69,33 +70,33 @@ As a shorthand, the `sections` key can be at the same level as the `file`, which
 For example, this file is exactly equivalent to the one above:
 
 ```yaml
-main:
-  file: intro
+root: intro
+sections:
+- file: doc1
   sections:
-  - file: doc1
+  - file: doc2
     sections:
-    - file: doc2
-    - url: https://example.com
-    - glob: subfolder/other*
+    - file: doc3
+- url: https://example.com
+- glob: subfolder/other*
 ```
 
 ### Titles and Captions
 
 By default, ToCs will use the initial header within a document as its title.
 
-With the `title` key you can set an alternative title for a document or URL.
+With the `title` key you can set an alternative title for a document or URL in the ToC.
 Each part can also have a `caption`, e.g. for use in ToC side-bars:
 
 ```yaml
-main:
-  file: intro
-  title: Introduction
-  parts:
-  - caption: Part Caption
-    sections:
-    - file: doc1
-    - url: https://example.com
-      title: Example Site
+root: intro
+parts:
+- caption: Part Caption
+  sections:
+  - file: doc1
+    title: Document 1
+  - url: https://example.com
+    title: Example Site
 ```
 
 ### Numbering
@@ -103,13 +104,12 @@ main:
 You can automatically add numbers to all docs with a part by adding the `numbered: true` flag to it:
 
 ```yaml
-main:
-  file: intro
-  parts:
-  - numbered: true
-    sections:
-    - file: doc1
-    - file: doc2
+root: intro
+parts:
+- numbered: true
+  sections:
+  - file: doc1
+  - file: doc2
 ```
 
 You can also **limit the TOC numbering depth** by setting the `numbered` flag to an integer instead of `true`, e.g., `numbered: 3`.
@@ -126,13 +126,12 @@ To have e.g. `numbered` added to all toctrees, set it under a `defaults` top-lev
 ```yaml
 defaults:
   numbered: true
-main:
-  file: intro
+root: intro
+sections:
+- file: doc1
   sections:
-  - file: doc1
-    sections:
-    - file: doc2
-    - url: https://example.com
+  - file: doc2
+  - url: https://example.com
 ```
 
 Available keys: `numbered`, `titlesonly`, `reversed`
@@ -192,10 +191,9 @@ $ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
 Note, you can also add additional files in `meta`/`create_files` amd append text to the end of files with `meta`/`create_append`, e.g.
 
 ```yaml
-main:
-  file: intro
-  sections:
-  - glob: doc*
+root: intro
+sections:
+- glob: doc*
 meta:
   create_append:
     intro: |
@@ -236,7 +234,7 @@ intro:
     sections:
     - doc1
     titlesonly: true
-  title: Introduction
+  title: null
 ```
 
 ## Development Notes

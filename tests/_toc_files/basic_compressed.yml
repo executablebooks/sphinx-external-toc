@@ -1,14 +1,12 @@
 defaults:
   numbered: true
-main:
-  file: intro
-  title: Introduction
+root: intro
+sections:
+- file: doc1
+- file: doc2
+- file: doc3
   sections:
-  - file: doc1
-  - file: doc2
-  - file: doc3
-    sections:
-    - file: doc4
-    - url: https://example.com
+  - file: doc4
+  - url: https://example.com
 meta:
   regress: intro

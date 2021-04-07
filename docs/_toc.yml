@@ -1,16 +1,16 @@
 defaults:
   numbered: 3
   titlesonly: false
-main:
-  file: intro
-  title: Introduction
-  parts:
-  - sections:
-    - file: doc1
-    - file: doc2
-      sections:
-      - file: subfolder/doc3
-      - url: https://example.com
-        title: Example Link
-  - sections:
-    - glob: subglobs/glob*
+root: intro
+parts:
+- caption: Part 1
+  sections:
+  - file: doc1
+  - file: doc2
+    sections:
+    - file: subfolder/doc3
+    - url: https://example.com
+      title: Example Link
+- caption: Part 2
+  sections:
+  - glob: subglobs/glob*
