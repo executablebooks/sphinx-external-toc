@@ -1,5 +1,4 @@
-main:
-  file: intro
+root: intro
 meta:
   create_files:
   - doc1

@@ -1,8 +1,6 @@
-main:
-  file: intro
-  title: Introduction
-  sections:
-  - glob: doc*
+root: intro
+sections:
+- glob: doc*
 meta:
   create_files:
   - doc1

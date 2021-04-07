@@ -1,17 +1,15 @@
 defaults:
   numbered: true
-main:
-  file: intro
-  title: Introduction
-  parts:
-    - caption: Part Caption
-      sections:
-      - file: doc1
-      - file: doc2
-      - file: doc3
-        parts:
-        - sections:
-          - file: subfolder/doc4
-          - url: https://example.com
+root: intro
+parts:
+  - caption: Part Caption
+    sections:
+    - file: doc1
+    - file: doc2
+    - file: doc3
+      parts:
+      - sections:
+        - file: subfolder/doc4
+        - url: https://example.com
 meta:
   regress: intro

@@ -158,24 +158,21 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
     """Parse a dictionary of the ToC."""
     defaults: Dict[str, Any] = data.get("defaults", {})
 
-    if "main" not in data:
-        raise MalformedError("'main' key not present")
-
-    doc_item, docs_list = _parse_doc_item(data["main"], defaults, "main/")
+    doc_item, docs_list = _parse_doc_item(data, defaults, "/", file_key="root")
 
     site_map = SiteMap(root=doc_item, meta=data.get("meta"))
 
-    _parse_docs_list(docs_list, site_map, defaults, "main/")
+    _parse_docs_list(docs_list, site_map, defaults, "/")
 
     return site_map
 
 
 def _parse_doc_item(
-    data: Dict[str, Any], defaults: Dict[str, Any], path: str
+    data: Dict[str, Any], defaults: Dict[str, Any], path: str, file_key: str = "file"
 ) -> Tuple[DocItem, Sequence[Dict[str, Any]]]:
     """Parse a single doc item."""
-    if "file" not in data:
-        raise MalformedError(f"'file' key not found: '{path}'")
+    if file_key not in data:
+        raise MalformedError(f"'{file_key}' key not found: '{path}'")
     if "sections" in data:
         # this is a shorthand for defining a single part
         if "parts" in data:
@@ -224,7 +221,7 @@ def _parse_doc_item(
         # TODO this is a hacky fix for the fact that sphinx logs a warning
         # for nested toctrees, see:
         # sphinx/environment/collectors/toctree.py::TocTreeCollector::assign_section_numbers::_walk_toctree
-        if keywords.get("numbered") and path != "main/":
+        if keywords.get("numbered") and path != "/":
             keywords.pop("numbered")
 
         try:
@@ -234,7 +231,7 @@ def _parse_doc_item(
         parts.append(toc_item)
 
     try:
-        doc_item = DocItem(docname=data["file"], title=data.get("title"), parts=parts)
+        doc_item = DocItem(docname=data[file_key], title=data.get("title"), parts=parts)
     except TypeError as exc:
         raise MalformedError(f"doc validation: {path}") from exc
 

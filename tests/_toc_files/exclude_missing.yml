@@ -1,8 +1,7 @@
-main:
-  file: intro
-  sections:
-  - file: doc1
-  - glob: subfolder/other*
+root: intro
+sections:
+- file: doc1
+- glob: subfolder/other*
 meta:
   create_files:
   - doc2
