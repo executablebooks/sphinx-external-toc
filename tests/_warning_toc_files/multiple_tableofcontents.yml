@@ -1,0 +1,11 @@
+main:
+  file: intro
+  sections:
+  - file: doc1
+meta:
+  create_append:
+    intro: |
+      .. tableofcontents::
+
+      .. tableofcontents::
+  expected_warning: more than one tableofcontents directive

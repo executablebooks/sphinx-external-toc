@@ -1,3 +1,5 @@
+_meta:
+  regress: intro
 _root: intro
 doc1:
   docname: doc1

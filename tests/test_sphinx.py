@@ -56,12 +56,11 @@ def sphinx_build_factory(make_app):
 @pytest.mark.parametrize(
     "path", TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES]
 )
-def test_success(path: Path, tmp_path: Path, sphinx_build_factory):
+def test_success(path: Path, tmp_path: Path, sphinx_build_factory, file_regression):
     """Test successful builds."""
     src_dir = tmp_path / "srcdir"
     # write document files
     site_map = create_site_from_toc(path, root_path=src_dir)
-    print(list(src_dir.glob("**/*")))
     # write conf.py
     src_dir.joinpath("conf.py").write_text(
         CONF_CONTENT
@@ -75,6 +74,11 @@ def test_success(path: Path, tmp_path: Path, sphinx_build_factory):
     # run sphinx
     builder = sphinx_build_factory(src_dir)
     builder.build()
+    # optionally check the doctree of a file
+    if "regress" in site_map.meta:
+        doctree = builder.app.env.get_doctree(site_map.meta["regress"])
+        doctree["source"] = site_map.meta["regress"]
+        file_regression.check(doctree.pformat(), extension=".xml", encoding="utf8")
 
 
 @pytest.mark.parametrize(

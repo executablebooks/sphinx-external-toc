@@ -13,3 +13,5 @@ main:
         - sections:
           - file: subfolder/doc4
           - url: https://example.com
+meta:
+  regress: intro

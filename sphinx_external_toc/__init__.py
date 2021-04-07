@@ -11,7 +11,12 @@ if TYPE_CHECKING:
 
 def setup(app: "Sphinx") -> dict:
     """Initialize the Sphinx extension."""
-    from .events import add_changed_toctrees, append_toctrees, parse_toc_to_env
+    from .events import (
+        add_changed_toctrees,
+        insert_toctrees,
+        parse_toc_to_env,
+        TableofContents,
+    )
 
     # variables
     app.add_config_value("external_toc_path", "_toc.yml", "env")
@@ -22,7 +27,8 @@ def setup(app: "Sphinx") -> dict:
     # it will always mark the config as changed in the env setup and re-build everything
     app.connect("config-inited", parse_toc_to_env, priority=900)
     app.connect("env-get-outdated", add_changed_toctrees)
+    app.add_directive("tableofcontents", TableofContents)
     # Note: this needs to occur before `TocTreeCollector.process_doc` (default priority 500)
-    app.connect("doctree-read", append_toctrees, priority=100)
+    app.connect("doctree-read", insert_toctrees, priority=100)
 
     return {"version": __version__, "parallel_read_safe": True}

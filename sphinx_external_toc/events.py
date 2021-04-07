@@ -1,7 +1,7 @@
-"""Sphinx event functions."""
+"""Sphinx event functions and directives."""
 import glob
 from pathlib import Path
-from typing import List, Optional, Set
+from typing import Any, List, Optional, Set
 
 from docutils import nodes
 from sphinx.addnodes import toctree as toctree_node
@@ -10,6 +10,7 @@ from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
 from sphinx.errors import ExtensionError
 from sphinx.util import docname_join, logging
+from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
 from .api import DocItem, GlobItem, FileItem, SiteMap, UrlItem, parse_toc_file
@@ -48,7 +49,6 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
 
     Also, change the ``master_doc`` and add to ``exclude_patterns`` if necessary.
     """
-    print(config["exclude_patterns"])
     try:
         site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
     except Exception as exc:
@@ -118,7 +118,21 @@ def add_changed_toctrees(
     return changed_docs
 
 
-def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
+class TableOfContentsNode(nodes.Element):
+    """A placeholder for the insertion of a toctree (in ``append_toctrees``)."""
+
+    def __init__(self, **attributes: Any) -> None:
+        super().__init__(rawsource="", **attributes)
+
+
+class TableofContents(SphinxDirective):
+    # TODO allow for name option of tableofcontents (to reference it)
+    def run(self) -> List[TableOfContentsNode]:
+        """Insert a ``TableOfContentsNode`` node."""
+        return [TableOfContentsNode()]
+
+
+def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     """Create the toctree nodes and add it to the document.
 
     Adapted from `sphinx/directives/other.py::TocTree`
@@ -133,17 +147,43 @@ def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
             line=node.line,
         )
 
+    toc_placeholders: List[TableOfContentsNode] = list(
+        doctree.traverse(TableOfContentsNode)
+    )
+
     site_map: SiteMap = app.env.external_site_map
     doc_item: Optional[DocItem] = site_map.get(app.env.docname)
 
     if doc_item is None or not doc_item.parts:
+        if toc_placeholders:
+            create_warning(
+                app,
+                doctree,
+                "tableofcontents",
+                "tableofcontents directive in document with no descendants",
+            )
+        for node in toc_placeholders:
+            node.replace_self([])
         return
+
+    # TODO allow for more than one tableofcontents, i.e. per part?
+    for node in toc_placeholders[1:]:
+        create_warning(
+            app,
+            doctree,
+            "tableofcontents",
+            "more than one tableofcontents directive in document",
+            line=node.line,
+        )
+        node.replace_self([])
 
     # initial variables
     suffixes = app.config.source_suffix
     all_docnames = app.env.found_docs.copy()
     all_docnames.remove(app.env.docname)  # remove current document
     excluded = Matcher(app.config.exclude_patterns)
+
+    node_list: List[nodes.Element] = []
 
     for toctree in doc_item.parts:
 
@@ -158,14 +198,12 @@ def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         # but alabaster theme intermittently raised `KeyError('rawcaption')`
         subnode["rawcaption"] = toctree.caption or ""
         subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.sections)
-        subnode["hidden"] = True
+        subnode["hidden"] = False if toc_placeholders else True
         subnode["includehidden"] = False
         subnode["numbered"] = toctree.numbered
         subnode["titlesonly"] = toctree.titlesonly
         wrappernode = nodes.compound(classes=["toctree-wrapper"])
         wrappernode.append(subnode)
-
-        node_list: List[nodes.Element] = []
 
         for entry in toctree.sections:
 
@@ -217,7 +255,10 @@ def append_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
         node_list.append(wrappernode)
 
-        # note here the toctree cannot not just be appended to the end of the document,
+    if toc_placeholders:
+        toc_placeholders[0].replace_self(node_list)
+    else:
+        # note here the toctree cannot not just be appended to the end of the doc,
         # since `TocTreeCollector.process_doc` expects it in a section
         # TODO check if there is this is always ok
         doctree.children[-1].extend(node_list)
