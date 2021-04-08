@@ -1,6 +1,6 @@
 """Sphinx event functions and directives."""
 import glob
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Set
 
 from docutils import nodes
@@ -50,8 +50,13 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
 
     Also, change the ``master_doc`` and add to ``exclude_patterns`` if necessary.
     """
+    path = Path(app.srcdir) / PurePosixPath(app.config["external_toc_path"])
+    if not (path.exists() and path.is_file()):
+        raise ExtensionError(
+            f"[etoc] `external_toc_path` is not an existing file: {path}"
+        )
     try:
-        site_map = parse_toc_yaml(Path(app.srcdir) / app.config["external_toc_path"])
+        site_map = parse_toc_yaml(path)
     except Exception as exc:
         raise ExtensionError(f"[etoc] {exc}") from exc
     config.external_site_map = site_map

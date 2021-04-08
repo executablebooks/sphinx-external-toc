@@ -161,7 +161,7 @@ def parse_toc_yaml(path: Union[str, Path], encoding: str = "utf8") -> SiteMap:
 def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
     """Parse a dictionary of the ToC."""
     if not isinstance(data, Mapping):
-        MalformedError(f"toc is not a mapping: {type(data)}")
+        raise MalformedError(f"toc is not a mapping: {type(data)}")
 
     defaults: Dict[str, Any] = data.get("defaults", {})
 
@@ -210,11 +210,22 @@ def _parse_doc_item(
                     "toctree section contains incompatible keys "
                     f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
                 )
+
             if link_keys == {FILE_KEY}:
                 sections.append(FileItem(section[FILE_KEY]))
             elif link_keys == {GLOB_KEY}:
+                if "sections" in section or "parts" in section:
+                    raise MalformedError(
+                        "toctree section contains incompatible keys "
+                        f"{GLOB_KEY} and parts/sections: {path}{part_idx}/{sect_idx}"
+                    )
                 sections.append(GlobItem(section[GLOB_KEY]))
             elif link_keys == {URL_KEY}:
+                if "sections" in section or "parts" in section:
+                    raise MalformedError(
+                        "toctree section contains incompatible keys "
+                        f"{URL_KEY} and parts/sections: {path}{part_idx}/{sect_idx}"
+                    )
                 sections.append(UrlItem(section[URL_KEY], section.get("title")))
 
         # generate toc key-word arguments

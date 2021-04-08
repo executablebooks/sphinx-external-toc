@@ -23,6 +23,8 @@ external_toc_path = "_toc.yml"  # optional, default: _toc.yml
 external_toc_exclude_missing = False  # optional, default: False
 ```
 
+Note the `external_toc_path` is always read as a Unix path.
+
 ### Basic Structure
 
 A minimal ToC defines the top level `root` key, for a single root document file:
@@ -326,6 +328,9 @@ Questions / TODOs:
 - test against orphan file
 - https://github.com/executablebooks/sphinx-book-theme/pull/304
 - CLI command to generate toc from existing documentation `toctrees` (and then remove toctree directives)
+- test rebuild on toc changes (and document how rebuilds are controlled when toc changes)
+- some jupyter-book issues point to potential changes in numbering, based on where the `toctree` is in the document.
+  So could look into placing it e.g. under the first heading/title
 
 [github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
 [github-link]: https://github.com/executablebooks/sphinx-external-toc
