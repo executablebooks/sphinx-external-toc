@@ -2,7 +2,6 @@ from pathlib import Path
 
 import pytest
 
-from sphinx_external_toc.api import create_toc_dict
 from sphinx_external_toc.tools import create_site_from_toc, create_site_map_from_path
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
@@ -40,6 +39,6 @@ def test_create_site_map_from_path(tmp_path: Path, data_regression):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.touch()
     site_map = create_site_map_from_path(tmp_path)
-    # data_regression.check(site_map.as_json())
-    data = create_toc_dict(site_map)
-    data_regression.check(data)
+    data_regression.check(site_map.as_json())
+    # data = create_toc_dict(site_map)
+    # data_regression.check(data)

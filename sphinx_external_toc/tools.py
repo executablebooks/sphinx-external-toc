@@ -1,8 +1,9 @@
+from fnmatch import fnmatch
 from itertools import chain
 from pathlib import Path, PurePosixPath
 import re
 import shutil
-from typing import Mapping, Optional, Pattern, Sequence, Tuple, Union
+from typing import Mapping, Optional, Sequence, Tuple, Union
 
 from .api import parse_toc_yaml, SiteMap, DocItem, TocItem, FileItem
 
@@ -83,9 +84,9 @@ def create_site_from_toc(
 def create_site_map_from_path(
     root_path: Union[str, Path],
     *,
-    suffixes: Sequence[str] = (".rst",),
+    suffixes: Sequence[str] = (".rst", ".md"),
     default_index: str = "index",
-    ignore_regexes: Sequence[str] = ("^[.]",),
+    ignore_matches: Sequence[str] = (".*",),
 ) -> SiteMap:
     """Create the site-map from a folder structure.
 
@@ -95,15 +96,15 @@ def create_site_map_from_path(
     :param suffixes: File suffixes to consider as documents
     :param default_index: File name (without suffix) considered as the index file
         for a folder, if not found then the first file is taken as the index
-    :param ignore_regexes: file/folder names which match one of these will be ignored,
+    :param ignore_matches: file/folder names which match one of these will be ignored,
+        uses fnmatch Unix shell-style wildcards,
         defaults to ignoring hidden files (starting with a dot)
 
     """
     root_path = Path(root_path)
-    ignore_patterns = [re.compile(rgx) for rgx in ignore_regexes]
     # assess root
     root_index, root_files, root_folders = _assess_folder(
-        root_path, suffixes, default_index, ignore_patterns
+        root_path, suffixes, default_index, ignore_matches
     )
     if not root_index:
         raise IOError(f"path does not contain a root file: {root_path}")
@@ -117,7 +118,7 @@ def create_site_map_from_path(
         root_folders,
         suffixes,
         default_index,
-        ignore_patterns,
+        ignore_matches,
     )
 
     # create base site-map
@@ -142,7 +143,7 @@ def create_site_map_from_path(
             child_folders,
             suffixes,
             default_index,
-            ignore_patterns,
+            ignore_matches,
         )
         assert doc_item.docname not in site_map
         site_map[doc_item.docname] = doc_item
@@ -158,7 +159,7 @@ def _doc_item_from_path(
     folder_names: Sequence[str],
     suffixes: Sequence[str],
     default_index: str,
-    ignore_regexes: Sequence[Pattern],
+    ignore_matches: Sequence[str],
 ):
     """Return the ``DocItem`` and children folders that contain an index."""
     file_items = [
@@ -172,7 +173,7 @@ def _doc_item_from_path(
     for folder_name in folder_names:
         sub_folder = folder / folder_name
         child_index, child_files, child_folders = _assess_folder(
-            sub_folder, suffixes, default_index, ignore_regexes
+            sub_folder, suffixes, default_index, ignore_matches
         )
         if not child_index:
             # TODO handle folders with no files, but files in sub-folders
@@ -207,7 +208,7 @@ def _assess_folder(
     folder: Path,
     suffixes: Sequence[str],
     default_index: str,
-    ignore_regexes: Sequence[Pattern],
+    ignore_matches: Sequence[str],
 ) -> Tuple[Optional[str], Sequence[str], Sequence[str]]:
     """Assess the folder for ToC items.
 
@@ -234,7 +235,7 @@ def _assess_folder(
                     for path in folder.iterdir()
                     if path.is_file()
                     and any(path.name.endswith(suffix) for suffix in suffixes)
-                    and (not any(rgx.match(path.name) for rgx in ignore_regexes))
+                    and (not any(fnmatch(path.name, pat) for pat in ignore_matches))
                 ]
             )
         )
@@ -244,7 +245,7 @@ def _assess_folder(
             path.name
             for path in folder.iterdir()
             if path.is_dir()
-            if (not any(rgx.match(path.name) for rgx in ignore_regexes))
+            if (not any(fnmatch(path.name, pat) for pat in ignore_matches))
         ]
     )
 

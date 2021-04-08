@@ -1,0 +1,26 @@
+root: index
+sections:
+- file: 1_a_title
+  title: A title
+- file: 11_another_title
+  title: Another title
+- file: 1_a_subfolder/index
+  title: A subfolder
+- file: 2_another_subfolder/index
+  title: Another subfolder
+  sections:
+  - file: 2_another_subfolder/other
+    title: Other
+- file: 3_subfolder/1_no_index
+  title: No index
+  sections:
+  - file: 3_subfolder/2_no_index
+    title: No index
+- file: 14_subfolder/index
+  title: Subfolder
+  sections:
+  - file: 14_subfolder/subsubfolder/index
+    title: Subsubfolder
+    sections:
+    - file: 14_subfolder/subsubfolder/other
+      title: Other
