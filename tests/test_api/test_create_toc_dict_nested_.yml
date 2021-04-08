@@ -1,0 +1,11 @@
+meta:
+  create_files:
+  - folder/globfolder/glob1
+root: intro
+sections:
+- file: folder/doc1
+- file: folder/doc2
+- file: folder/doc3
+  sections:
+  - file: folder/subfolder/doc4
+  - glob: folder/globfolder/*

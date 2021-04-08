@@ -1,5 +1,5 @@
 """ """
-from collections.abc import MutableMapping
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Union
 
@@ -160,6 +160,9 @@ def parse_toc_yaml(path: Union[str, Path], encoding: str = "utf8") -> SiteMap:
 
 def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
     """Parse a dictionary of the ToC."""
+    if not isinstance(data, Mapping):
+        MalformedError(f"toc is not a mapping: {type(data)}")
+
     defaults: Dict[str, Any] = data.get("defaults", {})
 
     doc_item, docs_list = _parse_doc_item(data, defaults, "/", file_key="root")
