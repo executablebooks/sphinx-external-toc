@@ -7,6 +7,10 @@ import attr
 from attr.validators import instance_of, deep_iterable, optional
 import yaml
 
+FILE_KEY = "file"
+GLOB_KEY = "glob"
+URL_KEY = "url"
+
 
 class FileItem(str):
     """A document path in a toctree list.
@@ -147,7 +151,7 @@ class MalformedError(Exception):
     """Raised if toc file is malformed."""
 
 
-def parse_toc_file(path: Union[str, Path], encoding: str = "utf8") -> SiteMap:
+def parse_toc_yaml(path: Union[str, Path], encoding: str = "utf8") -> SiteMap:
     """Parse the ToC file."""
     with Path(path).open(encoding=encoding) as handle:
         data = yaml.safe_load(handle)
@@ -168,7 +172,7 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
 
 
 def _parse_doc_item(
-    data: Dict[str, Any], defaults: Dict[str, Any], path: str, file_key: str = "file"
+    data: Dict[str, Any], defaults: Dict[str, Any], path: str, file_key: str = FILE_KEY
 ) -> Tuple[DocItem, Sequence[Dict[str, Any]]]:
     """Parse a single doc item."""
     if file_key not in data:
@@ -184,7 +188,7 @@ def _parse_doc_item(
     if not isinstance(parts_data, Sequence):
         raise MalformedError(f"'parts' not a sequence: '{path}'")
 
-    _known_link_keys = {"file", "glob", "url"}
+    _known_link_keys = {FILE_KEY, GLOB_KEY, URL_KEY}
 
     parts = []
     for part_idx, part in enumerate(parts_data):
@@ -203,12 +207,12 @@ def _parse_doc_item(
                     "toctree section contains incompatible keys "
                     f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
                 )
-            if link_keys == {"file"}:
-                sections.append(FileItem(section["file"]))
-            elif link_keys == {"glob"}:
-                sections.append(GlobItem(section["glob"]))
-            elif link_keys == {"url"}:
-                sections.append(UrlItem(section["url"], section.get("title")))
+            if link_keys == {FILE_KEY}:
+                sections.append(FileItem(section[FILE_KEY]))
+            elif link_keys == {GLOB_KEY}:
+                sections.append(GlobItem(section[GLOB_KEY]))
+            elif link_keys == {URL_KEY}:
+                sections.append(UrlItem(section[URL_KEY], section.get("title")))
 
         # generate toc key-word arguments
         keywords = {}
@@ -239,7 +243,7 @@ def _parse_doc_item(
         section
         for part in parts_data
         for section in part["sections"]
-        if "file" in section
+        if FILE_KEY in section
     ]
 
     return (
@@ -264,3 +268,72 @@ def _parse_docs_list(
         site_map[docname] = child_item
 
         _parse_docs_list(child_docs_list, site_map, defaults, child_path)
+
+
+def create_toc_dict(site_map: SiteMap, *, skip_defaults: bool = True) -> Dict[str, Any]:
+    """Create the Toc dictionary from a site-map."""
+    data = _docitem_to_dict(
+        site_map.root, site_map, skip_defaults=skip_defaults, file_key="root"
+    )
+    if site_map.meta:
+        data["meta"] = site_map.meta.copy()
+    return data
+
+
+def _docitem_to_dict(
+    doc_item: DocItem,
+    site_map: SiteMap,
+    *,
+    skip_defaults: bool = True,
+    file_key: str = FILE_KEY,
+    parsed_docnames: Optional[Set[str]] = None,
+) -> Dict[str, Any]:
+
+    # protect against infinite recursion
+    parsed_docnames = parsed_docnames or set()
+    if doc_item.docname in parsed_docnames:
+        raise RecursionError(f"{doc_item.docname!r} in site-map multiple times")
+    parsed_docnames.add(doc_item.docname)
+
+    data: Dict[str, Any] = {}
+
+    data[file_key] = doc_item.docname
+    if doc_item.title is not None:
+        data["title"] = doc_item.title
+
+    if not doc_item.parts:
+        return data
+
+    def _parse_section(item):
+        if isinstance(item, FileItem):
+            return _docitem_to_dict(
+                site_map[item],
+                site_map,
+                skip_defaults=skip_defaults,
+                parsed_docnames=parsed_docnames,
+            )
+        if isinstance(item, GlobItem):
+            return {GLOB_KEY: str(item)}
+        if isinstance(item, UrlItem):
+            if item.title is not None:
+                return {URL_KEY: item.url, "title": item.title}
+            return {URL_KEY: item.url}
+        raise TypeError(item)
+
+    data["parts"] = []
+    fields = attr.fields_dict(TocItem)
+    for part in doc_item.parts:
+        # only add these keys if their value is not the default
+        part_data = {
+            key: getattr(part, key)
+            for key in ("caption", "numbered", "reversed", "titlesonly")
+            if (not skip_defaults) or getattr(part, key) != fields[key].default
+        }
+        part_data["sections"] = [_parse_section(s) for s in part.sections]
+        data["parts"].append(part_data)
+
+    # apply shorthand if possible
+    if len(data["parts"]) == 1 and list(data["parts"][0]) == ["sections"]:
+        data["sections"] = data.pop("parts")[0]["sections"]
+
+    return data

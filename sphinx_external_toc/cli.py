@@ -2,7 +2,7 @@ import click
 import yaml
 
 from sphinx_external_toc import __version__
-from sphinx_external_toc.api import parse_toc_file
+from sphinx_external_toc.api import parse_toc_yaml
 from sphinx_external_toc.tools import create_site_from_toc
 
 
@@ -16,7 +16,7 @@ def main():
 @click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
 def parse_toc(toc_file):
     """Parse a ToC file to a site-map YAML."""
-    site_map = parse_toc_file(toc_file)
+    site_map = parse_toc_yaml(toc_file)
     click.echo(yaml.dump(site_map.as_json()))
 
 

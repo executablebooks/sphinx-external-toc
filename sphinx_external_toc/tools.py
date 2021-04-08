@@ -3,7 +3,7 @@ from pathlib import Path, PurePosixPath
 import shutil
 from typing import Mapping, Optional, Sequence, Union
 
-from .api import parse_toc_file, SiteMap
+from .api import parse_toc_yaml, SiteMap
 
 
 def create_site_from_toc(
@@ -31,7 +31,7 @@ def create_site_from_toc(
 
     """
     assert default_ext in {".rst", ".md"}
-    site_map = parse_toc_file(toc_path)
+    site_map = parse_toc_yaml(toc_path)
 
     root_path = Path(toc_path).parent if root_path is None else Path(root_path)
     root_path.mkdir(parents=True, exist_ok=True)

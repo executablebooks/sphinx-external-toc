@@ -14,7 +14,7 @@ from sphinx.util import docname_join, logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
-from .api import DocItem, GlobItem, FileItem, SiteMap, UrlItem, parse_toc_file
+from .api import DocItem, GlobItem, FileItem, SiteMap, UrlItem, parse_toc_yaml
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     Also, change the ``master_doc`` and add to ``exclude_patterns`` if necessary.
     """
     try:
-        site_map = parse_toc_file(Path(app.srcdir) / app.config["external_toc_path"])
+        site_map = parse_toc_yaml(Path(app.srcdir) / app.config["external_toc_path"])
     except Exception as exc:
         raise ExtensionError(f"[etoc] {exc}") from exc
     config.external_site_map = site_map
@@ -120,13 +120,15 @@ def add_changed_toctrees(
 
 
 class TableOfContentsNode(nodes.Element):
-    """A placeholder for the insertion of a toctree (in ``append_toctrees``)."""
+    """A placeholder for the insertion of a toctree (in ``insert_toctrees``)."""
 
     def __init__(self, **attributes: Any) -> None:
         super().__init__(rawsource="", **attributes)
 
 
 class TableofContents(SphinxDirective):
+    """Insert a placeholder for toctree insertion."""
+
     # TODO allow for name option of tableofcontents (to reference it)
     def run(self) -> List[TableOfContentsNode]:
         """Insert a ``TableOfContentsNode`` node."""
