@@ -1,0 +1,39 @@
+_meta:
+  create_files:
+  - folder/globfolder/glob1
+_root: intro
+folder/doc1:
+  docname: folder/doc1
+  parts: []
+  title: null
+folder/doc2:
+  docname: folder/doc2
+  parts: []
+  title: null
+folder/doc3:
+  docname: folder/doc3
+  parts:
+  - caption: null
+    numbered: false
+    reversed: false
+    sections:
+    - folder/subfolder/doc4
+    - folder/globfolder/*
+    titlesonly: true
+  title: null
+folder/subfolder/doc4:
+  docname: folder/subfolder/doc4
+  parts: []
+  title: null
+intro:
+  docname: intro
+  parts:
+  - caption: null
+    numbered: false
+    reversed: false
+    sections:
+    - folder/doc1
+    - folder/doc2
+    - folder/doc3
+    titlesonly: true
+  title: null

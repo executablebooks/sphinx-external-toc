@@ -10,7 +10,7 @@ from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
 from sphinx.errors import ExtensionError
 from sphinx.transforms import SphinxTransform
-from sphinx.util import docname_join, logging
+from sphinx.util import logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
@@ -217,7 +217,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
             elif isinstance(entry, FileItem):
 
                 child_doc_item = site_map[entry]
-                docname = docname_join(app.env.docname, str(entry))
+                docname = str(entry)
                 title = child_doc_item.title
 
                 # remove any suffixes
@@ -239,7 +239,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
                     subnode["includefiles"].append(docname)
 
             elif isinstance(entry, GlobItem):
-                patname = docname_join(app.env.docname, str(entry))
+                patname = str(entry)
                 docnames = sorted(patfilter(all_docnames, patname))
                 for docname in docnames:
                     all_docnames.remove(docname)  # don't include it again

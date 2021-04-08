@@ -1,0 +1,10 @@
+- _toc.yml
+- folder
+- folder/doc1.rst
+- folder/doc2.rst
+- folder/doc3.rst
+- folder/globfolder
+- folder/globfolder/glob1.rst
+- folder/subfolder
+- folder/subfolder/doc4.rst
+- intro.rst
