@@ -3,6 +3,7 @@
 [![Github-CI][github-ci]][github-link]
 [![Coverage Status][codecov-badge]][codecov-link]
 [![Code style: black][black-badge]][black-link]
+[![PyPI][pypi-badge]][pypi-link]
 
 A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
 
@@ -332,3 +333,5 @@ Questions / TODOs:
 [codecov-link]: https://codecov.io/gh/executablebooks/sphinx-external-toc
 [black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
 [black-link]: https://github.com/ambv/black
+[pypi-badge]: https://img.shields.io/pypi/v/sphinx-external-toc.svg
+[pypi-link]: https://pypi.org/project/sphinx-external-toc
