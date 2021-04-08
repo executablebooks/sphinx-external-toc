@@ -306,12 +306,14 @@ def _docitem_to_dict(
 
     def _parse_section(item):
         if isinstance(item, FileItem):
-            return _docitem_to_dict(
-                site_map[item],
-                site_map,
-                skip_defaults=skip_defaults,
-                parsed_docnames=parsed_docnames,
-            )
+            if item in site_map:
+                return _docitem_to_dict(
+                    site_map[item],
+                    site_map,
+                    skip_defaults=skip_defaults,
+                    parsed_docnames=parsed_docnames,
+                )
+            return {FILE_KEY: str(item)}
         if isinstance(item, GlobItem):
             return {GLOB_KEY: str(item)}
         if isinstance(item, UrlItem):
