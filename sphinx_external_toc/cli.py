@@ -92,7 +92,7 @@ def create_toc(site_folder, extension, index, skip_match, guess_titles):
     )
     if guess_titles:
         for docname in site_map:
-            # don;t give a title to the root document
+            # don't give a title to the root document
             if docname == site_map.root.docname:
                 continue
             filepath = PurePosixPath(docname)

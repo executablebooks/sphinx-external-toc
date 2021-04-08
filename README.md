@@ -205,6 +205,75 @@ meta:
   - doc3
 ```
 
+To build a ToC file from an existing site:
+
+```console
+$ sphinx-etoc create-toc path/to/folder
+```
+
+Some rules used:
+
+- Files/folders will be skipped if they match a pattern added by `-s` (based on [fnmatch](https://docs.python.org/3/library/fnmatch.html) Unix shell-style wildcards)
+- Sub-folders with no content files inside will be skipped
+- File and folder names will be sorted by [natural order](https://en.wikipedia.org/wiki/Natural_sort_order)
+- If there is a file called `index` (or the name set by `-i`) in any folder, it will be treated as the index file, otherwise the first file by ordering will be used.
+
+The command can also guess a `title` for each file, based on its path:
+
+- The folder name is used for index files, otherwise the file name
+- Words are split by `_`
+- The first "word" is removed if it is an integer
+
+For example, for a site with files:
+
+```
+index.rst
+1_a_title.rst
+11_another_title.rst
+.hidden_file.rst
+.hidden_folder/index.rst
+1_a_subfolder/index.rst
+2_another_subfolder/index.rst
+2_another_subfolder/other.rst
+3_subfolder/1_no_index.rst
+3_subfolder/2_no_index.rst
+14_subfolder/index.rst
+14_subfolder/subsubfolder/index.rst
+14_subfolder/subsubfolder/other.rst
+```
+
+will create the ToC:
+
+```console
+$ sphinx-etoc create-toc path/to/folder -i index -s ".*" -e ".rst" -t
+root: index
+sections:
+- file: 1_a_title
+  title: A title
+- file: 11_another_title
+  title: Another title
+- file: 1_a_subfolder/index
+  title: A subfolder
+- file: 2_another_subfolder/index
+  title: Another subfolder
+  sections:
+  - file: 2_another_subfolder/other
+    title: Other
+- file: 3_subfolder/1_no_index
+  title: No index
+  sections:
+  - file: 3_subfolder/2_no_index
+    title: No index
+- file: 14_subfolder/index
+  title: Subfolder
+  sections:
+  - file: 14_subfolder/subsubfolder/index
+    title: Subsubfolder
+    sections:
+    - file: 14_subfolder/subsubfolder/other
+      title: Other
+```
+
 ## API
 
 The ToC file is parsed to a `SiteMap`, which is a `MutableMapping` subclass, with keys representing docnames mapping to a `DocItem` that stores information on the toctrees it should contain:
@@ -239,20 +308,6 @@ intro:
 
 ## Development Notes
 
-Want to have a built-in CLI including commands:
-
-- generate toc from existing documentation toctrees (and remove toctree directives)
-- generate toc from existing documentation, but just from its structure (i.e. `jupyter-book toc mybookpath/`)
-- generate documentation skeleton from toc
-- check toc (without running sphinx)
-
-Process:
-
-- Read toc ("builder-inited" event), error if toc not found
-  - Note, in jupyter-book: if index page does not exist, works out first page from toc and creates an index page that just redirects to it)
-- adds toctree node to page doctree after it is parsed ("doctree-read" event)
-  - Note, in jupyter-book this was done by physically adding to the text before parsing ("source-read" event), but this is not as robust.
-
 Questions / TODOs:
 
 - Should `titlesonly` default to `True` (as in jupyter-book)?
@@ -268,6 +323,7 @@ Questions / TODOs:
 - document suppressing warnings
 - test against orphan file
 - https://github.com/executablebooks/sphinx-book-theme/pull/304
+- CLI command to generate toc from existing documentation `toctrees` (and then remove toctree directives)
 
 [github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
 [github-link]: https://github.com/executablebooks/sphinx-external-toc
