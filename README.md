@@ -310,6 +310,7 @@ intro:
 
 Questions / TODOs:
 
+- add migration CLI command for old jupyter-book format
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
 - Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`
