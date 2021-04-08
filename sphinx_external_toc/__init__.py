@@ -13,7 +13,7 @@ def setup(app: "Sphinx") -> dict:
     """Initialize the Sphinx extension."""
     from .events import (
         add_changed_toctrees,
-        insert_toctrees,
+        InsertToctrees,
         parse_toc_to_env,
         TableofContents,
     )
@@ -28,7 +28,6 @@ def setup(app: "Sphinx") -> dict:
     app.connect("config-inited", parse_toc_to_env, priority=900)
     app.connect("env-get-outdated", add_changed_toctrees)
     app.add_directive("tableofcontents", TableofContents)
-    # Note: this needs to occur before `TocTreeCollector.process_doc` (default priority 500)
-    app.connect("doctree-read", insert_toctrees, priority=100)
+    app.add_transform(InsertToctrees)
 
     return {"version": __version__, "parallel_read_safe": True}
