@@ -198,7 +198,7 @@ meta:
   create_append:
     intro: |
       This is some
-      extra text
+      appended text
   create_files:
   - doc1
   - doc2
@@ -211,9 +211,9 @@ The ToC file is parsed to a `SiteMap`, which is a `MutableMapping` subclass, wit
 
 ```python
 import yaml
-from sphinx_external_toc.api import parse_toc_file
+from sphinx_external_toc.api import parse_toc_yaml
 path = "path/to/_toc.yml"
-site_map = parse_toc_file(path)
+site_map = parse_toc_yaml(path)
 yaml.dump(site_map.as_json())
 ```
 
@@ -257,7 +257,7 @@ Questions / TODOs:
 
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
-- Add additional top-level keys, e.g. `appendices` and `bibliography`
+- Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`
 - Add tests for "bad" toc files
 - Using `external_toc_exclude_missing` to exclude a certain file suffix:
   currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,
