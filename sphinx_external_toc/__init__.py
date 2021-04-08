@@ -12,10 +12,10 @@ if TYPE_CHECKING:
 def setup(app: "Sphinx") -> dict:
     """Initialize the Sphinx extension."""
     from .events import (
-        add_changed_toctrees,
         InsertToctrees,
-        parse_toc_to_env,
         TableofContents,
+        add_changed_toctrees,
+        parse_toc_to_env,
     )
 
     # variables

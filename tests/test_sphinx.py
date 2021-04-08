@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 
 import pytest
-from sphinx.testing.util import SphinxTestApp
 from sphinx.testing.path import path as sphinx_path
+from sphinx.testing.util import SphinxTestApp
 
 from sphinx_external_toc.tools import create_site_from_toc
 

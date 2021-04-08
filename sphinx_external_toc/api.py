@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterator, List, Optional, Sequence, Set, Tuple, Union
 
 import attr
-from attr.validators import instance_of, deep_iterable, optional
 import yaml
+from attr.validators import deep_iterable, instance_of, optional
 
 FILE_KEY = "file"
 GLOB_KEY = "glob"

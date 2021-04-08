@@ -1,11 +1,11 @@
+import re
+import shutil
 from fnmatch import fnmatch
 from itertools import chain
 from pathlib import Path, PurePosixPath
-import re
-import shutil
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
-from .api import parse_toc_yaml, SiteMap, DocItem, TocItem, FileItem
+from .api import DocItem, FileItem, SiteMap, TocItem, parse_toc_yaml
 
 
 def create_site_from_toc(

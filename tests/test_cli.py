@@ -2,12 +2,11 @@ import os
 from pathlib import Path
 from typing import List
 
+import pytest
 from click.testing import CliRunner
 
-from sphinx_external_toc.cli import main, parse_toc, create_toc
 from sphinx_external_toc import __version__
-
-import pytest
+from sphinx_external_toc.cli import create_toc, main, parse_toc
 
 
 @pytest.fixture()
