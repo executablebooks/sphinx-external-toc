@@ -317,7 +317,6 @@ Questions / TODOs:
 - Should `titlesonly` default to `True` (as in jupyter-book)?
 - nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
 - Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`
-- Add tests for "bad" toc files
 - Using `external_toc_exclude_missing` to exclude a certain file suffix:
   currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,
   it will add `doc.rst` to the excluded patterns but then, when looking for `doc.md`,

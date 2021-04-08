@@ -1,0 +1,5 @@
+root: index
+sections:
+- url: http://example.com
+  sections:
+  - file: other

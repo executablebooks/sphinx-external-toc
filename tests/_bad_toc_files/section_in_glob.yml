@@ -1,0 +1,5 @@
+root: index
+sections:
+- glob: doc*
+  sections:
+  - file: other
