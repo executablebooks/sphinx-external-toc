@@ -9,6 +9,7 @@ from sphinx.application import Sphinx
 from sphinx.config import Config
 from sphinx.environment import BuildEnvironment
 from sphinx.errors import ExtensionError
+from sphinx.transforms import SphinxTransform
 from sphinx.util import docname_join, logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
@@ -262,3 +263,16 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         # since `TocTreeCollector.process_doc` expects it in a section
         # TODO check if there is this is always ok
         doctree.children[-1].extend(node_list)
+
+
+class InsertToctrees(SphinxTransform):
+    """Create the toctree nodes and add it to the document.
+
+    This needs to occur at least before the ``DoctreeReadEvent`` (priority 880),
+    which triggers the `TocTreeCollector.process_doc` event (priority 500)
+    """
+
+    default_priority = 100
+
+    def apply(self, **kwargs: Any) -> None:
+        insert_toctrees(self.app, self.document)
