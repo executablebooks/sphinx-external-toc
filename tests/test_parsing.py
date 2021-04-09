@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from sphinx_external_toc.api import MalformedError, create_toc_dict, parse_toc_yaml
+from sphinx_external_toc.parsing import MalformedError, create_toc_dict, parse_toc_yaml
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
 TOC_FILES_BAD = list(Path(__file__).parent.joinpath("_bad_toc_files").glob("*.yml"))

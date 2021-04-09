@@ -5,7 +5,8 @@ from itertools import chain
 from pathlib import Path, PurePosixPath
 from typing import Mapping, Optional, Sequence, Tuple, Union
 
-from .api import DocItem, FileItem, SiteMap, TocItem, parse_toc_yaml
+from .api import DocItem, FileItem, SiteMap, TocItem
+from .parsing import parse_toc_yaml
 
 
 def create_site_from_toc(

@@ -4,7 +4,7 @@ import click
 import yaml
 
 from sphinx_external_toc import __version__
-from sphinx_external_toc.api import create_toc_dict, parse_toc_yaml
+from sphinx_external_toc.parsing import create_toc_dict, parse_toc_yaml
 from sphinx_external_toc.tools import create_site_from_toc, create_site_map_from_path
 
 

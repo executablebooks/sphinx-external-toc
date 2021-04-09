@@ -283,7 +283,7 @@ The ToC file is parsed to a `SiteMap`, which is a `MutableMapping` subclass, wit
 
 ```python
 import yaml
-from sphinx_external_toc.api import parse_toc_yaml
+from sphinx_external_toc.parsing import parse_toc_yaml
 path = "path/to/_toc.yml"
 site_map = parse_toc_yaml(path)
 yaml.dump(site_map.as_json())
