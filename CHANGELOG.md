@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.1.0a3 - 2021-04-09
+
+👌 IMPROVE: `toc.yml` validation
+
 ## 0.1.0a2 - 2021-04-08
 
 🐛 FIX: for nested docnames in sub-folders
