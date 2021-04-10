@@ -214,7 +214,11 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.sections)
         subnode["hidden"] = False if toc_placeholders else toctree.hidden
         subnode["includehidden"] = False
-        subnode["numbered"] = toctree.numbered
+        subnode["numbered"] = (
+            0
+            if toctree.numbered is False
+            else (999 if toctree.numbered is True else int(toctree.numbered))
+        )
         subnode["titlesonly"] = toctree.titlesonly
         wrappernode = nodes.compound(classes=["toctree-wrapper"])
         wrappernode.append(subnode)
