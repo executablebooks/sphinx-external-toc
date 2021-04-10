@@ -1,0 +1,18 @@
+defaults:
+  titlesonly: true
+options:
+  numbered: true
+root: index
+sections:
+- file: content1
+  title: Content1
+- file: subfolder/index
+  sections:
+  - file: subfolder/asubpage
+    title: Asubpage
+  title: Subfolder
+- file: content2
+  title: Content2
+- file: content3
+  title: Content3
+title: Toc

@@ -1,9 +1,9 @@
-defaults:
-  numbered: 3
-  titlesonly: false
 root: intro
+defaults:
+  titlesonly: false
 parts:
 - caption: Part 1
+  numbered: true
   sections:
   - file: doc1
   - file: doc2
@@ -12,5 +12,6 @@ parts:
     - url: https://example.com
       title: Example Link
 - caption: Part 2
+  numbered: true
   sections:
   - glob: subglobs/glob*

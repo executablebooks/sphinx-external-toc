@@ -2,9 +2,17 @@ from pathlib import Path
 
 import pytest
 
-from sphinx_external_toc.tools import create_site_from_toc, create_site_map_from_path
+from sphinx_external_toc.parsing import parse_toc_data
+from sphinx_external_toc.tools import (
+    create_site_from_toc,
+    create_site_map_from_path,
+    migrate_jupyter_book,
+)
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
+JB_TOC_FILES = list(
+    Path(__file__).parent.joinpath("_jb_migrate_toc_files").glob("*.yml")
+)
 
 
 @pytest.mark.parametrize(
@@ -42,3 +50,13 @@ def test_create_site_map_from_path(tmp_path: Path, data_regression):
     data_regression.check(site_map.as_json())
     # data = create_toc_dict(site_map)
     # data_regression.check(data)
+
+
+@pytest.mark.parametrize(
+    "path", JB_TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in JB_TOC_FILES]
+)
+def test_migrate_jb(path, data_regression):
+    toc = migrate_jupyter_book(Path(path))
+    data_regression.check(toc)
+    # check it is a valid toc
+    parse_toc_data(toc)

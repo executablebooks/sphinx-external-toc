@@ -1,0 +1,29 @@
+defaults:
+  titlesonly: true
+parts:
+- caption: A section
+  sections:
+  - file: subfolder/index
+    sections:
+    - file: subfolder/asubpage1
+      title: Asubpage
+    title: Subfolder
+- caption: Another section
+  sections:
+  - file: content1
+    sections:
+    - file: subfolder/asubpage2
+      title: Asubpage
+    title: Content1
+  - file: content2
+    sections:
+    - file: subfolder/asubpage3
+      title: Asubpage
+    title: Content2
+  - file: content3
+    sections:
+    - file: subfolder/asubpage4
+      title: Asubpage
+    title: Content3
+root: index
+title: Toc

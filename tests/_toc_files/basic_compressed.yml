@@ -1,4 +1,6 @@
 defaults:
+  titlesonly: true
+options:
   numbered: true
 root: intro
 sections:

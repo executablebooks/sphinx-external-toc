@@ -11,6 +11,8 @@ index:
   docname: index
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:
@@ -30,6 +32,8 @@ subfolder14/index:
   docname: subfolder14/index
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:
@@ -40,6 +44,8 @@ subfolder14/subsubfolder/index:
   docname: subfolder14/subsubfolder/index
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:
@@ -54,6 +60,8 @@ subfolder2/index:
   docname: subfolder2/index
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:
@@ -68,6 +76,8 @@ subfolder3/no_index1:
   docname: subfolder3/no_index1
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:

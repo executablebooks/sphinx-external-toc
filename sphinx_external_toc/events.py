@@ -76,21 +76,26 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
             # we do not use `Path.glob` here, since it does not ignore hidden files:
             # https://stackoverflow.com/questions/49862648/why-do-glob-glob-and-pathlib-path-glob-treat-hidden-files-differently
             for path_str in glob.iglob(
-                str(Path(app.srcdir) / "**" / f"*[{suffix}]"), recursive=True
+                str(Path(app.srcdir) / "**" / f"*{suffix}"), recursive=True
             ):
                 path = Path(path_str)
                 if not path.is_file():
                     continue
                 posix = path.relative_to(app.srcdir).as_posix()
-                possix_no_suffix = posix[: -len(suffix)]
+                posix_no_suffix = posix[: -len(suffix)]
+                components = posix.split("/")
                 if not (
                     # files can be stored with or without suffixes
                     posix in site_map
-                    or possix_no_suffix in site_map
-                    # ignore anything already excluded
-                    or already_excluded(posix)
+                    or posix_no_suffix in site_map
+                    # ignore anything already excluded, we have to check against
+                    # the file path and all its sub-directory paths
+                    or any(
+                        already_excluded("/".join(components[: i + 1]))
+                        for i in range(len(components))
+                    )
                     # don't exclude docnames matching globs
-                    or any(patmatch(possix_no_suffix, pat) for pat in site_map.globs())
+                    or any(patmatch(posix_no_suffix, pat) for pat in site_map.globs())
                 ):
                     new_excluded.append(posix)
         if new_excluded:
@@ -201,13 +206,13 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         subnode.source = doctree.source
         subnode["entries"] = []
         subnode["includefiles"] = []
-        subnode["maxdepth"] = -1
+        subnode["maxdepth"] = toctree.maxdepth
         subnode["caption"] = toctree.caption
         # TODO this wasn't in the original code,
         # but alabaster theme intermittently raised `KeyError('rawcaption')`
         subnode["rawcaption"] = toctree.caption or ""
         subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.sections)
-        subnode["hidden"] = False if toc_placeholders else True
+        subnode["hidden"] = False if toc_placeholders else toctree.hidden
         subnode["includehidden"] = False
         subnode["numbered"] = toctree.numbered
         subnode["titlesonly"] = toctree.titlesonly

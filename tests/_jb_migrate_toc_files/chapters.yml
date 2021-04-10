@@ -1,0 +1,26 @@
+- file: index
+  title: Toc
+- chapter: A section
+  sections:
+  - file: subfolder/index
+    title: Subfolder
+    sections:
+    - file: subfolder/asubpage1
+      title: Asubpage
+- chapter: Another section
+  sections:
+  - file: content1
+    title: Content1
+    sections:
+    - file: subfolder/asubpage2
+      title: Asubpage
+  - file: content2
+    title: Content2
+    sections:
+    - file: subfolder/asubpage3
+      title: Asubpage
+  - file: content3
+    title: Content3
+    sections:
+    - file: subfolder/asubpage4
+      title: Asubpage

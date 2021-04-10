@@ -12,6 +12,15 @@ FILE_KEY = "file"
 GLOB_KEY = "glob"
 URL_KEY = "url"
 
+TOCTREE_OPTIONS = (
+    "caption",
+    "hidden",
+    "maxdepth",
+    "numbered",
+    "reversed",
+    "titlesonly",
+)
+
 
 class MalformedError(Exception):
     """Raised if toc file is malformed."""
@@ -50,7 +59,7 @@ def _parse_doc_item(
         # this is a shorthand for defining a single part
         if "parts" in data:
             raise MalformedError(f"Both 'sections' and 'parts' found: '{path}'")
-        parts_data = [{"sections": data["sections"]}]
+        parts_data = [{"sections": data["sections"], **data.get("options", {})}]
     elif "parts" in data:
         parts_data = data["parts"]
         if not (isinstance(parts_data, Sequence) and parts_data):
@@ -112,18 +121,10 @@ def _parse_doc_item(
                 sections.append(UrlItem(section[URL_KEY], section.get("title")))
 
         # generate toc key-word arguments
-        keywords = {}
-        for key in ("caption", "numbered", "titlesonly", "reversed"):
-            if key in part:
-                keywords[key] = part[key]
-            elif key in defaults:
+        keywords = {k: part[k] for k in TOCTREE_OPTIONS if k in part}
+        for key in defaults:
+            if key not in keywords:
                 keywords[key] = defaults[key]
-
-        # TODO this is a hacky fix for the fact that sphinx logs a warning
-        # for nested toctrees, see:
-        # sphinx/environment/collectors/toctree.py::TocTreeCollector::assign_section_numbers::_walk_toctree
-        if keywords.get("numbered") and path != "/":
-            keywords.pop("numbered")
 
         try:
             toc_item = TocItem(sections=sections, **keywords)
