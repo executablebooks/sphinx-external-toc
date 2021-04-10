@@ -13,6 +13,8 @@ doc3:
   docname: doc3
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:
@@ -25,6 +27,8 @@ intro:
   docname: intro
   parts:
   - caption: Part Caption
+    hidden: true
+    maxdepth: -1
     numbered: true
     reversed: false
     sections:

@@ -37,11 +37,16 @@ class TocItem:
             instance_of((GlobItem, FileItem, UrlItem)), instance_of(list)
         )
     )
-    caption: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
-    numbered: Union[bool, int] = attr.ib(False, validator=instance_of((bool, int)))
-    # TODO in jupyter-book titlesonly default is True, but why
-    titlesonly: bool = attr.ib(True, validator=instance_of(bool))
-    reversed: bool = attr.ib(False, validator=instance_of(bool))
+    caption: Optional[str] = attr.ib(
+        None, kw_only=True, validator=optional(instance_of(str))
+    )
+    hidden: bool = attr.ib(True, kw_only=True, validator=instance_of(bool))
+    maxdepth: int = attr.ib(-1, kw_only=True, validator=instance_of(int))
+    numbered: Union[bool, int] = attr.ib(
+        False, kw_only=True, validator=instance_of((bool, int))
+    )
+    reversed: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
+    titlesonly: bool = attr.ib(True, kw_only=True, validator=instance_of(bool))
 
     def files(self) -> List[str]:
         return [

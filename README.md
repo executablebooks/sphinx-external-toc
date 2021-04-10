@@ -84,60 +84,100 @@ sections:
 - glob: subfolder/other*
 ```
 
-### Titles and Captions
+### File and URL titles
 
-By default, ToCs will use the initial header within a document as its title.
+By default, the initial header within a `file` document will be used as its title in generated Table of Contents.
+With the `title` key you can set an alternative title for a document. and also for `url`:
 
-With the `title` key you can set an alternative title for a document or URL in the ToC.
-Each part can also have a `caption`, e.g. for use in ToC side-bars:
+```yaml
+root: intro
+parts:
+- sections:
+  - file: doc1
+    title: Document 1 Title
+  - url: https://example.com
+    title: Example URL Title
+```
+
+### ToC tree (part) options
+
+Each part can be configured with a number of options (see also [sphinx `toctree` options](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree)):
+
+- `caption` (string): A title for the whole the part, e.g. shown above the part in ToCs
+- `hidden` (boolean): Whether to show the ToC within (inline of) the document (default `False`).
+  By default it is appended to the end of the document, but see also the `tableofcontents` directive for positioning of the ToC.
+- `maxdepth` (integer): A maximum nesting depth to use when showing the ToC within the document.
+- `numbered` (boolean or integer): Automatically add numbers to all documents within a part (default `False`).
+  If set to `True`, all sub-parts will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
+  or if set to an integer then the numbering will only be applied to that depth.
+- `reversed` (boolean): If `True` then the entries in the part will be listed in reverse order.
+  This can be useful when using `glob` sections.
+- `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level.
+
+These options can be set at the level of the part:
 
 ```yaml
 root: intro
 parts:
 - caption: Part Caption
+  hidden: False
+  maxdepth: 1
+  numbered: True
+  reversed: False
+  titlesonly: True
   sections:
   - file: doc1
-    title: Document 1
-  - url: https://example.com
-    title: Example Site
+    parts:
+    - titlesonly: True
+      sections:
+      - file: doc2
 ```
 
-### Numbering
-
-You can automatically add numbers to all docs with a part by adding the `numbered: true` flag to it:
+or, if you are using the shorthand for a single part, set options under an `options` key:
 
 ```yaml
 root: intro
-parts:
-- numbered: true
+options:
+  caption: Part Caption
+  hidden: False
+  maxdepth: 1
+  numbered: True
+  reversed: False
+  titlesonly: True
+sections:
+- file: doc1
+  options:
+    titlesonly: True
   sections:
-  - file: doc1
   - file: doc2
 ```
 
-You can also **limit the TOC numbering depth** by setting the `numbered` flag to an integer instead of `true`, e.g., `numbered: 3`.
+You can also use the top-level `defaults` key, to set default options for all parts:
+
+```yaml
+root: intro
+defaults:
+  titlesonly: True
+options:
+  caption: Part Caption
+  hidden: False
+  maxdepth: 1
+  numbered: True
+  reversed: False
+sections:
+- file: doc1
+  sections:
+  - file: doc2
+```
+
+:::{warning}
+`numbered` should not generally be used as a default, since numbering cannot be changed by nested parts, and sphinx will log a warning.
+:::
 
 :::{note}
 By default, section numbering restarts for each `part`.
 If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
 :::
-
-### Defaults
-
-To have e.g. `numbered` added to all toctrees, set it under a `defaults` top-level key:
-
-```yaml
-defaults:
-  numbered: true
-root: intro
-sections:
-- file: doc1
-  sections:
-  - file: doc2
-  - url: https://example.com
-```
-
-Available keys: `numbered`, `titlesonly`, `reversed`
 
 ## Add a ToC to a page's content
 
@@ -158,6 +198,8 @@ MyST Markdown:
 ````
 
 Currently, only one `tableofcontents` should be used per page (all `toctree` will be added here), and only if it is a page with child/descendant documents.
+
+Note, this will override the `hidden` option set for a part.
 
 ## Excluding files not in ToC
 
@@ -313,9 +355,6 @@ intro:
 
 Questions / TODOs:
 
-- add migration CLI command for old jupyter-book format
-- Should `titlesonly` default to `True` (as in jupyter-book)?
-- nested numbered toctree not allowed (logs warning), so should be handled if `numbered: true` is in defaults
 - Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`
 - Using `external_toc_exclude_missing` to exclude a certain file suffix:
   currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,

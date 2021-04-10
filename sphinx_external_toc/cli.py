@@ -1,11 +1,15 @@
-from pathlib import PurePosixPath
+from pathlib import Path, PurePosixPath
 
 import click
 import yaml
 
 from sphinx_external_toc import __version__
 from sphinx_external_toc.parsing import create_toc_dict, parse_toc_yaml
-from sphinx_external_toc.tools import create_site_from_toc, create_site_map_from_path
+from sphinx_external_toc.tools import (
+    create_site_from_toc,
+    create_site_map_from_path,
+    migrate_jupyter_book,
+)
 
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
@@ -105,3 +109,17 @@ def create_toc(site_folder, extension, index, skip_match, guess_titles):
             site_map[docname].title = " ".join(words).capitalize()
     data = create_toc_dict(site_map)
     click.echo(yaml.dump(data, sort_keys=False, default_flow_style=False))
+
+
+@main.command("migrate")
+@click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
+@click.option(
+    "-f",
+    "--format",
+    type=click.Choice(["jb-v0.10"]),
+    help="The format to migrate from.",
+)
+def migrate_toc(toc_file, format):
+    """Migrate a ToC from a previous revision."""
+    toc = migrate_jupyter_book(Path(toc_file))
+    click.echo(yaml.dump(toc, sort_keys=False, default_flow_style=False))

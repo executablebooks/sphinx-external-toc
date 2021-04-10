@@ -17,12 +17,16 @@ intro:
   docname: intro
   parts:
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:
     - doc1
     titlesonly: true
   - caption: null
+    hidden: true
+    maxdepth: -1
     numbered: false
     reversed: false
     sections:

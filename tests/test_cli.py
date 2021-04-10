@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 from sphinx_external_toc import __version__
-from sphinx_external_toc.cli import create_toc, main, parse_toc
+from sphinx_external_toc.cli import create_toc, main, migrate_toc, parse_toc
 
 
 @pytest.fixture()
@@ -57,3 +57,11 @@ def test_create_toc(tmp_path, invoke_cli, file_regression):
         path.touch()
     result = invoke_cli(create_toc, [os.path.abspath(tmp_path), "-t"])
     file_regression.check(result.output.rstrip())
+
+
+def test_migrate_toc(invoke_cli):
+    path = os.path.abspath(
+        Path(__file__).parent.joinpath("_jb_migrate_toc_files", "simple_list.yml")
+    )
+    result = invoke_cli(migrate_toc, [path])
+    assert "root: index" in result.output

@@ -1,8 +1,9 @@
 defaults:
-  numbered: true
+  titlesonly: true
 root: intro
 parts:
   - caption: Part Caption
+    numbered: true
     sections:
     - file: doc1
     - file: doc2

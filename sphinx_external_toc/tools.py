@@ -3,10 +3,12 @@ import shutil
 from fnmatch import fnmatch
 from itertools import chain
 from pathlib import Path, PurePosixPath
-from typing import Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, Mapping, MutableMapping, Optional, Sequence, Tuple, Union, cast
+
+import yaml
 
 from .api import DocItem, FileItem, SiteMap, TocItem
-from .parsing import parse_toc_yaml
+from .parsing import MalformedError, parse_toc_yaml
 
 
 def create_site_from_toc(
@@ -261,3 +263,93 @@ def _assess_folder(
     index_file = sub_files.pop(index)
 
     return (index_file, sub_files, sub_folders)
+
+
+def migrate_jupyter_book(
+    toc: Union[Path, MutableMapping[str, Any], list]
+) -> MutableMapping[str, Any]:
+    """Migrate a jupyter-book v0.10.2 toc."""
+
+    if isinstance(toc, Path):
+        with toc.open(encoding="utf8") as handle:
+            toc = yaml.safe_load(handle)
+
+    # convert list to dict
+    if isinstance(toc, list):
+        toc_updated = toc[0]
+        if len(toc) > 1:
+            subsections = toc[1:]
+            # The first set of pages will be called *either* sections or chapters
+            first_sections = toc_updated.get("sections", [])
+            first_sections += toc_updated.get("chapters", [])
+            first_sections += subsections
+            contains_part = any(
+                ("part" in section or "chapter" in section)
+                for section in first_sections
+            )
+            contains_file = any("file" in section for section in first_sections)
+            if contains_part and contains_file:
+                raise MalformedError(
+                    "top-level contains mixed parts and individual files"
+                )
+            toc_updated["parts" if contains_part else "sections"] = first_sections
+            toc_updated.pop("chapters", None)
+        toc = toc_updated
+    elif not isinstance(toc, MutableMapping):
+        raise MalformedError("ToC is not a list or mapping")
+
+    toc = cast(MutableMapping[str, Any], toc)
+
+    # convert first `file` to `root`
+    if "file" in toc:
+        toc["root"] = toc.pop("file")
+
+    # set `titlesonly` True as default
+    toc["defaults"] = {"titlesonly": True}
+
+    # change all chapters to sections
+    # change all part/chapter to caption
+    dicts = [toc]
+    while dicts:
+        dct = dicts.pop(0)
+        if "chapters" in dct:
+            if "sections" in dct:
+                raise MalformedError(
+                    f"both 'chapters' and 'sections' in same dict: {dct}"
+                )
+            dct["sections"] = dct.pop("chapters")
+        for key in ("part", "chapter"):
+            if key in dct:
+                if "caption" in dct:
+                    raise MalformedError(
+                        f"'caption' already in dict, when converting '{key}'"
+                    )
+                dct["caption"] = dct.pop(key)
+
+        # add nested dicts
+        for val in dct.values():
+            vals = val if isinstance(val, Sequence) else [val]
+            for item in vals:
+                if isinstance(item, MutableMapping):
+                    dicts.append(item)
+
+    # if `numbered` at top level, move to options or copy to each part
+    if "numbered" in toc:
+        numbered = toc.pop("numbered")
+        if "sections" in toc:
+            toc["options"] = {"numbered": numbered}
+        for part in toc.get("parts", []):
+            if "numbered" not in part:
+                part["numbered"] = numbered
+
+    # order keys
+    keys = list(toc.keys())
+    sort_key = {
+        key: i
+        for i, key in enumerate(
+            ["root", "title", "defaults", "options", "sections", "parts", "meta"]
+        )
+    }
+    toc = {key: toc[key] for key in sorted(keys, key=lambda k: sort_key.get(k, 99))}
+
+    return toc

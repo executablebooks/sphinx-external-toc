@@ -1,0 +1,6 @@
+defaults:
+  titlesonly: true
+root: index
+sections:
+- file: content1
+- file: content2
