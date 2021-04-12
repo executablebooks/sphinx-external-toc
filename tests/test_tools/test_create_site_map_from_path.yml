@@ -1,90 +1,92 @@
-11_other:
-  docname: 11_other
-  parts: []
-  title: null
-1_other:
-  docname: 1_other
-  parts: []
-  title: null
-_root: index
-index:
-  docname: index
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - 1_other
-    - 11_other
-    - subfolder1/index
-    - subfolder2/index
-    - subfolder3/no_index1
-    - subfolder14/index
-    titlesonly: true
-  title: null
-subfolder1/index:
-  docname: subfolder1/index
-  parts: []
-  title: null
-subfolder14/index:
-  docname: subfolder14/index
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - subfolder14/subsubfolder/index
-    titlesonly: true
-  title: null
-subfolder14/subsubfolder/index:
-  docname: subfolder14/subsubfolder/index
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - subfolder14/subsubfolder/other
-    titlesonly: true
-  title: null
-subfolder14/subsubfolder/other:
-  docname: subfolder14/subsubfolder/other
-  parts: []
-  title: null
-subfolder2/index:
-  docname: subfolder2/index
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - subfolder2/other
-    titlesonly: true
-  title: null
-subfolder2/other:
-  docname: subfolder2/other
-  parts: []
-  title: null
-subfolder3/no_index1:
-  docname: subfolder3/no_index1
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - subfolder3/no_index2
-    titlesonly: true
-  title: null
-subfolder3/no_index2:
-  docname: subfolder3/no_index2
-  parts: []
-  title: null
+documents:
+  11_other:
+    docname: 11_other
+    subtrees: []
+    title: null
+  1_other:
+    docname: 1_other
+    subtrees: []
+    title: null
+  index:
+    docname: index
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - 1_other
+      - 11_other
+      - subfolder1/index
+      - subfolder2/index
+      - subfolder3/no_index1
+      - subfolder14/index
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  subfolder1/index:
+    docname: subfolder1/index
+    subtrees: []
+    title: null
+  subfolder14/index:
+    docname: subfolder14/index
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - subfolder14/subsubfolder/index
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  subfolder14/subsubfolder/index:
+    docname: subfolder14/subsubfolder/index
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - subfolder14/subsubfolder/other
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  subfolder14/subsubfolder/other:
+    docname: subfolder14/subsubfolder/other
+    subtrees: []
+    title: null
+  subfolder2/index:
+    docname: subfolder2/index
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - subfolder2/other
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  subfolder2/other:
+    docname: subfolder2/other
+    subtrees: []
+    title: null
+  subfolder3/no_index1:
+    docname: subfolder3/no_index1
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - subfolder3/no_index2
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  subfolder3/no_index2:
+    docname: subfolder3/no_index2
+    subtrees: []
+    title: null
+meta: {}
+root: index

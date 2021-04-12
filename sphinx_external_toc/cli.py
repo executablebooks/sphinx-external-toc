@@ -23,7 +23,7 @@ def main():
 def parse_toc(toc_file):
     """Parse a ToC file to a site-map YAML."""
     site_map = parse_toc_yaml(toc_file)
-    click.echo(yaml.dump(site_map.as_json()))
+    click.echo(yaml.dump(site_map.as_json(), sort_keys=False, default_flow_style=False))
 
 
 @main.command("create-site")

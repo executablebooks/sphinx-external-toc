@@ -1,43 +1,44 @@
-_meta:
+documents:
+  doc1:
+    docname: doc1
+    subtrees: []
+    title: null
+  doc2:
+    docname: doc2
+    subtrees: []
+    title: null
+  doc3:
+    docname: doc3
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - subfolder/doc4
+      - title: null
+        url: https://example.com
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  intro:
+    docname: intro
+    subtrees:
+    - caption: Part Caption
+      hidden: true
+      items:
+      - doc1
+      - doc2
+      - doc3
+      maxdepth: -1
+      numbered: true
+      reversed: false
+      titlesonly: true
+    title: null
+  subfolder/doc4:
+    docname: subfolder/doc4
+    subtrees: []
+    title: null
+meta:
   regress: intro
-_root: intro
-doc1:
-  docname: doc1
-  parts: []
-  title: null
-doc2:
-  docname: doc2
-  parts: []
-  title: null
-doc3:
-  docname: doc3
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - subfolder/doc4
-    - title: null
-      url: https://example.com
-    titlesonly: true
-  title: null
-intro:
-  docname: intro
-  parts:
-  - caption: Part Caption
-    hidden: true
-    maxdepth: -1
-    numbered: true
-    reversed: false
-    sections:
-    - doc1
-    - doc2
-    - doc3
-    titlesonly: true
-  title: null
-subfolder/doc4:
-  docname: subfolder/doc4
-  parts: []
-  title: null
+root: intro

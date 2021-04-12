@@ -1,43 +1,44 @@
-_meta:
+documents:
+  folder/doc1:
+    docname: folder/doc1
+    subtrees: []
+    title: null
+  folder/doc2:
+    docname: folder/doc2
+    subtrees: []
+    title: null
+  folder/doc3:
+    docname: folder/doc3
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - folder/subfolder/doc4
+      - folder/globfolder/*
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+  folder/subfolder/doc4:
+    docname: folder/subfolder/doc4
+    subtrees: []
+    title: null
+  intro:
+    docname: intro
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - folder/doc1
+      - folder/doc2
+      - folder/doc3
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+meta:
   create_files:
   - folder/globfolder/glob1
-_root: intro
-folder/doc1:
-  docname: folder/doc1
-  parts: []
-  title: null
-folder/doc2:
-  docname: folder/doc2
-  parts: []
-  title: null
-folder/doc3:
-  docname: folder/doc3
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - folder/subfolder/doc4
-    - folder/globfolder/*
-    titlesonly: true
-  title: null
-folder/subfolder/doc4:
-  docname: folder/subfolder/doc4
-  parts: []
-  title: null
-intro:
-  docname: intro
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - folder/doc1
-    - folder/doc2
-    - folder/doc3
-    titlesonly: true
-  title: null
+root: intro

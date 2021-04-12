@@ -7,7 +7,7 @@ from typing import Any, Mapping, MutableMapping, Optional, Sequence, Tuple, Unio
 
 import yaml
 
-from .api import DocItem, FileItem, SiteMap, TocItem
+from .api import Document, FileItem, SiteMap, TocTree
 from .parsing import MalformedError, parse_toc_yaml
 
 
@@ -129,7 +129,7 @@ def create_site_map_from_path(
     # we add all files to the site map, even if they don't have descendants
     # so we may later change their title
     for root_file in root_files:
-        site_map[root_file] = DocItem(root_file)
+        site_map[root_file] = Document(root_file)
 
     # while there are subfolders add them to the site-map
     while indexed_folders:
@@ -137,7 +137,7 @@ def create_site_map_from_path(
         for child_file in child_files:
             child_docname = (sub_path / child_file).relative_to(root_path).as_posix()
             assert child_docname not in site_map
-            site_map[child_docname] = DocItem(child_docname)
+            site_map[child_docname] = Document(child_docname)
         doc_item, new_indexed_folders = _doc_item_from_path(
             root_path,
             sub_path,
@@ -164,7 +164,7 @@ def _doc_item_from_path(
     default_index: str,
     ignore_matches: Sequence[str],
 ):
-    """Return the ``DocItem`` and children folders that contain an index."""
+    """Return the ``Document`` and children folders that contain an index."""
     file_items = [
         FileItem((folder / name).relative_to(root).as_posix())
         for name in other_docnames
@@ -186,9 +186,9 @@ def _doc_item_from_path(
             FileItem((sub_folder / child_index).relative_to(root).as_posix())
         )
 
-    doc_item = DocItem(
+    doc_item = Document(
         docname=(folder / index_docname).relative_to(root).as_posix(),
-        parts=[TocItem(sections=file_items + index_items)]  # type: ignore[arg-type]
+        subtrees=[TocTree(items=file_items + index_items)]  # type: ignore[arg-type]
         if (file_items or index_items)
         else [],
     )

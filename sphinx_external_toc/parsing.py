@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 import attr
 import yaml
 
-from .api import DocItem, FileItem, GlobItem, SiteMap, TocItem, UrlItem
+from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 
 FILE_KEY = "file"
 GLOB_KEY = "glob"
@@ -51,7 +51,7 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
 
 def _parse_doc_item(
     data: Dict[str, Any], defaults: Dict[str, Any], path: str, file_key: str = FILE_KEY
-) -> Tuple[DocItem, Sequence[Dict[str, Any]]]:
+) -> Tuple[Document, Sequence[Dict[str, Any]]]:
     """Parse a single doc item."""
     if file_key not in data:
         raise MalformedError(f"'{file_key}' key not found: '{path}'")
@@ -127,13 +127,15 @@ def _parse_doc_item(
                 keywords[key] = defaults[key]
 
         try:
-            toc_item = TocItem(sections=sections, **keywords)
+            toc_item = TocTree(items=sections, **keywords)
         except TypeError as exc:
             raise MalformedError(f"toctree validation: {path}{part_idx}") from exc
         parts.append(toc_item)
 
     try:
-        doc_item = DocItem(docname=data[file_key], title=data.get("title"), parts=parts)
+        doc_item = Document(
+            docname=data[file_key], title=data.get("title"), subtrees=parts
+        )
     except TypeError as exc:
         raise MalformedError(f"doc validation: {path}") from exc
 
@@ -179,7 +181,7 @@ def create_toc_dict(site_map: SiteMap, *, skip_defaults: bool = True) -> Dict[st
 
 
 def _docitem_to_dict(
-    doc_item: DocItem,
+    doc_item: Document,
     site_map: SiteMap,
     *,
     skip_defaults: bool = True,
@@ -199,7 +201,7 @@ def _docitem_to_dict(
     if doc_item.title is not None:
         data["title"] = doc_item.title
 
-    if not doc_item.parts:
+    if not doc_item.subtrees:
         return data
 
     def _parse_section(item):
@@ -221,15 +223,15 @@ def _docitem_to_dict(
         raise TypeError(item)
 
     data["parts"] = []
-    fields = attr.fields_dict(TocItem)
-    for part in doc_item.parts:
+    fields = attr.fields_dict(TocTree)
+    for part in doc_item.subtrees:
         # only add these keys if their value is not the default
         part_data = {
             key: getattr(part, key)
             for key in ("caption", "numbered", "reversed", "titlesonly")
             if (not skip_defaults) or getattr(part, key) != fields[key].default
         }
-        part_data["sections"] = [_parse_section(s) for s in part.sections]
+        part_data["sections"] = [_parse_section(s) for s in part.items]
         data["parts"].append(part_data)
 
     # apply shorthand if possible
