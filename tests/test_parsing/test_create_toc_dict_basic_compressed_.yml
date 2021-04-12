@@ -1,12 +1,12 @@
 meta:
   regress: intro
-parts:
-- numbered: true
-  sections:
-  - file: doc1
-  - file: doc2
-  - file: doc3
-    sections:
-    - file: doc4
-    - url: https://example.com
+options:
+  numbered: true
 root: intro
+sections:
+- file: doc1
+- file: doc2
+- file: doc3
+  sections:
+  - file: doc4
+  - url: https://example.com

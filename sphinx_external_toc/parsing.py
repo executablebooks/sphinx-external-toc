@@ -8,6 +8,9 @@ import yaml
 
 from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 
+DEFAULT_SUBTREES_KEY = "parts"
+DEFAULT_ITEMS_KEY = "sections"
+
 FILE_KEY = "file"
 GLOB_KEY = "glob"
 URL_KEY = "url"
@@ -50,100 +53,109 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
 
 
 def _parse_doc_item(
-    data: Dict[str, Any], defaults: Dict[str, Any], path: str, file_key: str = FILE_KEY
+    data: Dict[str, Any],
+    defaults: Dict[str, Any],
+    path: str,
+    *,
+    subtrees_key: str = DEFAULT_SUBTREES_KEY,
+    items_key: str = DEFAULT_ITEMS_KEY,
+    file_key: str = FILE_KEY,
 ) -> Tuple[Document, Sequence[Dict[str, Any]]]:
     """Parse a single doc item."""
     if file_key not in data:
         raise MalformedError(f"'{file_key}' key not found: '{path}'")
-    if "sections" in data:
-        # this is a shorthand for defining a single part
-        if "parts" in data:
-            raise MalformedError(f"Both 'sections' and 'parts' found: '{path}'")
-        parts_data = [{"sections": data["sections"], **data.get("options", {})}]
-    elif "parts" in data:
-        parts_data = data["parts"]
-        if not (isinstance(parts_data, Sequence) and parts_data):
-            raise MalformedError(f"parts not a non-empty list: '{path}'")
+    if items_key in data:
+        # this is a shorthand for defining a single subtree
+        if subtrees_key in data:
+            raise MalformedError(
+                f"Both '{subtrees_key}' and '{items_key}' found: '{path}'"
+            )
+        subtrees_data = [{items_key: data[items_key], **data.get("options", {})}]
+    elif subtrees_key in data:
+        subtrees_data = data[subtrees_key]
+        if not (isinstance(subtrees_data, Sequence) and subtrees_data):
+            raise MalformedError(f"'{subtrees_key}' not a non-empty list: '{path}'")
     else:
-        parts_data = []
+        subtrees_data = []
 
     _known_link_keys = {FILE_KEY, GLOB_KEY, URL_KEY}
 
-    parts = []
-    for part_idx, part in enumerate(parts_data):
+    toctrees = []
+    for toc_idx, toc_data in enumerate(subtrees_data):
 
-        if not (isinstance(part, Mapping) and "sections" in part):
+        if not (isinstance(toc_data, Mapping) and items_key in toc_data):
             raise MalformedError(
-                f"part not a mapping containing 'sections' key: '{path}{part_idx}'"
+                f"part not a mapping containing '{items_key}' key: '{path}{toc_idx}'"
             )
 
-        section_data = part["sections"]
+        items_data = toc_data[items_key]
 
-        if not (isinstance(section_data, Sequence) and section_data):
-            raise MalformedError(f"sections not a non-empty list: '{path}{part_idx}'")
+        if not (isinstance(items_data, Sequence) and items_data):
+            raise MalformedError(
+                f"'{items_key}' not a non-empty list: '{path}{toc_idx}'"
+            )
 
         # generate sections list
-        sections: List[Union[GlobItem, FileItem, UrlItem]] = []
-        for sect_idx, section in enumerate(section_data):
+        items: List[Union[GlobItem, FileItem, UrlItem]] = []
+        for item_idx, item_data in enumerate(items_data):
 
-            if not isinstance(section, Mapping):
+            if not isinstance(item_data, Mapping):
                 raise MalformedError(
-                    f"toctree section not a mapping type: '{path}{part_idx}/{sect_idx}'"
+                    f"'{items_key}' item not a mapping type: '{path}{toc_idx}/{item_idx}'"
                 )
 
-            link_keys = _known_link_keys.intersection(section)
+            link_keys = _known_link_keys.intersection(item_data)
+
+            # validation checks
             if not link_keys:
                 raise MalformedError(
-                    "toctree section does not contain one of "
-                    f"{_known_link_keys!r}: '{path}{part_idx}/{sect_idx}'"
+                    f"'{items_key}' item does not contain one of "
+                    f"{_known_link_keys!r}: '{path}{toc_idx}/{item_idx}'"
                 )
             if not len(link_keys) == 1:
                 raise MalformedError(
-                    "toctree section contains incompatible keys "
-                    f"{link_keys!r}: {path}{part_idx}/{sect_idx}"
+                    f"'{items_key}' item contains incompatible keys "
+                    f"{link_keys!r}: {path}{toc_idx}/{item_idx}"
                 )
+            for item_key in (GLOB_KEY, URL_KEY):
+                for other_key in (subtrees_key, items_key):
+                    if link_keys == {item_key} and other_key in item_data:
+                        raise MalformedError(
+                            f"'{items_key}' item contains incompatible keys "
+                            f"'{item_key}' and '{other_key}': {path}{toc_idx}/{item_idx}"
+                        )
 
             if link_keys == {FILE_KEY}:
-                sections.append(FileItem(section[FILE_KEY]))
+                items.append(FileItem(item_data[FILE_KEY]))
             elif link_keys == {GLOB_KEY}:
-                if "sections" in section or "parts" in section:
-                    raise MalformedError(
-                        "toctree section contains incompatible keys "
-                        f"{GLOB_KEY} and parts/sections: {path}{part_idx}/{sect_idx}"
-                    )
-                sections.append(GlobItem(section[GLOB_KEY]))
+                items.append(GlobItem(item_data[GLOB_KEY]))
             elif link_keys == {URL_KEY}:
-                if "sections" in section or "parts" in section:
-                    raise MalformedError(
-                        "toctree section contains incompatible keys "
-                        f"{URL_KEY} and parts/sections: {path}{part_idx}/{sect_idx}"
-                    )
-                sections.append(UrlItem(section[URL_KEY], section.get("title")))
+                items.append(UrlItem(item_data[URL_KEY], item_data.get("title")))
 
         # generate toc key-word arguments
-        keywords = {k: part[k] for k in TOCTREE_OPTIONS if k in part}
+        keywords = {k: toc_data[k] for k in TOCTREE_OPTIONS if k in toc_data}
         for key in defaults:
             if key not in keywords:
                 keywords[key] = defaults[key]
 
         try:
-            toc_item = TocTree(items=sections, **keywords)
+            toc_item = TocTree(items=items, **keywords)
         except TypeError as exc:
-            raise MalformedError(f"toctree validation: {path}{part_idx}") from exc
-        parts.append(toc_item)
+            raise MalformedError(f"toctree validation: {path}{toc_idx}") from exc
+        toctrees.append(toc_item)
 
     try:
         doc_item = Document(
-            docname=data[file_key], title=data.get("title"), subtrees=parts
+            docname=data[file_key], title=data.get("title"), subtrees=toctrees
         )
     except TypeError as exc:
         raise MalformedError(f"doc validation: {path}") from exc
 
     docs_data = [
-        section
-        for part in parts_data
-        for section in part["sections"]
-        if FILE_KEY in section
+        item_data
+        for toc_data in subtrees_data
+        for item_data in toc_data[items_key]
+        if FILE_KEY in item_data
     ]
 
     return (
@@ -185,6 +197,8 @@ def _docitem_to_dict(
     site_map: SiteMap,
     *,
     skip_defaults: bool = True,
+    subtrees_key: str = DEFAULT_SUBTREES_KEY,
+    items_key: str = DEFAULT_ITEMS_KEY,
     file_key: str = FILE_KEY,
     parsed_docnames: Optional[Set[str]] = None,
 ) -> Dict[str, Any]:
@@ -204,7 +218,7 @@ def _docitem_to_dict(
     if not doc_item.subtrees:
         return data
 
-    def _parse_section(item):
+    def _parse_item(item):
         if isinstance(item, FileItem):
             if item in site_map:
                 return _docitem_to_dict(
@@ -222,20 +236,26 @@ def _docitem_to_dict(
             return {URL_KEY: item.url}
         raise TypeError(item)
 
-    data["parts"] = []
+    data[subtrees_key] = []
     fields = attr.fields_dict(TocTree)
-    for part in doc_item.subtrees:
+    for toctree in doc_item.subtrees:
         # only add these keys if their value is not the default
-        part_data = {
-            key: getattr(part, key)
-            for key in ("caption", "numbered", "reversed", "titlesonly")
-            if (not skip_defaults) or getattr(part, key) != fields[key].default
+        toctree_data = {
+            key: getattr(toctree, key)
+            for key in TOCTREE_OPTIONS
+            if (not skip_defaults) or getattr(toctree, key) != fields[key].default
         }
-        part_data["sections"] = [_parse_section(s) for s in part.items]
-        data["parts"].append(part_data)
+        toctree_data[items_key] = [_parse_item(s) for s in toctree.items]
+        data[subtrees_key].append(toctree_data)
 
-    # apply shorthand if possible
-    if len(data["parts"]) == 1 and list(data["parts"][0]) == ["sections"]:
-        data["sections"] = data.pop("parts")[0]["sections"]
+    # apply shorthand if possible (one toctree in subtrees)
+    if len(data[subtrees_key]) == 1 and items_key in data[subtrees_key][0]:
+        old_toctree_data = data.pop(subtrees_key)[0]
+        data[items_key] = old_toctree_data[items_key]
+        # move options to options key
+        if len(old_toctree_data) > 1:
+            data["options"] = {
+                k: v for k, v in old_toctree_data.items() if k != items_key
+            }
 
     return data
