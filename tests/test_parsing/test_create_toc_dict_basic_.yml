@@ -1,13 +1,13 @@
 meta:
   regress: intro
-parts:
-- caption: Part Caption
+options:
+  caption: Part Caption
   numbered: true
-  sections:
-  - file: doc1
-  - file: doc2
-  - file: doc3
-    sections:
-    - file: subfolder/doc4
-    - url: https://example.com
 root: intro
+sections:
+- file: doc1
+- file: doc2
+- file: doc3
+  sections:
+  - file: subfolder/doc4
+  - url: https://example.com
