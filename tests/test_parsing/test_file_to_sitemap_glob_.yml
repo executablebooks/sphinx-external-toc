@@ -1,18 +1,19 @@
-_meta:
+documents:
+  intro:
+    docname: intro
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - doc*
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+meta:
   create_files:
   - doc1
   - doc2
   - doc3
-_root: intro
-intro:
-  docname: intro
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - doc*
-    titlesonly: true
-  title: null
+root: intro

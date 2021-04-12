@@ -1,23 +1,24 @@
-_meta:
+documents:
+  doc1:
+    docname: doc1
+    subtrees: []
+    title: null
+  intro:
+    docname: intro
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - doc1
+      - subfolder/other*
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+meta:
   create_files:
   - doc2
   - subfolder/other1
   exclude_missing: true
-_root: intro
-doc1:
-  docname: doc1
-  parts: []
-  title: null
-intro:
-  docname: intro
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - doc1
-    - subfolder/other*
-    titlesonly: true
-  title: null
+root: intro

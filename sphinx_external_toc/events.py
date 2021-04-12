@@ -14,7 +14,7 @@ from sphinx.util import logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
-from .api import DocItem, FileItem, GlobItem, SiteMap, UrlItem
+from .api import Document, FileItem, GlobItem, SiteMap, UrlItem
 from .parsing import parse_toc_yaml
 
 logger = logging.getLogger(__name__)
@@ -166,9 +166,9 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     )
 
     site_map: SiteMap = app.env.external_site_map
-    doc_item: Optional[DocItem] = site_map.get(app.env.docname)
+    doc_item: Optional[Document] = site_map.get(app.env.docname)
 
-    if doc_item is None or not doc_item.parts:
+    if doc_item is None or not doc_item.subtrees:
         if toc_placeholders:
             create_warning(
                 app,
@@ -199,7 +199,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
     node_list: List[nodes.Element] = []
 
-    for toctree in doc_item.parts:
+    for toctree in doc_item.subtrees:
 
         subnode = toctree_node()
         subnode["parent"] = app.env.docname
@@ -211,7 +211,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         # TODO this wasn't in the original code,
         # but alabaster theme intermittently raised `KeyError('rawcaption')`
         subnode["rawcaption"] = toctree.caption or ""
-        subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.sections)
+        subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.items)
         subnode["hidden"] = False if toc_placeholders else toctree.hidden
         subnode["includehidden"] = False
         subnode["numbered"] = (
@@ -223,7 +223,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         wrappernode = nodes.compound(classes=["toctree-wrapper"])
         wrappernode.append(subnode)
 
-        for entry in toctree.sections:
+        for entry in toctree.items:
 
             if isinstance(entry, UrlItem):
 

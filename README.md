@@ -321,7 +321,7 @@ sections:
 
 ## API
 
-The ToC file is parsed to a `SiteMap`, which is a `MutableMapping` subclass, with keys representing docnames mapping to a `DocItem` that stores information on the toctrees it should contain:
+The ToC file is parsed to a `SiteMap`, which is a `MutableMapping` subclass, with keys representing docnames mapping to a `Document` that stores information on the toctrees it should contain:
 
 ```python
 import yaml
@@ -334,21 +334,23 @@ yaml.dump(site_map.as_json())
 Would produce e.g.
 
 ```yaml
-_root: intro
-doc1:
-  docname: doc1
-  parts: []
-  title: null
-intro:
-  docname: intro
-  parts:
-  - caption: Part Caption
-    numbered: true
-    reversed: false
-    sections:
-    - doc1
-    titlesonly: true
-  title: null
+root: intro
+documents:
+  doc1:
+    docname: doc1
+    subtrees: []
+    title: null
+  intro:
+    docname: intro
+    subtrees:
+    - caption: Part Caption
+      numbered: true
+      reversed: false
+      items:
+      - doc1
+      titlesonly: true
+    title: null
+meta: {}
 ```
 
 ## Development Notes

@@ -1,35 +1,36 @@
-_meta:
+documents:
+  doc1:
+    docname: doc1
+    subtrees: []
+    title: null
+  doc2:
+    docname: doc2
+    subtrees: []
+    title: null
+  intro:
+    docname: intro
+    subtrees:
+    - caption: null
+      hidden: true
+      items:
+      - doc1
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    - caption: null
+      hidden: true
+      items:
+      - doc2
+      maxdepth: -1
+      numbered: false
+      reversed: false
+      titlesonly: true
+    title: null
+meta:
   create_append:
     intro: '.. tableofcontents::
 
       '
   regress: intro
-_root: intro
-doc1:
-  docname: doc1
-  parts: []
-  title: null
-doc2:
-  docname: doc2
-  parts: []
-  title: null
-intro:
-  docname: intro
-  parts:
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - doc1
-    titlesonly: true
-  - caption: null
-    hidden: true
-    maxdepth: -1
-    numbered: false
-    reversed: false
-    sections:
-    - doc2
-    titlesonly: true
-  title: null
+root: intro
