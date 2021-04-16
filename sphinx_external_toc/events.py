@@ -46,6 +46,14 @@ def create_warning(
     return None
 
 
+def remove_suffix(docname: str, suffixes: List[str]) -> str:
+    """Remove any suffixes."""
+    for suffix in suffixes:
+        if docname.endswith(suffix):
+            return docname[: -len(suffix)]
+    return docname
+
+
 def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     """Parse the external toc file and store it in the Sphinx environment.
 
@@ -192,7 +200,6 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         node.replace_self([])
 
     # initial variables
-    suffixes = app.config.source_suffix
     all_docnames = app.env.found_docs.copy()
     all_docnames.remove(app.env.docname)  # remove current document
     excluded = Matcher(app.config.exclude_patterns)
@@ -235,11 +242,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
                 docname = str(entry)
                 title = child_doc_item.title
 
-                # remove any suffixes
-                for suffix in suffixes:
-                    if docname.endswith(suffix):
-                        docname = docname[: -len(suffix)]
-                        break
+                docname = remove_suffix(docname, app.config.source_suffix)
 
                 if docname not in app.env.found_docs:
                     if excluded(app.env.doc2path(docname, None)):
@@ -293,3 +296,26 @@ class InsertToctrees(SphinxTransform):
 
     def apply(self, **kwargs: Any) -> None:
         insert_toctrees(self.app, self.document)
+
+
+def ensure_index_file(app: Sphinx, exception: Optional[Exception]) -> None:
+    """Ensure that an index.html exists for HTML builds.
+
+    This is required when navigating to the site, without specifying a page,
+    which will then route to index.html by default.
+    """
+    index_path = Path(app.outdir).joinpath("index.html")
+    if (
+        exception is not None
+        or "html" not in app.builder.format
+        or app.config.master_doc == "index"
+        # TODO rewrite the redirect if master_doc has changed since last build
+        or index_path.exists()
+    ):
+        return
+    root_name = remove_suffix(app.config.master_doc, app.config.source_suffix)
+    # TODO the other way to do this would be to
+    # simply copy the contents of the root file? (this method was taken from jupyter-book)
+    redirect_text = f'<meta http-equiv="Refresh" content="0; url={root_name}.html" />\n'
+    index_path.write_text(redirect_text, encoding="utf8")
+    logger.info("[etoc] missing index.html written as redirect to '%s.html'", root_name)

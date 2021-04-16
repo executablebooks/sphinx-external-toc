@@ -15,6 +15,7 @@ def setup(app: "Sphinx") -> dict:
         InsertToctrees,
         TableofContents,
         add_changed_toctrees,
+        ensure_index_file,
         parse_toc_to_env,
     )
 
@@ -29,5 +30,6 @@ def setup(app: "Sphinx") -> dict:
     app.connect("env-get-outdated", add_changed_toctrees)
     app.add_directive("tableofcontents", TableofContents)
     app.add_transform(InsertToctrees)
+    app.connect("build-finished", ensure_index_file)
 
     return {"version": __version__, "parallel_read_safe": True}
