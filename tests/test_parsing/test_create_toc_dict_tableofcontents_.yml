@@ -4,9 +4,9 @@ meta:
 
       '
   regress: intro
-parts:
+root: intro
+subtrees:
 - sections:
   - file: doc1
 - sections:
   - file: doc2
-root: intro

@@ -1,7 +1,7 @@
 root: intro
 defaults:
   titlesonly: false
-parts:
+subtrees:
 - caption: Part 1
   numbered: true
   sections:

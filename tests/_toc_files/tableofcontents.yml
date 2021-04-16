@@ -1,5 +1,5 @@
 root: intro
-parts:
+subtrees:
 - sections:
   - file: doc1
 - sections:
