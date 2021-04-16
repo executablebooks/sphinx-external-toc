@@ -8,7 +8,7 @@ import yaml
 
 from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 
-DEFAULT_SUBTREES_KEY = "parts"
+DEFAULT_SUBTREES_KEY = "subtrees"
 DEFAULT_ITEMS_KEY = "sections"
 
 FILE_KEY = "file"

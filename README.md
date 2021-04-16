@@ -39,7 +39,7 @@ The value of the `root` key will be a path to a file, in Unix format (folders sp
 This root file will be set as the [`master_doc`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-master_doc).
 :::
 
-Document files can then have a `parts` key - denoting a list of individual toctrees for that document - and in-turn each part should have a `sections` key - denoting a list of children links, that are one of: `file`, `url` or `glob`:
+Document files can then have a `subtrees` key - denoting a list of individual toctrees for that document - and in-turn each subtree should have a `sections` key - denoting a list of children links, that are one of: `file`, `url` or `glob`:
 
 - `file`: path to a single document file in Unix format,  with or without the file extension (as for `root`)
 - `glob`: path to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
@@ -53,13 +53,13 @@ This can proceed recursively to any depth.
 
 ```yaml
 root: intro
-parts:
+subtrees:
 - sections:
   - file: doc1
-    parts:
+    subtrees:
     - sections:
       - file: doc2
-        parts:
+        subtrees:
         - sections:
           - file: doc3
   - url: https://example.com
@@ -69,7 +69,7 @@ parts:
 This is equivalent to having a single `toctree` directive in `intro`, containing `doc1`,
 and a single `toctree` directive in `doc1`, with the `:glob:` flag and containing `doc2`, `https://example.com` and `subfolder/other*`.
 
-As a shorthand, the `sections` key can be at the same level as the `file`, which denotes a document with a single `part`.
+As a shorthand, the `sections` key can be at the same level as the `file`, which denotes a document with a single subtree.
 For example, this file is exactly equivalent to the one above:
 
 ```yaml
@@ -91,7 +91,7 @@ With the `title` key you can set an alternative title for a document. and also f
 
 ```yaml
 root: intro
-parts:
+subtrees:
 - sections:
   - file: doc1
     title: Document 1 Title
@@ -99,27 +99,27 @@ parts:
     title: Example URL Title
 ```
 
-### ToC tree (part) options
+### ToC tree options
 
-Each part can be configured with a number of options (see also [sphinx `toctree` options](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree)):
+Each subtree can be configured with a number of options (see also [sphinx `toctree` options](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree)):
 
-- `caption` (string): A title for the whole the part, e.g. shown above the part in ToCs
+- `caption` (string): A title for the whole the subtree, e.g. shown above the subtree in ToCs
 - `hidden` (boolean): Whether to show the ToC within (inline of) the document (default `False`).
   By default it is appended to the end of the document, but see also the `tableofcontents` directive for positioning of the ToC.
 - `maxdepth` (integer): A maximum nesting depth to use when showing the ToC within the document.
-- `numbered` (boolean or integer): Automatically add numbers to all documents within a part (default `False`).
-  If set to `True`, all sub-parts will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
+- `numbered` (boolean or integer): Automatically add numbers to all documents within a subtree (default `False`).
+  If set to `True`, all sub-trees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
   or if set to an integer then the numbering will only be applied to that depth.
-- `reversed` (boolean): If `True` then the entries in the part will be listed in reverse order.
+- `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order.
   This can be useful when using `glob` sections.
 - `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level.
 
-These options can be set at the level of the part:
+These options can be set at the level of the subtree:
 
 ```yaml
 root: intro
-parts:
-- caption: Part Caption
+subtrees:
+- caption: Subtree Caption
   hidden: False
   maxdepth: 1
   numbered: True
@@ -127,18 +127,18 @@ parts:
   titlesonly: True
   sections:
   - file: doc1
-    parts:
+    subtrees:
     - titlesonly: True
       sections:
       - file: doc2
 ```
 
-or, if you are using the shorthand for a single part, set options under an `options` key:
+or, if you are using the shorthand for a single subtree, set options under an `options` key:
 
 ```yaml
 root: intro
 options:
-  caption: Part Caption
+  caption: Subtree Caption
   hidden: False
   maxdepth: 1
   numbered: True
@@ -152,14 +152,14 @@ sections:
   - file: doc2
 ```
 
-You can also use the top-level `defaults` key, to set default options for all parts:
+You can also use the top-level `defaults` key, to set default options for all subtrees:
 
 ```yaml
 root: intro
 defaults:
   titlesonly: True
 options:
-  caption: Part Caption
+  caption: Subtree Caption
   hidden: False
   maxdepth: 1
   numbered: True
@@ -171,17 +171,17 @@ sections:
 ```
 
 :::{warning}
-`numbered` should not generally be used as a default, since numbering cannot be changed by nested parts, and sphinx will log a warning.
+`numbered` should not generally be used as a default, since numbering cannot be changed by nested subtrees, and sphinx will log a warning.
 :::
 
 :::{note}
-By default, section numbering restarts for each `part`.
+By default, section numbering restarts for each subtree.
 If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
 :::
 
 ## Add a ToC to a page's content
 
-By default, the `toctree` generated per document (one per `part`) are appended to the end of the document and hidden (then, for example, most HTML themes show them in a side-bar).
+By default, the `toctree` generated per document (one per subtree) are appended to the end of the document and hidden (then, for example, most HTML themes show them in a side-bar).
 But if you would like them to be visible at a certain place within the document body, you may do so by using the `tableofcontents` directive:
 
 ReStructuredText:
@@ -199,7 +199,7 @@ MyST Markdown:
 
 Currently, only one `tableofcontents` should be used per page (all `toctree` will be added here), and only if it is a page with child/descendant documents.
 
-Note, this will override the `hidden` option set for a part.
+Note, this will override the `hidden` option set for a subtree.
 
 ## Excluding files not in ToC
 
@@ -343,7 +343,7 @@ documents:
   intro:
     docname: intro
     subtrees:
-    - caption: Part Caption
+    - caption: Subtree Caption
       numbered: true
       reversed: false
       items:

@@ -8,7 +8,7 @@ from typing import Any, Mapping, MutableMapping, Optional, Sequence, Tuple, Unio
 import yaml
 
 from .api import Document, FileItem, SiteMap, TocTree
-from .parsing import MalformedError, parse_toc_yaml
+from .parsing import DEFAULT_SUBTREES_KEY, MalformedError, parse_toc_yaml
 
 
 def create_site_from_toc(
@@ -266,7 +266,8 @@ def _assess_folder(
 
 
 def migrate_jupyter_book(
-    toc: Union[Path, MutableMapping[str, Any], list]
+    toc: Union[Path, MutableMapping[str, Any], list],
+    subtrees_key: str = DEFAULT_SUBTREES_KEY,
 ) -> MutableMapping[str, Any]:
     """Migrate a jupyter-book v0.10.2 toc."""
 
@@ -289,10 +290,8 @@ def migrate_jupyter_book(
             )
             contains_file = any("file" in section for section in first_sections)
             if contains_part and contains_file:
-                raise MalformedError(
-                    "top-level contains mixed parts and individual files"
-                )
-            toc_updated["parts" if contains_part else "sections"] = first_sections
+                raise MalformedError("top-level contains mixed {} and individual files")
+            toc_updated[subtrees_key if contains_part else "sections"] = first_sections
             toc_updated.pop("chapters", None)
         toc = toc_updated
     elif not isinstance(toc, MutableMapping):
@@ -338,7 +337,7 @@ def migrate_jupyter_book(
         numbered = toc.pop("numbered")
         if "sections" in toc:
             toc["options"] = {"numbered": numbered}
-        for part in toc.get("parts", []):
+        for part in toc.get(subtrees_key, []):
             if "numbered" not in part:
                 part["numbered"] = numbered
 
@@ -347,7 +346,7 @@ def migrate_jupyter_book(
     sort_key = {
         key: i
         for i, key in enumerate(
-            ["root", "title", "defaults", "options", "sections", "parts", "meta"]
+            ["root", "title", "defaults", "options", subtrees_key, "sections", "meta"]
         )
     }
     toc = {key: toc[key] for key in sorted(keys, key=lambda k: sort_key.get(k, 99))}

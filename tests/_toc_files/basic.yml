@@ -1,14 +1,14 @@
 defaults:
   titlesonly: true
 root: intro
-parts:
+subtrees:
   - caption: Part Caption
     numbered: true
     sections:
     - file: doc1
     - file: doc2
     - file: doc3
-      parts:
+      subtrees:
       - sections:
         - file: subfolder/doc4
         - url: https://example.com

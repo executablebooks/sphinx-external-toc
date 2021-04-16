@@ -1,6 +1,7 @@
 defaults:
   titlesonly: true
-parts:
+root: index
+subtrees:
 - caption: A section
   sections:
   - file: subfolder/index
@@ -25,5 +26,4 @@ parts:
     - file: subfolder/asubpage4
       title: Asubpage
     title: Content3
-root: index
 title: Toc
