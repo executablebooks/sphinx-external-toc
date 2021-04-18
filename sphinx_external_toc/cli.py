@@ -15,10 +15,10 @@ from sphinx_external_toc.tools import (
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(version=__version__)
 def main():
-    """Command-line for ``sphinx-external-toc``."""
+    """Command-line for sphinx-external-toc."""
 
 
-@main.command("parse-toc")
+@main.command("parse")
 @click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
 def parse_toc(toc_file):
     """Parse a ToC file to a site-map YAML."""

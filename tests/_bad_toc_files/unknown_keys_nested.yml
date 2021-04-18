@@ -1,0 +1,7 @@
+root: main
+subtrees:
+- file: doc1
+  items:
+  - file: doc2
+  - file: doc3
+    unknown: 1

@@ -276,7 +276,7 @@ To see all options:
 $ sphinx-etoc --help
 Usage: sphinx-etoc [OPTIONS] COMMAND [ARGS]...
 
-  Command-line for ``sphinx-external-toc``.
+  Command-line for sphinx-external-toc.
 
 Options:
   --version   Show the version and exit.
@@ -285,7 +285,7 @@ Options:
 Commands:
   from-site  Create a ToC file from a site directory.
   migrate    Migrate a ToC from a previous revision.
-  parse-toc  Parse a ToC file to a site-map YAML.
+  parse      Parse a ToC file to a site-map YAML.
   to-site    Create a site directory from a ToC file.
 ```
 

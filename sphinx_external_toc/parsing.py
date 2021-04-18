@@ -11,6 +11,7 @@ from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 DEFAULT_SUBTREES_KEY = "subtrees"
 DEFAULT_ITEMS_KEY = "items"
 FILE_FORMAT_KEY = "format"
+ROOT_KEY = "root"
 FILE_KEY = "file"
 GLOB_KEY = "glob"
 URL_KEY = "url"
@@ -97,7 +98,7 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
     defaults: Dict[str, Any] = {**file_format.toc_defaults, **data.get("defaults", {})}
 
     doc_item, docs_list = _parse_doc_item(
-        data, defaults, "/", depth=0, file_key="root", file_format=file_format
+        data, defaults, "/", depth=0, is_root=True, file_format=file_format
     )
 
     site_map = SiteMap(
@@ -118,11 +119,12 @@ def _parse_doc_item(
     *,
     depth: int,
     file_format: FileFormat,
-    file_key: str = FILE_KEY,
-) -> Tuple[Document, Sequence[Dict[str, Any]]]:
+    is_root: bool = False,
+) -> Tuple[Document, Sequence[Tuple[str, Dict[str, Any]]]]:
     """Parse a single doc item."""
+    file_key = ROOT_KEY if is_root else FILE_KEY
     if file_key not in data:
-        raise MalformedError(f"'{file_key}' key not found: '{path}'")
+        raise MalformedError(f"'{file_key}' key not found @ '{path}'")
 
     subtrees_key = file_format.get_subtrees_key(depth)
     items_key = file_format.get_items_key(depth)
@@ -142,20 +144,23 @@ def _parse_doc_item(
     if not allowed_keys.issuperset(data.keys()):
         unknown_keys = set(data.keys()).difference(allowed_keys)
         raise MalformedError(
-            f"Unknown keys found: {unknown_keys!r}, allowed: {allowed_keys!r}: '{path}'"
+            f"Unknown keys found: {unknown_keys!r}, allowed: {allowed_keys!r} @ '{path}'"
         )
 
+    shorthand_used = False
     if items_key in data:
         # this is a shorthand for defining a single subtree
         if subtrees_key in data:
             raise MalformedError(
-                f"Both '{subtrees_key}' and '{items_key}' found: '{path}'"
+                f"Both '{subtrees_key}' and '{items_key}' found @ '{path}'"
             )
         subtrees_data = [{items_key: data[items_key], **data.get("options", {})}]
+        shorthand_used = True
     elif subtrees_key in data:
         subtrees_data = data[subtrees_key]
         if not (isinstance(subtrees_data, Sequence) and subtrees_data):
-            raise MalformedError(f"'{subtrees_key}' not a non-empty list: '{path}'")
+            raise MalformedError(f"'{subtrees_key}' not a non-empty list @ '{path}'")
+        path = f"{path}{subtrees_key}/"
     else:
         subtrees_data = []
 
@@ -164,17 +169,17 @@ def _parse_doc_item(
     toctrees = []
     for toc_idx, toc_data in enumerate(subtrees_data):
 
+        toc_path = path if shorthand_used else f"{path}{toc_idx}/"
+
         if not (isinstance(toc_data, Mapping) and items_key in toc_data):
             raise MalformedError(
-                f"subtree not a mapping containing '{items_key}' key: '{path}{toc_idx}'"
+                f"item not a mapping containing '{items_key}' key @ '{toc_path}'"
             )
 
         items_data = toc_data[items_key]
 
         if not (isinstance(items_data, Sequence) and items_data):
-            raise MalformedError(
-                f"'{items_key}' not a non-empty list: '{path}{toc_idx}'"
-            )
+            raise MalformedError(f"'{items_key}' not a non-empty list @ '{toc_path}'")
 
         # generate items list
         items: List[Union[GlobItem, FileItem, UrlItem]] = []
@@ -182,7 +187,7 @@ def _parse_doc_item(
 
             if not isinstance(item_data, Mapping):
                 raise MalformedError(
-                    f"'{items_key}' item not a mapping type: '{path}{toc_idx}/{item_idx}'"
+                    f"item not a mapping type @ '{toc_path}{items_key}/{item_idx}'"
                 )
 
             link_keys = _known_link_keys.intersection(item_data)
@@ -190,20 +195,20 @@ def _parse_doc_item(
             # validation checks
             if not link_keys:
                 raise MalformedError(
-                    f"'{items_key}' item does not contain one of "
-                    f"{_known_link_keys!r}: '{path}{toc_idx}/{item_idx}'"
+                    f"item does not contain one of "
+                    f"{_known_link_keys!r} @ '{toc_path}{items_key}/{item_idx}'"
                 )
             if not len(link_keys) == 1:
                 raise MalformedError(
-                    f"'{items_key}' item contains incompatible keys "
-                    f"{link_keys!r}: {path}{toc_idx}/{item_idx}"
+                    f"item contains incompatible keys "
+                    f"{link_keys!r} @ '{toc_path}{items_key}/{item_idx}'"
                 )
             for item_key in (GLOB_KEY, URL_KEY):
                 for other_key in (subtrees_key, items_key):
                     if link_keys == {item_key} and other_key in item_data:
                         raise MalformedError(
-                            f"'{items_key}' item contains incompatible keys "
-                            f"'{item_key}' and '{other_key}': {path}{toc_idx}/{item_idx}"
+                            f"item contains incompatible keys "
+                            f"'{item_key}' and '{other_key}' @ '{toc_path}{items_key}/{item_idx}'"
                         )
 
             if link_keys == {FILE_KEY}:
@@ -222,7 +227,7 @@ def _parse_doc_item(
         try:
             toc_item = TocTree(items=items, **keywords)
         except TypeError as exc:
-            raise MalformedError(f"toctree validation: {path}{toc_idx}") from exc
+            raise MalformedError(f"toctree validation @ '{toc_path}'") from exc
         toctrees.append(toc_item)
 
     try:
@@ -232,21 +237,27 @@ def _parse_doc_item(
     except TypeError as exc:
         raise MalformedError(f"doc validation: {path}") from exc
 
-    docs_data = [
-        item_data
-        for toc_data in subtrees_data
-        for item_data in toc_data[items_key]
+    # list of docs that need to be parsed recursively (and path)
+    docs_to_be_parsed_list = [
+        (
+            f"{path}/{items_key}/{ii}/"
+            if shorthand_used
+            else f"{path}{ti}/{items_key}/{ii}/",
+            item_data,
+        )
+        for ti, toc_data in enumerate(subtrees_data)
+        for ii, item_data in enumerate(toc_data[items_key])
         if FILE_KEY in item_data
     ]
 
     return (
         doc_item,
-        docs_data,
+        docs_to_be_parsed_list,
     )
 
 
 def _parse_docs_list(
-    docs_list: Sequence[Dict[str, Any]],
+    docs_list: Sequence[Tuple[str, Dict[str, Any]]],
     site_map: SiteMap,
     defaults: Dict[str, Any],
     path: str,
@@ -255,11 +266,10 @@ def _parse_docs_list(
     file_format: FileFormat,
 ):
     """Parse a list of docs."""
-    for doc_data in docs_list:
-        docname = doc_data["file"]
+    for child_path, doc_data in docs_list:
+        docname = doc_data[FILE_KEY]
         if docname in site_map:
-            raise MalformedError(f"document file used multiple times: {docname}")
-        child_path = f"{path}{docname}/"
+            raise MalformedError(f"document file used multiple times: '{docname}'")
         child_item, child_docs_list = _parse_doc_item(
             doc_data, defaults, child_path, depth=depth, file_format=file_format
         )
@@ -280,13 +290,13 @@ def create_toc_dict(site_map: SiteMap, *, skip_defaults: bool = True) -> Dict[st
     try:
         file_format = FILE_FORMATS[site_map.file_format or "default"]
     except KeyError:
-        raise KeyError(f"File format not recognised: '{site_map.file_format}'")
+        raise KeyError(f"File format not recognised @ '{site_map.file_format}'")
     data = _docitem_to_dict(
         site_map.root,
         site_map,
         depth=0,
         skip_defaults=skip_defaults,
-        file_key="root",
+        is_root=True,
         file_format=file_format,
     )
     if site_map.meta:
@@ -304,7 +314,7 @@ def _docitem_to_dict(
     depth: int,
     file_format: FileFormat,
     skip_defaults: bool = True,
-    file_key: str = FILE_KEY,
+    is_root: bool = False,
     parsed_docnames: Optional[Set[str]] = None,
 ) -> Dict[str, Any]:
     """
@@ -312,6 +322,7 @@ def _docitem_to_dict(
     :param skip_defaults: do not add key/values for values that are already the default
 
     """
+    file_key = ROOT_KEY if is_root else FILE_KEY
     subtrees_key = file_format.get_subtrees_key(depth)
     items_key = file_format.get_items_key(depth)
 
