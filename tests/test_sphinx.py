@@ -108,7 +108,6 @@ extensions = ["sphinx_external_toc"]
 external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
 
 """
-    print(content)
     src_dir.joinpath("conf.py").write_text(content, encoding="utf8")
     # run sphinx
     builder = sphinx_build_factory(src_dir)
