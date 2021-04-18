@@ -3,7 +3,7 @@ from collections.abc import MutableMapping
 from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
 import attr
-from attr.validators import deep_iterable, instance_of, optional
+from attr.validators import deep_iterable, instance_of, matches_re, optional
 
 
 class FileItem(str):
@@ -23,7 +23,8 @@ class GlobItem(str):
 class UrlItem:
     """A URL in a toctree."""
 
-    url: str = attr.ib(validator=instance_of(str))
+    # regex should match sphinx.util.url_re
+    url: str = attr.ib(validator=[instance_of(str), matches_re(r".+://.*")])
     title: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
 
 
