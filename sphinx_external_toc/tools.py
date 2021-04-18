@@ -321,8 +321,9 @@ def migrate_jupyter_book(
         raise MalformedError("ToC is not a list or dict")
 
     # convert first `file` to `root`
-    if "file" in toc:
-        toc["root"] = toc.pop("file")
+    if "file" not in toc:
+        raise MalformedError("no top-level 'file' key found")
+    toc["root"] = toc.pop("file")
 
     # setting `titlesonly` True is now part of the file format
     # toc["defaults"] = {"titlesonly": True}
@@ -375,7 +376,10 @@ def migrate_jupyter_book(
                 subtree["numbered"] = numbered
 
     # now convert to a site map, so we can validate
-    site_map = parse_toc_data(toc)
+    try:
+        site_map = parse_toc_data(toc)
+    except MalformedError as err:
+        raise MalformedError(f"Error parsing migrated output: {err}") from err
     # change the file format and convert back to a dict
     site_map.file_format = file_format
     return create_toc_dict(site_map, skip_defaults=True)

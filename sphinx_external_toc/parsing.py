@@ -365,11 +365,11 @@ def _docitem_to_dict(
     # apply shorthand if possible (one toctree in subtrees)
     if len(data[subtrees_key]) == 1 and items_key in data[subtrees_key][0]:
         old_toctree_data = data.pop(subtrees_key)[0]
-        data[items_key] = old_toctree_data[items_key]
         # move options to options key
         if len(old_toctree_data) > 1:
             data["options"] = {
                 k: v for k, v in old_toctree_data.items() if k != items_key
             }
+        data[items_key] = old_toctree_data[items_key]
 
     return data
