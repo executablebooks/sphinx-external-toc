@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.0a8 - 2021-04-19
+
+- 👌 IMPROVE: validate URL: Ensure value of `url` keys match regex used by Sphinx to identify them
+- 🐛 FIX: `external_toc_path` with absolute path
+
 ## 0.1.0a7 - 2021-04-18
 
 - 👌 IMPROVE: Parsing `MalformedError` messages
