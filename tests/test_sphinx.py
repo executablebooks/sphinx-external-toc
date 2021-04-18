@@ -94,3 +94,21 @@ def test_warning(path: Path, tmp_path: Path, sphinx_build_factory):
     builder = sphinx_build_factory(src_dir)
     builder.build(assert_pass=False)
     assert sitemap.meta["expected_warning"] in builder.warnings
+
+
+def test_absolute_path(tmp_path: Path, sphinx_build_factory):
+    """Test if `external_toc_path` is supplied as an absolute path."""
+    src_dir = tmp_path / "srcdir"
+    # write document files
+    toc_path = Path(__file__).parent.joinpath("_toc_files", "basic.yml")
+    create_site_from_toc(toc_path, root_path=src_dir, toc_name=None)
+    # write conf.py
+    content = f"""
+extensions = ["sphinx_external_toc"]
+external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
+
+"""
+    src_dir.joinpath("conf.py").write_text(content, encoding="utf8")
+    # run sphinx
+    builder = sphinx_build_factory(src_dir)
+    builder.build()

@@ -59,11 +59,16 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
 
     Also, change the ``master_doc`` and add to ``exclude_patterns`` if necessary.
     """
-    path = Path(app.srcdir) / PurePosixPath(app.config["external_toc_path"])
-    if not (path.exists() and path.is_file()):
-        raise ExtensionError(
-            f"[etoc] `external_toc_path` is not an existing file: {path}"
-        )
+    # TODO this seems to work in the tests, but I still want to double check
+    external_toc_path = PurePosixPath(app.config["external_toc_path"])
+    if not external_toc_path.is_absolute():
+        path = Path(app.srcdir) / str(external_toc_path)
+    else:
+        path = Path(str(external_toc_path))
+    if not path.exists():
+        raise ExtensionError(f"[etoc] `external_toc_path` does not exist: {path}")
+    if not path.is_file():
+        raise ExtensionError(f"[etoc] `external_toc_path` is not a file: {path}")
     try:
         site_map = parse_toc_yaml(path)
     except Exception as exc:
