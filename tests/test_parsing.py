@@ -26,6 +26,7 @@ def test_create_toc_dict(path: Path, data_regression):
 
 TOC_FILES_BAD = list(Path(__file__).parent.joinpath("_bad_toc_files").glob("*.yml"))
 ERROR_MESSAGES = {
+    "bad_url.yml": "item validation @ '/items/0': 'url' must match regex",
     "empty.yml": "toc is not a mapping:",
     "file_and_glob_present.yml": "item contains incompatible keys .* @ '/items/0'",
     "list.yml": "toc is not a mapping:",

@@ -211,12 +211,18 @@ def _parse_doc_item(
                             f"'{item_key}' and '{other_key}' @ '{toc_path}{items_key}/{item_idx}'"
                         )
 
-            if link_keys == {FILE_KEY}:
-                items.append(FileItem(item_data[FILE_KEY]))
-            elif link_keys == {GLOB_KEY}:
-                items.append(GlobItem(item_data[GLOB_KEY]))
-            elif link_keys == {URL_KEY}:
-                items.append(UrlItem(item_data[URL_KEY], item_data.get("title")))
+            try:
+                if link_keys == {FILE_KEY}:
+                    items.append(FileItem(item_data[FILE_KEY]))
+                elif link_keys == {GLOB_KEY}:
+                    items.append(GlobItem(item_data[GLOB_KEY]))
+                elif link_keys == {URL_KEY}:
+                    items.append(UrlItem(item_data[URL_KEY], item_data.get("title")))
+            except (ValueError, TypeError) as exc:
+                exc_arg = exc.args[0] if exc.args else ""
+                raise MalformedError(
+                    f"item validation @ '{toc_path}{items_key}/{item_idx}': {exc_arg}"
+                ) from exc
 
         # generate toc key-word arguments
         keywords = {k: toc_data[k] for k in TOCTREE_OPTIONS if k in toc_data}
@@ -226,16 +232,20 @@ def _parse_doc_item(
 
         try:
             toc_item = TocTree(items=items, **keywords)
-        except TypeError as exc:
-            raise MalformedError(f"toctree validation @ '{toc_path}'") from exc
+        except (ValueError, TypeError) as exc:
+            exc_arg = exc.args[0] if exc.args else ""
+            raise MalformedError(
+                f"toctree validation @ '{toc_path}': {exc_arg}"
+            ) from exc
         toctrees.append(toc_item)
 
     try:
         doc_item = Document(
             docname=data[file_key], title=data.get("title"), subtrees=toctrees
         )
-    except TypeError as exc:
-        raise MalformedError(f"doc validation: {path}") from exc
+    except (ValueError, TypeError) as exc:
+        exc_arg = exc.args[0] if exc.args else ""
+        raise MalformedError(f"doc validation @ '{path}': {exc_arg}") from exc
 
     # list of docs that need to be parsed recursively (and path)
     docs_to_be_parsed_list = [
