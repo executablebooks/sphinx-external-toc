@@ -60,10 +60,11 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     Also, change the ``master_doc`` and add to ``exclude_patterns`` if necessary.
     """
     external_toc_path = PurePosixPath(app.config["external_toc_path"])
+    print(str(external_toc_path))
     if not external_toc_path.is_absolute():
-        path = Path(app.srcdir) / external_toc_path
+        path = Path(app.srcdir) / str(external_toc_path)
     else:
-        path = Path(external_toc_path)
+        path = Path(str(external_toc_path))
     print([p.name for p in path.parent.glob("*")])
     if not path.exists():
         raise ExtensionError(f"[etoc] `external_toc_path` does not exist: {path}")
