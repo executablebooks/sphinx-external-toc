@@ -1,0 +1,5 @@
+root: intro
+options:
+  titlesonly: 2
+items:
+- file: doc1
