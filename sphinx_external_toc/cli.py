@@ -4,7 +4,7 @@ import click
 import yaml
 
 from sphinx_external_toc import __version__
-from sphinx_external_toc.parsing import create_toc_dict, parse_toc_yaml
+from sphinx_external_toc.parsing import FILE_FORMATS, create_toc_dict, parse_toc_yaml
 from sphinx_external_toc.tools import (
     create_site_from_toc,
     create_site_map_from_path,
@@ -26,7 +26,7 @@ def parse_toc(toc_file):
     click.echo(yaml.dump(site_map.as_json(), sort_keys=False, default_flow_style=False))
 
 
-@main.command("create-site")
+@main.command("to-site")
 @click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
 @click.option(
     "-p",
@@ -45,7 +45,7 @@ def parse_toc(toc_file):
 )
 @click.option("-o", "--overwrite", is_flag=True, help="Overwrite existing files.")
 def create_site(toc_file, path, extension, overwrite):
-    """Create a site from a ToC file."""
+    """Create a site directory from a ToC file."""
     create_site_from_toc(
         toc_file, root_path=path, default_ext="." + extension, overwrite=overwrite
     )
@@ -53,9 +53,9 @@ def create_site(toc_file, path, extension, overwrite):
     click.secho("SUCCESS!", fg="green")
 
 
-@main.command("create-toc")
+@main.command("from-site")
 @click.argument(
-    "site_folder", type=click.Path(exists=True, file_okay=False, dir_okay=True)
+    "site_dir", type=click.Path(exists=True, file_okay=False, dir_okay=True)
 )
 @click.option(
     "-e",
@@ -86,13 +86,22 @@ def create_site(toc_file, path, extension, overwrite):
     is_flag=True,
     help="Guess titles of documents from path names",
 )
-def create_toc(site_folder, extension, index, skip_match, guess_titles):
-    """Create a ToC file from a file structure."""
+@click.option(
+    "-f",
+    "--file-format",
+    type=click.Choice(list(FILE_FORMATS)),
+    default=list(FILE_FORMATS)[0],
+    show_default=True,
+    help="The key-mappings to use.",
+)
+def create_toc(site_dir, extension, index, skip_match, guess_titles, file_format):
+    """Create a ToC file from a site directory."""
     site_map = create_site_map_from_path(
-        site_folder,
+        site_dir,
         suffixes=extension,
         default_index=index,
         ignore_matches=skip_match,
+        file_format=file_format,
     )
     if guess_titles:
         for docname in site_map:

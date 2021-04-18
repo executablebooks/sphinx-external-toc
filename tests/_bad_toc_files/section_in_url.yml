@@ -1,5 +1,5 @@
 root: index
-sections:
+items:
 - url: http://example.com
-  sections:
+  items:
   - file: other

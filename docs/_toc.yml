@@ -4,14 +4,14 @@ defaults:
 subtrees:
 - caption: Part 1
   numbered: true
-  sections:
+  items:
   - file: doc1
   - file: doc2
-    sections:
+    items:
     - file: subfolder/doc3
     - url: https://example.com
       title: Example Link
 - caption: Part 2
   numbered: true
-  sections:
+  items:
   - glob: subglobs/glob*

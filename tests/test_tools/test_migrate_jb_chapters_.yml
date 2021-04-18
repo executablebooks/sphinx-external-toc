@@ -1,16 +1,14 @@
-defaults:
-  titlesonly: true
-root: index
-subtrees:
+format: jb-book
+parts:
 - caption: A section
-  sections:
+  chapters:
   - file: subfolder/index
     sections:
     - file: subfolder/asubpage1
       title: Asubpage
     title: Subfolder
 - caption: Another section
-  sections:
+  chapters:
   - file: content1
     sections:
     - file: subfolder/asubpage2
@@ -26,4 +24,5 @@ subtrees:
     - file: subfolder/asubpage4
       title: Asubpage
     title: Content3
+root: index
 title: Toc

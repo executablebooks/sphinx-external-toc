@@ -17,7 +17,7 @@ documents:
       maxdepth: -1
       numbered: false
       reversed: false
-      titlesonly: true
+      titlesonly: false
     - caption: null
       hidden: true
       items:
@@ -25,7 +25,7 @@ documents:
       maxdepth: -1
       numbered: false
       reversed: false
-      titlesonly: true
+      titlesonly: false
     title: null
 meta:
   create_append:

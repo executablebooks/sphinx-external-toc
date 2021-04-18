@@ -3,6 +3,6 @@
         <title>
             Heading: intro.rst
         <compound classes="toctree-wrapper">
-            <toctree caption="True" entries="(None,\ 'doc1')" glob="False" hidden="False" includefiles="doc1" includehidden="False" maxdepth="-1" numbered="0" parent="intro" rawcaption="" titlesonly="True">
+            <toctree caption="True" entries="(None,\ 'doc1')" glob="False" hidden="False" includefiles="doc1" includehidden="False" maxdepth="-1" numbered="0" parent="intro" rawcaption="" titlesonly="False">
         <compound classes="toctree-wrapper">
-            <toctree caption="True" entries="(None,\ 'doc2')" glob="False" hidden="False" includefiles="doc2" includehidden="False" maxdepth="-1" numbered="0" parent="intro" rawcaption="" titlesonly="True">
+            <toctree caption="True" entries="(None,\ 'doc2')" glob="False" hidden="False" includefiles="doc2" includehidden="False" maxdepth="-1" numbered="0" parent="intro" rawcaption="" titlesonly="False">

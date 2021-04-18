@@ -3,12 +3,19 @@ import shutil
 from fnmatch import fnmatch
 from itertools import chain
 from pathlib import Path, PurePosixPath
-from typing import Any, Mapping, MutableMapping, Optional, Sequence, Tuple, Union, cast
+from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 
 import yaml
 
 from .api import Document, FileItem, SiteMap, TocTree
-from .parsing import DEFAULT_SUBTREES_KEY, MalformedError, parse_toc_yaml
+from .parsing import (
+    DEFAULT_ITEMS_KEY,
+    DEFAULT_SUBTREES_KEY,
+    MalformedError,
+    create_toc_dict,
+    parse_toc_data,
+    parse_toc_yaml,
+)
 
 
 def create_site_from_toc(
@@ -90,6 +97,7 @@ def create_site_map_from_path(
     suffixes: Sequence[str] = (".rst", ".md"),
     default_index: str = "index",
     ignore_matches: Sequence[str] = (".*",),
+    file_format: Optional[str] = None,
 ) -> SiteMap:
     """Create the site-map from a folder structure.
 
@@ -125,7 +133,7 @@ def create_site_map_from_path(
     )
 
     # create base site-map
-    site_map = SiteMap(root=root_item)
+    site_map = SiteMap(root=root_item, file_format=file_format)
     # we add all files to the site map, even if they don't have descendants
     # so we may later change their title
     for root_file in root_files:
@@ -266,9 +274,8 @@ def _assess_folder(
 
 
 def migrate_jupyter_book(
-    toc: Union[Path, MutableMapping[str, Any], list],
-    subtrees_key: str = DEFAULT_SUBTREES_KEY,
-) -> MutableMapping[str, Any]:
+    toc: Union[Path, Dict[str, Any], list],
+) -> Dict[str, Any]:
     """Migrate a jupyter-book v0.10.2 toc."""
 
     if isinstance(toc, Path):
@@ -278,77 +285,97 @@ def migrate_jupyter_book(
     # convert list to dict
     if isinstance(toc, list):
         toc_updated = toc[0]
+        if not isinstance(toc_updated, dict):
+            raise MalformedError("First list item is not a dict")
         if len(toc) > 1:
-            subsections = toc[1:]
+            first_items: List[dict] = []
+            top_items_key = "sections"  # this is the default top-level key
             # The first set of pages will be called *either* sections or chapters
-            first_sections = toc_updated.get("sections", [])
-            first_sections += toc_updated.get("chapters", [])
-            first_sections += subsections
-            contains_part = any(
-                ("part" in section or "chapter" in section)
-                for section in first_sections
-            )
-            contains_file = any("file" in section for section in first_sections)
-            if contains_part and contains_file:
-                raise MalformedError("top-level contains mixed {} and individual files")
-            toc_updated[subtrees_key if contains_part else "sections"] = first_sections
-            toc_updated.pop("chapters", None)
-        toc = toc_updated
-    elif not isinstance(toc, MutableMapping):
-        raise MalformedError("ToC is not a list or mapping")
+            if "sections" in toc_updated and "chapters" in toc_updated:
+                raise MalformedError(
+                    "First list item contains both 'chapters' and 'sections' keys"
+                )
+            for key in ("sections", "chapters"):
+                if key in toc_updated:
+                    top_items_key = key
+                    items = toc_updated.pop(key)
+                    if not isinstance(items, Sequence):
+                        raise MalformedError(f"First list item '{key}' is not a list")
+                    first_items += items
 
-    toc = cast(MutableMapping[str, Any], toc)
+            # add list items after to same level
+            first_items += toc[1:]
+
+            # check for part keys (and also chapter which was deprecated)
+            contains_part = any(
+                ("part" in item or "chapter" in item) for item in first_items
+            )
+            contains_file = any("file" in item for item in first_items)
+            if contains_part and contains_file:
+                raise MalformedError("top-level contains mixed 'part' and 'file' keys")
+
+            toc_updated["parts" if contains_part else top_items_key] = first_items
+
+        toc = toc_updated
+    elif not isinstance(toc, dict):
+        raise MalformedError("ToC is not a list or dict")
 
     # convert first `file` to `root`
     if "file" in toc:
         toc["root"] = toc.pop("file")
 
-    # set `titlesonly` True as default
-    toc["defaults"] = {"titlesonly": True}
+    # setting `titlesonly` True is now part of the file format
+    # toc["defaults"] = {"titlesonly": True}
 
-    # change all chapters to sections
+    # we should now have a dict with either a 'parts', 'chapters', or 'sections' key
+    top_level_keys = {"parts", "chapters", "sections"}.intersection(toc.keys())
+    if len(top_level_keys) > 1:
+        raise MalformedError(
+            f"There is more than one top-level key: {top_level_keys!r}"
+        )
+    # from the top-level key we can now derive the file-format (for key-mappings)
+    file_format = {
+        "": "jb-book",
+        "parts": "jb-book",
+        "chapters": "jb-book",
+        "sections": "jb-article",
+    }["" if not top_level_keys else list(top_level_keys)[0]]
+
+    # change all parts to DEFAULT_SUBTREES_KEY
+    # change all chapters to DEFAULT_ITEMS_KEY
     # change all part/chapter to caption
     dicts = [toc]
     while dicts:
         dct = dicts.pop(0)
+        if "chapters" in dct and "sections" in dct:
+            raise MalformedError(f"both 'chapters' and 'sections' in same dict: {dct}")
+        if "parts" in dct:
+            dct[DEFAULT_SUBTREES_KEY] = dct.pop("parts")
+        if "sections" in dct:
+            dct[DEFAULT_ITEMS_KEY] = dct.pop("sections")
         if "chapters" in dct:
-            if "sections" in dct:
-                raise MalformedError(
-                    f"both 'chapters' and 'sections' in same dict: {dct}"
-                )
-            dct["sections"] = dct.pop("chapters")
+            dct[DEFAULT_ITEMS_KEY] = dct.pop("chapters")
         for key in ("part", "chapter"):
             if key in dct:
-                if "caption" in dct:
-                    raise MalformedError(
-                        f"'caption' already in dict, when converting '{key}'"
-                    )
                 dct["caption"] = dct.pop(key)
 
         # add nested dicts
         for val in dct.values():
-            vals = val if isinstance(val, Sequence) else [val]
-            for item in vals:
-                if isinstance(item, MutableMapping):
+            for item in val if isinstance(val, Sequence) else [val]:
+                if isinstance(item, dict):
                     dicts.append(item)
 
-    # if `numbered` at top level, move to options or copy to each part
+    # if `numbered` at top level, move to options or copy to each subtree
     if "numbered" in toc:
         numbered = toc.pop("numbered")
-        if "sections" in toc:
+        if DEFAULT_ITEMS_KEY in toc:
             toc["options"] = {"numbered": numbered}
-        for part in toc.get(subtrees_key, []):
-            if "numbered" not in part:
-                part["numbered"] = numbered
+        for subtree in toc.get(DEFAULT_SUBTREES_KEY, []):
+            if "numbered" not in subtree:
+                subtree["numbered"] = numbered
 
-    # order keys
-    keys = list(toc.keys())
-    sort_key = {
-        key: i
-        for i, key in enumerate(
-            ["root", "title", "defaults", "options", subtrees_key, "sections", "meta"]
-        )
-    }
-    toc = {key: toc[key] for key in sorted(keys, key=lambda k: sort_key.get(k, 99))}
-
-    return toc
+    # now convert to a site map, so we can validate
+    site_map = parse_toc_data(toc)
+    # change the file format and convert back to a dict
+    site_map.file_format = file_format
+    return create_toc_dict(site_map, skip_defaults=True)

@@ -1,5 +1,5 @@
 root: intro
-sections:
+items:
 - file: doc1
 - glob: subfolder/other*
 meta:
