@@ -64,10 +64,11 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
         path = Path(app.srcdir) / external_toc_path
     else:
         path = Path(external_toc_path)
-    if not (path.exists() and path.is_file()):
-        raise ExtensionError(
-            f"[etoc] `external_toc_path` is not an existing file: {path}"
-        )
+    print([p.name for p in path.parent.glob("*")])
+    if not path.exists():
+        raise ExtensionError(f"[etoc] `external_toc_path` does not exist: {path}")
+    if not path.is_file():
+        raise ExtensionError(f"[etoc] `external_toc_path` is not a file: {path}")
     try:
         site_map = parse_toc_yaml(path)
     except Exception as exc:
