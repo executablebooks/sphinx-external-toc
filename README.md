@@ -27,7 +27,7 @@ external_toc_path = "_toc.yml"  # optional, default: _toc.yml
 external_toc_exclude_missing = False  # optional, default: False
 ```
 
-Note the `external_toc_path` is always read as a Unix path.
+Note the `external_toc_path` is always read as a Unix path, and can either be specified relative to the source directory (recommended) or as an absolute path.
 
 ### Basic Structure
 
