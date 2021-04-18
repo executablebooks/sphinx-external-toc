@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.1.0a7 - 2021-04-18
+
+- 👌 IMPROVE: Parsing `MalformedError` messages
+- 👌 IMPROVE: jupyter-book migration
+  - Better conversion validation
+  - Move `options` key above `parts`/`chapters`/`sections` key
+
 ## 0.1.0a6 - 2021-04-18
 
 - 👌 IMPROVE: Add `ensure_index_file` event on build completion

@@ -1,6 +1,6 @@
 """A sphinx extension that allows the site toctree to be defined in a single file."""
 
-__version__ = "0.1.0a6"
+__version__ = "0.1.0a7"
 
 
 from typing import TYPE_CHECKING
