@@ -1,13 +1,16 @@
+items:
+- file: doc1
+- file: doc2
+- file: doc3
+  items:
+  - file: subfolder/doc4
+  - url: https://example.com
+  options:
+    titlesonly: true
 meta:
   regress: intro
 options:
   caption: Part Caption
   numbered: true
+  titlesonly: true
 root: intro
-sections:
-- file: doc1
-- file: doc2
-- file: doc3
-  sections:
-  - file: subfolder/doc4
-  - url: https://example.com

@@ -46,7 +46,7 @@ class TocTree:
         False, kw_only=True, validator=instance_of((bool, int))
     )
     reversed: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
-    titlesonly: bool = attr.ib(True, kw_only=True, validator=instance_of(bool))
+    titlesonly: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
 
     def files(self) -> List[str]:
         return [str(item) for item in self.items if isinstance(item, FileItem)]
@@ -78,11 +78,17 @@ class Document:
 class SiteMap(MutableMapping):
     """A mapping of documents to their toctrees (or None if terminal)."""
 
-    def __init__(self, root: Document, meta: Optional[Dict[str, Any]] = None) -> None:
+    def __init__(
+        self,
+        root: Document,
+        meta: Optional[Dict[str, Any]] = None,
+        file_format: Optional[str] = None,
+    ) -> None:
         self._docs: Dict[str, Document] = {}
         self[root.docname] = root
         self._root: Document = root
         self._meta: Dict[str, Any] = meta or {}
+        self._file_format = file_format
 
     @property
     def root(self) -> Document:
@@ -93,6 +99,16 @@ class SiteMap(MutableMapping):
     def meta(self) -> Dict[str, Any]:
         """Return the site-map metadata."""
         return self._meta
+
+    @property
+    def file_format(self) -> Optional[str]:
+        """Return the format of the file to write to."""
+        return self._file_format
+
+    @file_format.setter
+    def file_format(self, value: Optional[str]) -> None:
+        """Set the format of the file to write to."""
+        self._file_format = value
 
     def globs(self) -> Set[str]:
         """Return set of all globs present across all toctrees."""
@@ -134,4 +150,7 @@ class SiteMap(MutableMapping):
             else self._docs[k]
             for k in sorted(self._docs)
         }
-        return {"root": self.root.docname, "documents": doc_dict, "meta": self.meta}
+        data = {"root": self.root.docname, "documents": doc_dict, "meta": self.meta}
+        if self.file_format:
+            data["file_format"] = self.file_format
+        return data

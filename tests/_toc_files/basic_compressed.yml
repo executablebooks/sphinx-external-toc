@@ -3,11 +3,11 @@ defaults:
 options:
   numbered: true
 root: intro
-sections:
+items:
 - file: doc1
 - file: doc2
 - file: doc3
-  sections:
+  items:
   - file: doc4
   - url: https://example.com
 meta:

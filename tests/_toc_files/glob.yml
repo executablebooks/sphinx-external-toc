@@ -1,5 +1,5 @@
 root: intro
-sections:
+items:
 - glob: doc*
 meta:
   create_files:

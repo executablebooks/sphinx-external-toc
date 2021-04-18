@@ -9,12 +9,11 @@ import yaml
 from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 
 DEFAULT_SUBTREES_KEY = "subtrees"
-DEFAULT_ITEMS_KEY = "sections"
-
+DEFAULT_ITEMS_KEY = "items"
+FILE_FORMAT_KEY = "format"
 FILE_KEY = "file"
 GLOB_KEY = "glob"
 URL_KEY = "url"
-
 TOCTREE_OPTIONS = (
     "caption",
     "hidden",
@@ -23,6 +22,52 @@ TOCTREE_OPTIONS = (
     "reversed",
     "titlesonly",
 )
+
+
+@attr.s(slots=True)
+class FileFormat:
+    """Mapping of keys for subtrees and items, dependant on depth in the ToC."""
+
+    subtrees_keys: Sequence[str] = attr.ib(())
+    items_keys: Sequence[str] = attr.ib(())
+    default_subtrees_key: str = attr.ib(DEFAULT_SUBTREES_KEY)
+    default_items_key: str = attr.ib(DEFAULT_ITEMS_KEY)
+    toc_defaults: Dict[str, Any] = attr.ib(factory=dict)
+
+    def get_subtrees_key(self, depth: int) -> str:
+        """Get the subtrees key name for this depth in the ToC
+
+        :param depth: recursive depth (starts at 0)
+        """
+        try:
+            return self.subtrees_keys[depth]
+        except IndexError:
+            return self.default_subtrees_key
+
+    def get_items_key(self, depth: int) -> str:
+        """Get the items key name for this depth in the ToC
+
+        :param depth: recursive depth (starts at 0)
+        """
+        try:
+            return self.items_keys[depth]
+        except IndexError:
+            return self.default_items_key
+
+
+FILE_FORMATS: Dict[str, FileFormat] = {
+    "default": FileFormat(),
+    "jb-book": FileFormat(
+        subtrees_keys=("parts",),
+        items_keys=("chapters",),
+        default_items_key="sections",
+        toc_defaults={"titlesonly": True},
+    ),
+    "jb-article": FileFormat(
+        default_items_key="sections",
+        toc_defaults={"titlesonly": True},
+    ),
+}
 
 
 class MalformedError(Exception):
@@ -41,13 +86,27 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
     if not isinstance(data, Mapping):
         raise MalformedError(f"toc is not a mapping: {type(data)}")
 
-    defaults: Dict[str, Any] = data.get("defaults", {})
+    try:
+        file_format = FILE_FORMATS[data.get(FILE_FORMAT_KEY, "default")]
+    except KeyError:
+        raise MalformedError(
+            f"'{FILE_FORMAT_KEY}' key value not recognised: "
+            f"'{data.get(FILE_FORMAT_KEY, 'default')}'"
+        )
 
-    doc_item, docs_list = _parse_doc_item(data, defaults, "/", file_key="root")
+    defaults: Dict[str, Any] = {**file_format.toc_defaults, **data.get("defaults", {})}
 
-    site_map = SiteMap(root=doc_item, meta=data.get("meta"))
+    doc_item, docs_list = _parse_doc_item(
+        data, defaults, "/", depth=0, file_key="root", file_format=file_format
+    )
 
-    _parse_docs_list(docs_list, site_map, defaults, "/")
+    site_map = SiteMap(
+        root=doc_item, meta=data.get("meta"), file_format=data.get(FILE_FORMAT_KEY)
+    )
+
+    _parse_docs_list(
+        docs_list, site_map, defaults, "/", depth=1, file_format=file_format
+    )
 
     return site_map
 
@@ -57,13 +116,35 @@ def _parse_doc_item(
     defaults: Dict[str, Any],
     path: str,
     *,
-    subtrees_key: str = DEFAULT_SUBTREES_KEY,
-    items_key: str = DEFAULT_ITEMS_KEY,
+    depth: int,
+    file_format: FileFormat,
     file_key: str = FILE_KEY,
 ) -> Tuple[Document, Sequence[Dict[str, Any]]]:
     """Parse a single doc item."""
     if file_key not in data:
         raise MalformedError(f"'{file_key}' key not found: '{path}'")
+
+    subtrees_key = file_format.get_subtrees_key(depth)
+    items_key = file_format.get_items_key(depth)
+
+    # check no unknown keys present
+    allowed_keys = {
+        file_key,
+        "title",
+        "options",
+        subtrees_key,
+        items_key,
+        # top-level only
+        FILE_FORMAT_KEY,
+        "defaults",
+        "meta",
+    }
+    if not allowed_keys.issuperset(data.keys()):
+        unknown_keys = set(data.keys()).difference(allowed_keys)
+        raise MalformedError(
+            f"Unknown keys found: {unknown_keys!r}, allowed: {allowed_keys!r}: '{path}'"
+        )
+
     if items_key in data:
         # this is a shorthand for defining a single subtree
         if subtrees_key in data:
@@ -85,7 +166,7 @@ def _parse_doc_item(
 
         if not (isinstance(toc_data, Mapping) and items_key in toc_data):
             raise MalformedError(
-                f"part not a mapping containing '{items_key}' key: '{path}{toc_idx}'"
+                f"subtree not a mapping containing '{items_key}' key: '{path}{toc_idx}'"
             )
 
         items_data = toc_data[items_key]
@@ -95,7 +176,7 @@ def _parse_doc_item(
                 f"'{items_key}' not a non-empty list: '{path}{toc_idx}'"
             )
 
-        # generate sections list
+        # generate items list
         items: List[Union[GlobItem, FileItem, UrlItem]] = []
         for item_idx, item_data in enumerate(items_data):
 
@@ -169,6 +250,9 @@ def _parse_docs_list(
     site_map: SiteMap,
     defaults: Dict[str, Any],
     path: str,
+    *,
+    depth: int,
+    file_format: FileFormat,
 ):
     """Parse a list of docs."""
     for doc_data in docs_list:
@@ -176,19 +260,40 @@ def _parse_docs_list(
         if docname in site_map:
             raise MalformedError(f"document file used multiple times: {docname}")
         child_path = f"{path}{docname}/"
-        child_item, child_docs_list = _parse_doc_item(doc_data, defaults, child_path)
+        child_item, child_docs_list = _parse_doc_item(
+            doc_data, defaults, child_path, depth=depth, file_format=file_format
+        )
         site_map[docname] = child_item
 
-        _parse_docs_list(child_docs_list, site_map, defaults, child_path)
+        _parse_docs_list(
+            child_docs_list,
+            site_map,
+            defaults,
+            child_path,
+            depth=depth + 1,
+            file_format=file_format,
+        )
 
 
 def create_toc_dict(site_map: SiteMap, *, skip_defaults: bool = True) -> Dict[str, Any]:
     """Create the Toc dictionary from a site-map."""
+    try:
+        file_format = FILE_FORMATS[site_map.file_format or "default"]
+    except KeyError:
+        raise KeyError(f"File format not recognised: '{site_map.file_format}'")
     data = _docitem_to_dict(
-        site_map.root, site_map, skip_defaults=skip_defaults, file_key="root"
+        site_map.root,
+        site_map,
+        depth=0,
+        skip_defaults=skip_defaults,
+        file_key="root",
+        file_format=file_format,
     )
     if site_map.meta:
         data["meta"] = site_map.meta.copy()
+    if site_map.file_format and site_map.file_format != "default":
+        # ensure it is the first key
+        data = {FILE_FORMAT_KEY: site_map.file_format, **data}
     return data
 
 
@@ -196,12 +301,19 @@ def _docitem_to_dict(
     doc_item: Document,
     site_map: SiteMap,
     *,
+    depth: int,
+    file_format: FileFormat,
     skip_defaults: bool = True,
-    subtrees_key: str = DEFAULT_SUBTREES_KEY,
-    items_key: str = DEFAULT_ITEMS_KEY,
     file_key: str = FILE_KEY,
     parsed_docnames: Optional[Set[str]] = None,
 ) -> Dict[str, Any]:
+    """
+
+    :param skip_defaults: do not add key/values for values that are already the default
+
+    """
+    subtrees_key = file_format.get_subtrees_key(depth)
+    items_key = file_format.get_items_key(depth)
 
     # protect against infinite recursion
     parsed_docnames = parsed_docnames or set()
@@ -224,6 +336,8 @@ def _docitem_to_dict(
                 return _docitem_to_dict(
                     site_map[item],
                     site_map,
+                    depth=depth + 1,
+                    file_format=file_format,
                     skip_defaults=skip_defaults,
                     parsed_docnames=parsed_docnames,
                 )

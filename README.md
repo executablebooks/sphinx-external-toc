@@ -11,6 +11,10 @@ In normal Sphinx documentation, the documentation site-map is defined *via* a bo
 
 This extension facilitates a **top-down** approach to defining the site-map structure, within a single YAML file.
 
+![ToC graphic](toc-graphic.png)
+
+It also allows for documents not specified in the ToC to be auto-excluded.
+
 ## User Guide
 
 ### Sphinx Configuration
@@ -39,7 +43,7 @@ The value of the `root` key will be a path to a file, in Unix format (folders sp
 This root file will be set as the [`master_doc`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-master_doc).
 :::
 
-Document files can then have a `subtrees` key - denoting a list of individual toctrees for that document - and in-turn each subtree should have a `sections` key - denoting a list of children links, that are one of: `file`, `url` or `glob`:
+Document files can then have a `subtrees` key - denoting a list of individual toctrees for that document - and in-turn each subtree should have a `items` key - denoting a list of children links, that are one of:
 
 - `file`: path to a single document file in Unix format,  with or without the file extension (as for `root`)
 - `glob`: path to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
@@ -54,13 +58,13 @@ This can proceed recursively to any depth.
 ```yaml
 root: intro
 subtrees:
-- sections:
+- items:
   - file: doc1
     subtrees:
-    - sections:
+    - items:
       - file: doc2
         subtrees:
-        - sections:
+        - items:
           - file: doc3
   - url: https://example.com
   - glob: subfolder/other*
@@ -69,16 +73,16 @@ subtrees:
 This is equivalent to having a single `toctree` directive in `intro`, containing `doc1`,
 and a single `toctree` directive in `doc1`, with the `:glob:` flag and containing `doc2`, `https://example.com` and `subfolder/other*`.
 
-As a shorthand, the `sections` key can be at the same level as the `file`, which denotes a document with a single subtree.
+As a shorthand, the `items` key can be at the same level as the `file`, which denotes a document with a single subtree.
 For example, this file is exactly equivalent to the one above:
 
 ```yaml
 root: intro
-sections:
+items:
 - file: doc1
-  sections:
+  items:
   - file: doc2
-    sections:
+    items:
     - file: doc3
 - url: https://example.com
 - glob: subfolder/other*
@@ -92,7 +96,7 @@ With the `title` key you can set an alternative title for a document. and also f
 ```yaml
 root: intro
 subtrees:
-- sections:
+- items:
   - file: doc1
     title: Document 1 Title
   - url: https://example.com
@@ -106,13 +110,13 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
 - `caption` (string): A title for the whole the subtree, e.g. shown above the subtree in ToCs
 - `hidden` (boolean): Whether to show the ToC within (inline of) the document (default `False`).
   By default it is appended to the end of the document, but see also the `tableofcontents` directive for positioning of the ToC.
-- `maxdepth` (integer): A maximum nesting depth to use when showing the ToC within the document.
+- `maxdepth` (integer): A maximum nesting depth to use when showing the ToC within the document (default -1, meaning infinite).
 - `numbered` (boolean or integer): Automatically add numbers to all documents within a subtree (default `False`).
   If set to `True`, all sub-trees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
   or if set to an integer then the numbering will only be applied to that depth.
-- `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order.
-  This can be useful when using `glob` sections.
-- `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level.
+- `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order (default `False`).
+  This can be useful when using `glob` items.
+- `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level (default `False`).
 
 These options can be set at the level of the subtree:
 
@@ -125,11 +129,11 @@ subtrees:
   numbered: True
   reversed: False
   titlesonly: True
-  sections:
+  items:
   - file: doc1
     subtrees:
     - titlesonly: True
-      sections:
+      items:
       - file: doc2
 ```
 
@@ -144,11 +148,11 @@ options:
   numbered: True
   reversed: False
   titlesonly: True
-sections:
+items:
 - file: doc1
   options:
     titlesonly: True
-  sections:
+  items:
   - file: doc2
 ```
 
@@ -164,9 +168,9 @@ options:
   maxdepth: 1
   numbered: True
   reversed: False
-sections:
+items:
 - file: doc1
-  sections:
+  items:
   - file: doc2
 ```
 
@@ -175,8 +179,53 @@ sections:
 :::
 
 :::{note}
-By default, section numbering restarts for each subtree.
+By default, title numbering restarts for each subtree.
 If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
+:::
+
+### Using different key-mappings
+
+For certain use-cases, it is helpful to map the `subtrees`/`items` keys to mirror e.g. an output [LaTeX structure](https://www.overleaf.com/learn/latex/sections_and_chapters).
+
+The `format` key can be used to provide such mappings (and also initial defaults).
+Currently available:
+
+- `jb-article`:
+  - Maps `items` -> `sections`
+  - Sets the default of `titlesonly` to `true`
+- `jb-book`:
+  - Maps the top-level `subtrees` to `parts`
+  - Maps the top-level `items` to `chapters`
+  - Maps other levels of `items` to `sections`
+  - Sets the default of `titlesonly` to `true`
+
+For example:
+
+```yaml
+defaults:
+  titlesonly: true
+root: index
+subtrees:
+- items:
+  - file: doc1
+    items:
+    - file: doc2
+```
+
+is equivalent to:
+
+```yaml
+format: jb-book
+root: index
+parts:
+- chapters:
+  - file: doc1
+    sections:
+    - file: doc2
+```
+
+:::{important}
+These change in key names do not change the output site-map structure.
 :::
 
 ## Add a ToC to a page's content
@@ -225,19 +274,32 @@ To see all options:
 
 ```console
 $ sphinx-etoc --help
+Usage: sphinx-etoc [OPTIONS] COMMAND [ARGS]...
+
+  Command-line for ``sphinx-external-toc``.
+
+Options:
+  --version   Show the version and exit.
+  -h, --help  Show this message and exit.
+
+Commands:
+  from-site  Create a ToC file from a site directory.
+  migrate    Migrate a ToC from a previous revision.
+  parse-toc  Parse a ToC file to a site-map YAML.
+  to-site    Create a site directory from a ToC file.
 ```
 
 To build a template site from only a ToC file:
 
 ```console
-$ sphinx-etoc create-site -p path/to/site -e rst path/to/_toc.yml
+$ sphinx-etoc to-site -p path/to/site -e rst path/to/_toc.yml
 ```
 
 Note, you can also add additional files in `meta`/`create_files` amd append text to the end of files with `meta`/`create_append`, e.g.
 
 ```yaml
 root: intro
-sections:
+items:
 - glob: doc*
 meta:
   create_append:
@@ -253,7 +315,7 @@ meta:
 To build a ToC file from an existing site:
 
 ```console
-$ sphinx-etoc create-toc path/to/folder
+$ sphinx-etoc from-site path/to/folder
 ```
 
 Some rules used:
@@ -290,9 +352,9 @@ index.rst
 will create the ToC:
 
 ```console
-$ sphinx-etoc create-toc path/to/folder -i index -s ".*" -e ".rst" -t
+$ sphinx-etoc from-site path/to/folder -i index -s ".*" -e ".rst" -t
 root: index
-sections:
+items:
 - file: 1_a_title
   title: A title
 - file: 11_another_title
@@ -301,20 +363,20 @@ sections:
   title: A subfolder
 - file: 2_another_subfolder/index
   title: Another subfolder
-  sections:
+  items:
   - file: 2_another_subfolder/other
     title: Other
 - file: 3_subfolder/1_no_index
   title: No index
-  sections:
+  items:
   - file: 3_subfolder/2_no_index
     title: No index
 - file: 14_subfolder/index
   title: Subfolder
-  sections:
+  items:
   - file: 14_subfolder/subsubfolder/index
     title: Subsubfolder
-    sections:
+    items:
     - file: 14_subfolder/subsubfolder/other
       title: Other
 ```

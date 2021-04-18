@@ -10,5 +10,7 @@ exclude codecov.yml
 
 include LICENSE
 include CHANGELOG.md
+include README.md
+include toc-graphic.png
 
 include sphinx_external_toc/py.typed

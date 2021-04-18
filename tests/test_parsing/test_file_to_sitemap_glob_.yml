@@ -9,7 +9,7 @@ documents:
       maxdepth: -1
       numbered: false
       reversed: false
-      titlesonly: true
+      titlesonly: false
     title: null
 meta:
   create_files:
