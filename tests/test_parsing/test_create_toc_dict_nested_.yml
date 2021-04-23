@@ -1,10 +1,10 @@
-items:
+entries:
 - file: folder/doc1
 - file: folder/doc2
-- file: folder/doc3
-  items:
+- entries:
   - file: folder/subfolder/doc4
   - glob: folder/globfolder/*
+  file: folder/doc3
 meta:
   create_files:
   - folder/globfolder/glob1

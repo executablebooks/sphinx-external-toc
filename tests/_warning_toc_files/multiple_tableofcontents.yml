@@ -1,5 +1,5 @@
 root: intro
-items:
+entries:
 - file: doc1
 meta:
   create_append:

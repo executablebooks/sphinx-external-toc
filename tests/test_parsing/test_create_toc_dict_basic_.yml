@@ -1,10 +1,10 @@
-items:
+entries:
 - file: doc1
 - file: doc2
-- file: doc3
-  items:
+- entries:
   - file: subfolder/doc4
   - url: https://example.com
+  file: doc3
   options:
     titlesonly: true
 meta:

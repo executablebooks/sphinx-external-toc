@@ -1,4 +1,4 @@
-items:
+entries:
 - file: doc1
 - glob: subfolder/other*
 meta:
