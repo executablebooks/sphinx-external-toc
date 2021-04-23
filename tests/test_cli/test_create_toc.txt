@@ -1,5 +1,5 @@
 root: index
-items:
+entries:
 - file: 1_a_title
   title: A title
 - file: 11_another_title
@@ -8,19 +8,19 @@ items:
   title: A subfolder
 - file: 2_another_subfolder/index
   title: Another subfolder
-  items:
+  entries:
   - file: 2_another_subfolder/other
     title: Other
 - file: 3_subfolder/1_no_index
   title: No index
-  items:
+  entries:
   - file: 3_subfolder/2_no_index
     title: No index
 - file: 14_subfolder/index
   title: Subfolder
-  items:
+  entries:
   - file: 14_subfolder/subsubfolder/index
     title: Subsubfolder
-    items:
+    entries:
     - file: 14_subfolder/subsubfolder/other
       title: Other

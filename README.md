@@ -43,7 +43,7 @@ The value of the `root` key will be a path to a file, in Unix format (folders sp
 This root file will be set as the [`master_doc`](https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-master_doc).
 :::
 
-Document files can then have a `subtrees` key - denoting a list of individual toctrees for that document - and in-turn each subtree should have a `items` key - denoting a list of children links, that are one of:
+Document files can then have a `subtrees` key - denoting a list of individual toctrees for that document - and in-turn each subtree should have a `entries` key - denoting a list of children links, that are one of:
 
 - `file`: path to a single document file in Unix format,  with or without the file extension (as for `root`)
 - `glob`: path to one or more document files *via* Unix shell-style wildcards (similar to [`fnmatch`](https://docs.python.org/3/library/fnmatch.html), but single stars don't match slashes.)
@@ -58,13 +58,13 @@ This can proceed recursively to any depth.
 ```yaml
 root: intro
 subtrees:
-- items:
+- entries:
   - file: doc1
     subtrees:
-    - items:
+    - entries:
       - file: doc2
         subtrees:
-        - items:
+        - entries:
           - file: doc3
   - url: https://example.com
   - glob: subfolder/other*
@@ -73,16 +73,16 @@ subtrees:
 This is equivalent to having a single `toctree` directive in `intro`, containing `doc1`,
 and a single `toctree` directive in `doc1`, with the `:glob:` flag and containing `doc2`, `https://example.com` and `subfolder/other*`.
 
-As a shorthand, the `items` key can be at the same level as the `file`, which denotes a document with a single subtree.
+As a shorthand, the `entries` key can be at the same level as the `file`, which denotes a document with a single subtree.
 For example, this file is exactly equivalent to the one above:
 
 ```yaml
 root: intro
-items:
+entries:
 - file: doc1
-  items:
+  entries:
   - file: doc2
-    items:
+    entries:
     - file: doc3
 - url: https://example.com
 - glob: subfolder/other*
@@ -96,7 +96,7 @@ With the `title` key you can set an alternative title for a document. and also f
 ```yaml
 root: intro
 subtrees:
-- items:
+- entries:
   - file: doc1
     title: Document 1 Title
   - url: https://example.com
@@ -115,7 +115,7 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
   If set to `True`, all sub-trees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
   or if set to an integer then the numbering will only be applied to that depth.
 - `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order (default `False`).
-  This can be useful when using `glob` items.
+  This can be useful when using `glob` entries.
 - `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level (default `False`).
 
 These options can be set at the level of the subtree:
@@ -129,11 +129,11 @@ subtrees:
   numbered: True
   reversed: False
   titlesonly: True
-  items:
+  entries:
   - file: doc1
     subtrees:
     - titlesonly: True
-      items:
+      entries:
       - file: doc2
 ```
 
@@ -148,11 +148,11 @@ options:
   numbered: True
   reversed: False
   titlesonly: True
-items:
+entries:
 - file: doc1
   options:
     titlesonly: True
-  items:
+  entries:
   - file: doc2
 ```
 
@@ -168,9 +168,9 @@ options:
   maxdepth: 1
   numbered: True
   reversed: False
-items:
+entries:
 - file: doc1
-  items:
+  entries:
   - file: doc2
 ```
 
@@ -185,18 +185,18 @@ If you want want this numbering to be continuous, check-out the [sphinx-multitoc
 
 ### Using different key-mappings
 
-For certain use-cases, it is helpful to map the `subtrees`/`items` keys to mirror e.g. an output [LaTeX structure](https://www.overleaf.com/learn/latex/sections_and_chapters).
+For certain use-cases, it is helpful to map the `subtrees`/`entries` keys to mirror e.g. an output [LaTeX structure](https://www.overleaf.com/learn/latex/sections_and_chapters).
 
 The `format` key can be used to provide such mappings (and also initial defaults).
 Currently available:
 
 - `jb-article`:
-  - Maps `items` -> `sections`
+  - Maps `entries` -> `sections`
   - Sets the default of `titlesonly` to `true`
 - `jb-book`:
   - Maps the top-level `subtrees` to `parts`
-  - Maps the top-level `items` to `chapters`
-  - Maps other levels of `items` to `sections`
+  - Maps the top-level `entries` to `chapters`
+  - Maps other levels of `entries` to `sections`
   - Sets the default of `titlesonly` to `true`
 
 For example:
@@ -206,9 +206,9 @@ defaults:
   titlesonly: true
 root: index
 subtrees:
-- items:
+- entries:
   - file: doc1
-    items:
+    entries:
     - file: doc2
 ```
 
@@ -266,6 +266,10 @@ external_toc_exclude_missing = True
 Note that, for performance, files that are in *hidden folders* (e.g. in `.tox` or `.venv`) will not be added to `exclude_patterns` even if they are not specified in the ToC.
 You should exclude these folders explicitly.
 
+:::{important}
+This feature is not currently compatible with [orphan files](https://www.sphinx-doc.org/en/master/usage/restructuredtext/field-lists.html#metadata).
+:::
+
 ## Command-line
 
 This package comes with the `sphinx-etoc` command-line program, with some additional tools.
@@ -299,7 +303,7 @@ Note, you can also add additional files in `meta`/`create_files` amd append text
 
 ```yaml
 root: intro
-items:
+entries:
 - glob: doc*
 meta:
   create_append:
@@ -354,7 +358,7 @@ will create the ToC:
 ```console
 $ sphinx-etoc from-site path/to/folder -i index -s ".*" -e ".rst" -t
 root: index
-items:
+entries:
 - file: 1_a_title
   title: A title
 - file: 11_another_title
@@ -363,20 +367,20 @@ items:
   title: A subfolder
 - file: 2_another_subfolder/index
   title: Another subfolder
-  items:
+  entries:
   - file: 2_another_subfolder/other
     title: Other
 - file: 3_subfolder/1_no_index
   title: No index
-  items:
+  entries:
   - file: 3_subfolder/2_no_index
     title: No index
 - file: 14_subfolder/index
   title: Subfolder
-  items:
+  entries:
   - file: 14_subfolder/subsubfolder/index
     title: Subsubfolder
-    items:
+    entries:
     - file: 14_subfolder/subsubfolder/other
       title: Other
 ```

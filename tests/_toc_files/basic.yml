@@ -4,12 +4,12 @@ root: intro
 subtrees:
   - caption: Part Caption
     numbered: true
-    items:
+    entries:
     - file: doc1
     - file: doc2
     - file: doc3
       subtrees:
-      - items:
+      - entries:
         - file: subfolder/doc4
         - url: https://example.com
 meta:

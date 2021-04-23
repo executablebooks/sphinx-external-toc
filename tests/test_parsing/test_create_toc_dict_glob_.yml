@@ -1,4 +1,4 @@
-items:
+entries:
 - glob: doc*
 meta:
   create_files:

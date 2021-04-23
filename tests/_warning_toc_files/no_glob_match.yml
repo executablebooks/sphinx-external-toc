@@ -1,5 +1,5 @@
 root: intro
-items:
+entries:
 - glob: doc*
 meta:
   expected_warning: toctree glob pattern

@@ -9,7 +9,7 @@ import yaml
 from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 
 DEFAULT_SUBTREES_KEY = "subtrees"
-DEFAULT_ITEMS_KEY = "items"
+DEFAULT_ITEMS_KEY = "entries"
 FILE_FORMAT_KEY = "format"
 ROOT_KEY = "root"
 FILE_KEY = "file"
@@ -173,7 +173,7 @@ def _parse_doc_item(
 
         if not (isinstance(toc_data, Mapping) and items_key in toc_data):
             raise MalformedError(
-                f"item not a mapping containing '{items_key}' key @ '{toc_path}'"
+                f"entry not a mapping containing '{items_key}' key @ '{toc_path}'"
             )
 
         items_data = toc_data[items_key]
@@ -187,7 +187,7 @@ def _parse_doc_item(
 
             if not isinstance(item_data, Mapping):
                 raise MalformedError(
-                    f"item not a mapping type @ '{toc_path}{items_key}/{item_idx}'"
+                    f"entry not a mapping type @ '{toc_path}{items_key}/{item_idx}'"
                 )
 
             link_keys = _known_link_keys.intersection(item_data)
@@ -195,19 +195,19 @@ def _parse_doc_item(
             # validation checks
             if not link_keys:
                 raise MalformedError(
-                    f"item does not contain one of "
+                    f"entry does not contain one of "
                     f"{_known_link_keys!r} @ '{toc_path}{items_key}/{item_idx}'"
                 )
             if not len(link_keys) == 1:
                 raise MalformedError(
-                    f"item contains incompatible keys "
+                    f"entry contains incompatible keys "
                     f"{link_keys!r} @ '{toc_path}{items_key}/{item_idx}'"
                 )
             for item_key in (GLOB_KEY, URL_KEY):
                 for other_key in (subtrees_key, items_key):
                     if link_keys == {item_key} and other_key in item_data:
                         raise MalformedError(
-                            f"item contains incompatible keys "
+                            f"entry contains incompatible keys "
                             f"'{item_key}' and '{other_key}' @ '{toc_path}{items_key}/{item_idx}'"
                         )
 
@@ -221,7 +221,7 @@ def _parse_doc_item(
             except (ValueError, TypeError) as exc:
                 exc_arg = exc.args[0] if exc.args else ""
                 raise MalformedError(
-                    f"item validation @ '{toc_path}{items_key}/{item_idx}': {exc_arg}"
+                    f"entry validation @ '{toc_path}{items_key}/{item_idx}': {exc_arg}"
                 ) from exc
 
         # generate toc key-word arguments

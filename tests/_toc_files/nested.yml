@@ -1,9 +1,9 @@
 root: intro
-items:
+entries:
 - file: folder/doc1
 - file: folder/doc2
 - file: folder/doc3
-  items:
+  entries:
   - file: folder/subfolder/doc4
   - glob: folder/globfolder/*
 meta:

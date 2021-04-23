@@ -1,4 +1,4 @@
 root: index
-items:
+entries:
 - file: doc
   glob: doc*

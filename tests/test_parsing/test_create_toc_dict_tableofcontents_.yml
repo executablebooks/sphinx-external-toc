@@ -6,7 +6,7 @@ meta:
   regress: intro
 root: intro
 subtrees:
-- items:
+- entries:
   - file: doc1
-- items:
+- entries:
   - file: doc2
