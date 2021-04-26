@@ -128,7 +128,20 @@ def create_toc(site_dir, extension, index, skip_match, guess_titles, file_format
     type=click.Choice(["jb-v0.10"]),
     help="The format to migrate from.",
 )
-def migrate_toc(toc_file, format):
+@click.option(
+    "-o",
+    "--output",
+    type=click.Path(allow_dash=True, exists=False, file_okay=True, dir_okay=False),
+    help="Write to a file path.",
+)
+def migrate_toc(toc_file, format, output):
     """Migrate a ToC from a previous revision."""
     toc = migrate_jupyter_book(Path(toc_file))
-    click.echo(yaml.dump(toc, sort_keys=False, default_flow_style=False))
+    content = yaml.dump(toc, sort_keys=False, default_flow_style=False)
+    if output:
+        path = Path(output)
+        path.parent.mkdir(exist_ok=True, parents=True)
+        path.write_text(content, encoding="utf8")
+        click.secho(f"Written to: {path}", fg="green")
+    else:
+        click.echo(content)
