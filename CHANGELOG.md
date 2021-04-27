@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.1.0 - 2021-04-27
+
+- ♻️ REFACTOR: key `items` -> `entries`
+- 👌 IMPROVE: Add `--output` to `migrate` command
+
 ## 0.1.0a8 - 2021-04-19
 
 - 👌 IMPROVE: validate URL: Ensure value of `url` keys match regex used by Sphinx to identify them
