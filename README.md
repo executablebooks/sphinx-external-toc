@@ -287,16 +287,16 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  from-site  Create a ToC file from a site directory.
+  from-files  Create a ToC file from a site directory.
   migrate    Migrate a ToC from a previous revision.
   parse      Parse a ToC file to a site-map YAML.
-  to-site    Create a site directory from a ToC file.
+  to-files    Create a site directory from a ToC file.
 ```
 
 To build a template site from only a ToC file:
 
 ```console
-$ sphinx-etoc to-site -p path/to/site -e rst path/to/_toc.yml
+$ sphinx-etoc to-files -p path/to/site -e rst path/to/_toc.yml
 ```
 
 Note, you can also add additional files in `meta`/`create_files` amd append text to the end of files with `meta`/`create_append`, e.g.
@@ -319,7 +319,7 @@ meta:
 To build a ToC file from an existing site:
 
 ```console
-$ sphinx-etoc from-site path/to/folder
+$ sphinx-etoc from-files path/to/folder
 ```
 
 Some rules used:
@@ -356,7 +356,7 @@ index.rst
 will create the ToC:
 
 ```console
-$ sphinx-etoc from-site path/to/folder -i index -s ".*" -e ".rst" -t
+$ sphinx-etoc from-files path/to/folder -i index -s ".*" -e ".rst" -t
 root: index
 entries:
 - file: 1_a_title
