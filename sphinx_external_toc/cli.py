@@ -26,7 +26,7 @@ def parse_toc(toc_file):
     click.echo(yaml.dump(site_map.as_json(), sort_keys=False, default_flow_style=False))
 
 
-@main.command("to-files")
+@main.command("to-project")
 @click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
 @click.option(
     "-p",
@@ -53,7 +53,7 @@ def create_site(toc_file, path, extension, overwrite):
     click.secho("SUCCESS!", fg="green")
 
 
-@main.command("from-files")
+@main.command("from-project")
 @click.argument(
     "site_dir", type=click.Path(exists=True, file_okay=False, dir_okay=True)
 )
