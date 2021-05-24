@@ -287,13 +287,13 @@ Options:
   -h, --help  Show this message and exit.
 
 Commands:
-  from-project  Create a ToC file from a site directory.
+  from-project  Create a ToC file from a project directory.
   migrate    Migrate a ToC from a previous revision.
   parse      Parse a ToC file to a site-map YAML.
-  to-project    Create a site directory from a ToC file.
+  to-project    Create a project directory from a ToC file.
 ```
 
-To build a template site from only a ToC file:
+To build a template project from only a ToC file:
 
 ```console
 $ sphinx-etoc to-project -p path/to/site -e rst path/to/_toc.yml
@@ -335,7 +335,7 @@ The command can also guess a `title` for each file, based on its path:
 - Words are split by `_`
 - The first "word" is removed if it is an integer
 
-For example, for a site with files:
+For example, for a project with files:
 
 ```
 index.rst

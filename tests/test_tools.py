@@ -26,7 +26,7 @@ def test_file_to_sitemap(path: Path, tmp_path: Path, data_regression):
 
 def test_create_site_map_from_path(tmp_path: Path, data_regression):
 
-    # create site files
+    # create project files
     files = [
         "index.rst",
         "1_other.rst",
