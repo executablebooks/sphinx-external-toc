@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.0 - 2021-05-24
+
+- ‼ BREAKING: the CLI command `to-site` is now `to-project`, and `from-site` is now `from-project`
+
 ## 0.1.0 - 2021-04-27
 
 - ♻️ REFACTOR: key `items` -> `entries`
