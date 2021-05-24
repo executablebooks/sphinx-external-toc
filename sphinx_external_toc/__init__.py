@@ -1,4 +1,4 @@
-"""A sphinx extension that allows the site toctree to be defined in a single file."""
+"""A sphinx extension that allows the project toctree to be defined in a single file."""
 
 __version__ = "0.1.0"
 

@@ -26,7 +26,7 @@ def parse_toc(toc_file):
     click.echo(yaml.dump(site_map.as_json(), sort_keys=False, default_flow_style=False))
 
 
-@main.command("to-site")
+@main.command("to-project")
 @click.argument("toc_file", type=click.Path(exists=True, file_okay=True))
 @click.option(
     "-p",
@@ -45,7 +45,7 @@ def parse_toc(toc_file):
 )
 @click.option("-o", "--overwrite", is_flag=True, help="Overwrite existing files.")
 def create_site(toc_file, path, extension, overwrite):
-    """Create a site directory from a ToC file."""
+    """Create a project directory from a ToC file."""
     create_site_from_toc(
         toc_file, root_path=path, default_ext="." + extension, overwrite=overwrite
     )
@@ -53,7 +53,7 @@ def create_site(toc_file, path, extension, overwrite):
     click.secho("SUCCESS!", fg="green")
 
 
-@main.command("from-site")
+@main.command("from-project")
 @click.argument(
     "site_dir", type=click.Path(exists=True, file_okay=False, dir_okay=True)
 )
@@ -95,7 +95,7 @@ def create_site(toc_file, path, extension, overwrite):
     help="The key-mappings to use.",
 )
 def create_toc(site_dir, extension, index, skip_match, guess_titles, file_format):
-    """Create a ToC file from a site directory."""
+    """Create a ToC file from a project directory."""
     site_map = create_site_map_from_path(
         site_dir,
         suffixes=extension,

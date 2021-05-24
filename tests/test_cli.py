@@ -35,7 +35,7 @@ def test_parse_toc(invoke_cli):
 
 
 def test_create_toc(tmp_path, invoke_cli, file_regression):
-    # create site files
+    # create project files
     files = [
         "index.rst",
         "1_a_title.rst",
