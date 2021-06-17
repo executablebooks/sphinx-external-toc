@@ -1,23 +1,6 @@
-# sphinx-external-toc
+# Sphinx
 
-[![Github-CI][github-ci]][github-link]
-[![Coverage Status][codecov-badge]][codecov-link]
-[![Code style: black][black-badge]][black-link]
-[![PyPI][pypi-badge]][pypi-link]
-
-A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
-
-In normal Sphinx documentation, the documentation site-map is defined *via* a bottom-up approach - adding [`toctree` directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) within pages of the documentation.
-
-This extension facilitates a **top-down** approach to defining the site-map structure, within a single YAML file.
-
-![ToC graphic](docs/toc-graphic.png)
-
-It also allows for documents not specified in the ToC to be auto-excluded.
-
-## User Guide
-
-### Sphinx Configuration
+## Configuration
 
 Add to your `conf.py`:
 
@@ -29,7 +12,7 @@ external_toc_exclude_missing = False  # optional, default: False
 
 Note the `external_toc_path` is always read as a Unix path, and can either be specified relative to the source directory (recommended) or as an absolute path.
 
-### Basic Structure
+## Basic Structure
 
 A minimal ToC defines the top level `root` key, for a single root document file:
 
@@ -88,7 +71,7 @@ entries:
 - glob: subfolder/other*
 ```
 
-### File and URL titles
+## File and URL titles
 
 By default, the initial header within a `file` document will be used as its title in generated Table of Contents.
 With the `title` key you can set an alternative title for a document. and also for `url`:
@@ -103,7 +86,7 @@ subtrees:
     title: Example URL Title
 ```
 
-### ToC tree options
+## ToC tree options
 
 Each subtree can be configured with a number of options (see also [sphinx `toctree` options](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#directive-toctree)):
 
@@ -183,7 +166,7 @@ By default, title numbering restarts for each subtree.
 If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
 :::
 
-### Using different key-mappings
+## Using different key-mappings
 
 For certain use-cases, it is helpful to map the `subtrees`/`entries` keys to mirror e.g. an output [LaTeX structure](https://www.overleaf.com/learn/latex/sections_and_chapters).
 
@@ -228,27 +211,6 @@ parts:
 These change in key names do not change the output site-map structure.
 :::
 
-## Add a ToC to a page's content
-
-By default, the `toctree` generated per document (one per subtree) are appended to the end of the document and hidden (then, for example, most HTML themes show them in a side-bar).
-But if you would like them to be visible at a certain place within the document body, you may do so by using the `tableofcontents` directive:
-
-ReStructuredText:
-
-```restructuredtext
-.. tableofcontents::
-```
-
-MyST Markdown:
-
-````md
-```{tableofcontents}
-```
-````
-
-Currently, only one `tableofcontents` should be used per page (all `toctree` will be added here), and only if it is a page with child/descendant documents.
-
-Note, this will override the `hidden` option set for a subtree.
 
 ## Excluding files not in ToC
 
@@ -269,180 +231,3 @@ You should exclude these folders explicitly.
 :::{important}
 This feature is not currently compatible with [orphan files](https://www.sphinx-doc.org/en/master/usage/restructuredtext/field-lists.html#metadata).
 :::
-
-## Command-line
-
-This package comes with the `sphinx-etoc` command-line program, with some additional tools.
-
-To see all options:
-
-```console
-$ sphinx-etoc --help
-Usage: sphinx-etoc [OPTIONS] COMMAND [ARGS]...
-
-  Command-line for sphinx-external-toc.
-
-Options:
-  --version   Show the version and exit.
-  -h, --help  Show this message and exit.
-
-Commands:
-  from-project  Create a ToC file from a project directory.
-  migrate    Migrate a ToC from a previous revision.
-  parse      Parse a ToC file to a site-map YAML.
-  to-project    Create a project directory from a ToC file.
-```
-
-To build a template project from only a ToC file:
-
-```console
-$ sphinx-etoc to-project -p path/to/site -e rst path/to/_toc.yml
-```
-
-Note, you can also add additional files in `meta`/`create_files` amd append text to the end of files with `meta`/`create_append`, e.g.
-
-```yaml
-root: intro
-entries:
-- glob: doc*
-meta:
-  create_append:
-    intro: |
-      This is some
-      appended text
-  create_files:
-  - doc1
-  - doc2
-  - doc3
-```
-
-To build a ToC file from an existing site:
-
-```console
-$ sphinx-etoc from-project path/to/folder
-```
-
-Some rules used:
-
-- Files/folders will be skipped if they match a pattern added by `-s` (based on [fnmatch](https://docs.python.org/3/library/fnmatch.html) Unix shell-style wildcards)
-- Sub-folders with no content files inside will be skipped
-- File and folder names will be sorted by [natural order](https://en.wikipedia.org/wiki/Natural_sort_order)
-- If there is a file called `index` (or the name set by `-i`) in any folder, it will be treated as the index file, otherwise the first file by ordering will be used.
-
-The command can also guess a `title` for each file, based on its path:
-
-- The folder name is used for index files, otherwise the file name
-- Words are split by `_`
-- The first "word" is removed if it is an integer
-
-For example, for a project with files:
-
-```
-index.rst
-1_a_title.rst
-11_another_title.rst
-.hidden_file.rst
-.hidden_folder/index.rst
-1_a_subfolder/index.rst
-2_another_subfolder/index.rst
-2_another_subfolder/other.rst
-3_subfolder/1_no_index.rst
-3_subfolder/2_no_index.rst
-14_subfolder/index.rst
-14_subfolder/subsubfolder/index.rst
-14_subfolder/subsubfolder/other.rst
-```
-
-will create the ToC:
-
-```console
-$ sphinx-etoc from-project path/to/folder -i index -s ".*" -e ".rst" -t
-root: index
-entries:
-- file: 1_a_title
-  title: A title
-- file: 11_another_title
-  title: Another title
-- file: 1_a_subfolder/index
-  title: A subfolder
-- file: 2_another_subfolder/index
-  title: Another subfolder
-  entries:
-  - file: 2_another_subfolder/other
-    title: Other
-- file: 3_subfolder/1_no_index
-  title: No index
-  entries:
-  - file: 3_subfolder/2_no_index
-    title: No index
-- file: 14_subfolder/index
-  title: Subfolder
-  entries:
-  - file: 14_subfolder/subsubfolder/index
-    title: Subsubfolder
-    entries:
-    - file: 14_subfolder/subsubfolder/other
-      title: Other
-```
-
-## API
-
-The ToC file is parsed to a `SiteMap`, which is a `MutableMapping` subclass, with keys representing docnames mapping to a `Document` that stores information on the toctrees it should contain:
-
-```python
-import yaml
-from sphinx_external_toc.parsing import parse_toc_yaml
-path = "path/to/_toc.yml"
-site_map = parse_toc_yaml(path)
-yaml.dump(site_map.as_json())
-```
-
-Would produce e.g.
-
-```yaml
-root: intro
-documents:
-  doc1:
-    docname: doc1
-    subtrees: []
-    title: null
-  intro:
-    docname: intro
-    subtrees:
-    - caption: Subtree Caption
-      numbered: true
-      reversed: false
-      items:
-      - doc1
-      titlesonly: true
-    title: null
-meta: {}
-```
-
-## Development Notes
-
-Questions / TODOs:
-
-- Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`
-- Using `external_toc_exclude_missing` to exclude a certain file suffix:
-  currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,
-  it will add `doc.rst` to the excluded patterns but then, when looking for `doc.md`,
-  will still select `doc.rst` (since it is first in `source_suffix`).
-  Maybe open an issue on sphinx, that `doc2path` should respect exclude patterns.
-- Integrate https://github.com/executablebooks/sphinx-multitoc-numbering into this extension? (or upstream PR)
-- document suppressing warnings
-- test against orphan file
-- https://github.com/executablebooks/sphinx-book-theme/pull/304
-- CLI command to generate toc from existing documentation `toctrees` (and then remove toctree directives)
-- test rebuild on toc changes (and document how rebuilds are controlled when toc changes)
-- some jupyter-book issues point to potential changes in numbering, based on where the `toctree` is in the document.
-  So could look into placing it e.g. under the first heading/title
-
-[github-ci]: https://github.com/executablebooks/sphinx-external-toc/workflows/continuous-integration/badge.svg?branch=main
-[github-link]: https://github.com/executablebooks/sphinx-external-toc
-[codecov-badge]: https://codecov.io/gh/executablebooks/sphinx-external-toc/branch/main/graph/badge.svg
-[codecov-link]: https://codecov.io/gh/executablebooks/sphinx-external-toc
-[black-badge]: https://img.shields.io/badge/code%20style-black-000000.svg
-[black-link]: https://github.com/ambv/black
-[pypi-badge]: https://img.shields.io/pypi/v/sphinx-external-toc.svg
-[pypi-link]: https://pypi.org/project/sphinx-external-toc
