@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.2.1 - 2021-06-16
+
+- ⬆️ UPDATE: Relax dependency pinning to allow Sphinx v4
+
 ## 0.2.0 - 2021-05-24
 
 - ‼ BREAKING: the CLI command `to-site` is now `to-project`, and `from-site` is now `from-project`
