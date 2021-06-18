@@ -1,17 +1,18 @@
 root: intro
-defaults:
-  titlesonly: false
 subtrees:
-- caption: Part 1
+- caption: User Guide
   numbered: true
   entries:
-  - file: doc1
-  - file: doc2
+  - file: user_guide/sphinx
+  - file: user_guide/cli
+  - file: user_guide/api
+- caption: Example
+  entries:
+  - file: example/index
     entries:
-    - file: subfolder/doc3
-    - url: https://example.com
-      title: Example Link
-- caption: Part 2
-  numbered: true
+    - file: example/subfolder/page
+    - glob: example/globfolder/*
+- caption: Links
   entries:
-  - glob: subglobs/glob*
+  - title: GitHub Repository
+    url: https://github.com/executablebooks/sphinx-external-toc
