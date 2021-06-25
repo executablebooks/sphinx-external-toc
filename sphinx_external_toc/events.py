@@ -76,9 +76,10 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     config.external_site_map = site_map
 
     # Update the master_doc to the root doc of the site map
-    if config["master_doc"] != site_map.root.docname:
-        logger.info("[etoc] Changing master_doc to '%s'", site_map.root.docname)
-    config["master_doc"] = site_map.root.docname
+    root_doc = remove_suffix(site_map.root.docname, config.source_suffix)
+    if config["master_doc"] != root_doc:
+        logger.info("[etoc] Changing master_doc to '%s'", root_doc)
+    config["master_doc"] = root_doc
 
     if config["external_toc_exclude_missing"]:
         # add files not specified in ToC file to exclude list
@@ -180,6 +181,14 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
     site_map: SiteMap = app.env.external_site_map
     doc_item: Optional[Document] = site_map.get(app.env.docname)
+
+    # check for matches with suffix
+    # TODO check in sitemap, that we do not have multiple docs of the same name
+    # (strip extensions on creation)
+    for suffix in app.config.source_suffix:
+        if doc_item is not None:
+            break
+        doc_item = site_map.get(app.env.docname + suffix)
 
     if doc_item is None or not doc_item.subtrees:
         if toc_placeholders:
