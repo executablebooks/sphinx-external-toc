@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.2.2 - 2021-06-25
+
+🐛 FIX: File extensions in ToC
+
+Ensure files are still matched, if they are provided with file extensions.
+
 ## 0.2.1 - 2021-06-16
 
 - ⬆️ UPDATE: Relax dependency pinning to allow Sphinx v4
