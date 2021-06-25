@@ -112,3 +112,36 @@ external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
     # run sphinx
     builder = sphinx_build_factory(src_dir)
     builder.build()
+
+
+def test_file_extensions(tmp_path: Path, sphinx_build_factory):
+    """Test for tocs containing docnames with file extensions."""
+    src_dir = tmp_path / "srcdir"
+    src_dir.mkdir(exist_ok=True)
+    # write documents
+    src_dir.joinpath("intro.rst").write_text("Head\n====\n", encoding="utf8")
+    src_dir.joinpath("markdown.rst").write_text("Head\n====\n", encoding="utf8")
+    src_dir.joinpath("notebooks.rst").write_text("Head\n====\n", encoding="utf8")
+    # write toc
+    toc_path = tmp_path / "toc.yml"
+    toc_path.write_text(
+        """
+format: jb-book
+root: intro.rst
+chapters:
+- file: markdown.rst
+  sections:
+  - file: notebooks.rst
+    """,
+        encoding="utf8",
+    )
+    # write conf.py
+    content = f"""
+extensions = ["sphinx_external_toc"]
+external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
+
+"""
+    src_dir.joinpath("conf.py").write_text(content, encoding="utf8")
+    # run sphinx
+    builder = sphinx_build_factory(src_dir)
+    builder.build()
