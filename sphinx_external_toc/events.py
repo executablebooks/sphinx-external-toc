@@ -1,5 +1,6 @@
 """Sphinx event functions and directives."""
 import glob
+import copy
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Set
 
@@ -131,16 +132,23 @@ def add_changed_toctrees(
     """Add docs with new or changed toctrees to changed list."""
     previous_map = getattr(app.env, "external_site_map", None)
     # move external_site_map from config to env
-    app.env.external_site_map = site_map = app.config.external_site_map
+    app.env.external_site_map = site_map = copy.deepcopy(app.config.external_site_map)
     # Compare to previous map, to record docnames with new or changed toctrees
     changed_docs = set()
     if previous_map:
-        for docname in site_map:
-            if (
-                docname not in previous_map
-                or site_map[docname] != previous_map[docname]
-            ):
+        for docname, val in site_map.items():
+            # comparing attributes with previous map
+            if docname in previous_map:
+                val_p = previous_map[docname]
+                for site_map_subtree, previous_map_subtree in zip(val.subtrees, val_p.subtrees):
+                    for opt in val.child_options():
+                        if site_map_subtree[opt] != previous_map_subtree[opt]:
+                            # adding all the docs of the subtree, docname whose option changed
+                            changed_docs.add(docname)
+                            changed_docs.update(site_map_subtree.files())
+            else:
                 changed_docs.add(docname)
+        
     return changed_docs
 
 

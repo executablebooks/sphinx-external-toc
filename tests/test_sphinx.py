@@ -1,4 +1,5 @@
 import os
+import yaml
 from pathlib import Path
 
 import pytest
@@ -6,6 +7,8 @@ from sphinx.testing.path import path as sphinx_path
 from sphinx.testing.util import SphinxTestApp
 
 from sphinx_external_toc.tools import create_site_from_toc
+from sphinx_external_toc.events import add_changed_toctrees
+from sphinx_external_toc.parsing import parse_toc_yaml
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
 TOC_FILES_WARN = list(
@@ -49,6 +52,13 @@ def sphinx_build_factory(make_app):
     def _func(src_path: Path, **kwargs) -> SphinxBuild:
         app = make_app(srcdir=sphinx_path(os.path.abspath(str(src_path))), **kwargs)
         return SphinxBuild(app, src_path)
+
+    yield _func
+
+@pytest.fixture()
+def sphinx_app(make_app):
+    def _func(src_path: Path, **kwargs) -> SphinxBuild:
+        return make_app(srcdir=sphinx_path(os.path.abspath(str(src_path))), **kwargs)
 
     yield _func
 
@@ -145,3 +155,28 @@ external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
     # run sphinx
     builder = sphinx_build_factory(src_dir)
     builder.build()
+
+def test_changed_toctrees(tmp_path: Path, sphinx_app):
+    """Test for tocs with changed toctrees."""
+    src_dir = tmp_path / "srcdir"
+    # write document files
+    toc_path = Path(__file__).parent.joinpath("_toc_files", "basic.yml")
+    create_site_from_toc(toc_path, root_path=src_dir, toc_name="basic.yml")
+    # write conf.py
+    content = f"""
+extensions = ["sphinx_external_toc"]
+external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
+
+"""
+    src_dir.joinpath("conf.py").write_text(content, encoding="utf8")
+    # run sphinx
+    app = sphinx_app(src_dir)
+    changed_files = add_changed_toctrees(app, app.env, set(), set(), set())
+
+    new_toc_path = src_dir / "basic.yml"
+
+    # changing numbered option in the toctree
+    app.config.external_site_map['intro'].subtrees[0]['numbered'] = False
+    changed_files_t = add_changed_toctrees(app, app.env, set(), set(), set())
+
+    assert changed_files_t ==  {'intro', 'doc3', 'doc2', 'doc1'}

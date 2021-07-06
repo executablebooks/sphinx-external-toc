@@ -49,11 +49,20 @@ class TocTree:
     reversed: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
     titlesonly: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
 
+    def __getitem__(self, item):
+        return getattr(self, item)
+    
+    def __setitem__(self, attr, item):
+        return setattr(self, attr, item)
+
     def files(self) -> List[str]:
         return [str(item) for item in self.items if isinstance(item, FileItem)]
 
     def globs(self) -> List[str]:
         return [str(item) for item in self.items if isinstance(item, GlobItem)]
+    
+    def options(self) -> List[str]:
+        return [str(item) for item in dir(self) if not item.startswith('__') and not callable(self[item])]
 
 
 @attr.s(slots=True)
@@ -74,6 +83,10 @@ class Document:
     def child_globs(self) -> List[str]:
         """Return all children globs."""
         return [name for tree in self.subtrees for name in tree.globs()]
+    
+    def child_options(self) -> List[str]:
+        """Return all children options. """
+        return set(name for tree in self.subtrees for name in tree.options())
 
 
 class SiteMap(MutableMapping):
