@@ -1,14 +1,12 @@
 import os
-import yaml
 from pathlib import Path
 
 import pytest
 from sphinx.testing.path import path as sphinx_path
 from sphinx.testing.util import SphinxTestApp
 
-from sphinx_external_toc.tools import create_site_from_toc
 from sphinx_external_toc.events import add_changed_toctrees
-from sphinx_external_toc.parsing import parse_toc_yaml
+from sphinx_external_toc.tools import create_site_from_toc
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
 TOC_FILES_WARN = list(
@@ -54,6 +52,7 @@ def sphinx_build_factory(make_app):
         return SphinxBuild(app, src_path)
 
     yield _func
+
 
 @pytest.fixture()
 def sphinx_app(make_app):
@@ -156,6 +155,7 @@ external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
     builder = sphinx_build_factory(src_dir)
     builder.build()
 
+
 def test_changed_toctrees(tmp_path: Path, sphinx_app):
     """Test for tocs with changed toctrees."""
     src_dir = tmp_path / "srcdir"
@@ -173,10 +173,9 @@ external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
     app = sphinx_app(src_dir)
     changed_files = add_changed_toctrees(app, app.env, set(), set(), set())
 
-    new_toc_path = src_dir / "basic.yml"
-
     # changing numbered option in the toctree
-    app.config.external_site_map['intro'].subtrees[0]['numbered'] = False
+    app.config.external_site_map["intro"].subtrees[0]["numbered"] = False
     changed_files_t = add_changed_toctrees(app, app.env, set(), set(), set())
 
-    assert changed_files_t ==  {'intro', 'doc3', 'doc2', 'doc1'}
+    assert changed_files == set()
+    assert changed_files_t == {"intro", "doc3", "doc2", "doc1"}

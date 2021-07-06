@@ -1,6 +1,6 @@
 """Sphinx event functions and directives."""
-import glob
 import copy
+import glob
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Set
 
@@ -140,7 +140,9 @@ def add_changed_toctrees(
             # comparing attributes with previous map
             if docname in previous_map:
                 val_p = previous_map[docname]
-                for site_map_subtree, previous_map_subtree in zip(val.subtrees, val_p.subtrees):
+                for site_map_subtree, previous_map_subtree in zip(
+                    val.subtrees, val_p.subtrees
+                ):
                     for opt in val.child_options():
                         if site_map_subtree[opt] != previous_map_subtree[opt]:
                             # adding all the docs of the subtree, docname whose option changed
@@ -148,7 +150,7 @@ def add_changed_toctrees(
                             changed_docs.update(site_map_subtree.files())
             else:
                 changed_docs.add(docname)
-        
+
     return changed_docs
 
 
