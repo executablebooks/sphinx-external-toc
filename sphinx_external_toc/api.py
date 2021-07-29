@@ -155,3 +155,21 @@ class SiteMap(MutableMapping):
         if self.file_format:
             data["file_format"] = self.file_format
         return data
+
+    def get_changed(self, previous: "SiteMap") -> Set[str]:
+        """Compare this sitemap to another and return a list of changed documents.
+
+        Note: for sphinx, file extensions should be removed to get docnames
+        """
+        changed_docs = set()
+        # check if the root document has changed
+        if self.root.docname != previous.root.docname:
+            changed_docs.add(self.root.docname)
+        for name, doc in self._docs.items():
+            if name not in previous:
+                changed_docs.add(name)
+                continue
+            prev_doc = previous[name]
+            if prev_doc != doc:
+                changed_docs.add(name)
+        return changed_docs
