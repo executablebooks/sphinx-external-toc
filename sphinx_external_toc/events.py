@@ -133,15 +133,10 @@ def add_changed_toctrees(
     # move external_site_map from config to env
     app.env.external_site_map = site_map = app.config.external_site_map
     # Compare to previous map, to record docnames with new or changed toctrees
-    changed_docs = set()
-    if previous_map:
-        for docname in site_map:
-            if (
-                docname not in previous_map
-                or site_map[docname] != previous_map[docname]
-            ):
-                changed_docs.add(docname)
-    return changed_docs
+    if not previous_map:
+        return set()
+    filenames = site_map.get_changed(previous_map)
+    return {remove_suffix(name, app.config.source_suffix) for name in filenames}
 
 
 class TableOfContentsNode(nodes.Element):
