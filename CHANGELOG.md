@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.2.3 - 2021-07-29
+
+🔧 MAINTAIN: Update `attrs` minimum version to `20.3`, when `value_serializer` was introduced (required here).
+
+👌 IMPROVE: Changed document identification.
+The comparison of sitemaps and identification of changed documents to rebuild was improved and moved to `SiteMap.get_changed`.
+
 ## 0.2.2 - 2021-06-25
 
 🐛 FIX: File extensions in ToC
