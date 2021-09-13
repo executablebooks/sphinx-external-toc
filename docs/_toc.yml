@@ -11,6 +11,9 @@ subtrees:
   - file: example/index
     entries:
     - file: example/subfolder/page
+    - file: example/blankpage
+      entries:
+        - file: example/blanksubpage
     - glob: example/globfolder/*
 - caption: Links
   entries:
