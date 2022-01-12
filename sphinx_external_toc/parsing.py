@@ -29,16 +29,19 @@ TOCTREE_OPTIONS = (
 class FileFormat:
     """Mapping of keys for subtrees and items, dependant on depth in the ToC."""
 
-    subtrees_keys: Sequence[str] = attr.ib(())
-    items_keys: Sequence[str] = attr.ib(())
-    default_subtrees_key: str = attr.ib(DEFAULT_SUBTREES_KEY)
-    default_items_key: str = attr.ib(DEFAULT_ITEMS_KEY)
     toc_defaults: Dict[str, Any] = attr.ib(factory=dict)
+    subtrees_keys: Sequence[str] = attr.ib(default=())
+    items_keys: Sequence[str] = attr.ib(default=())
+    default_subtrees_key: str = attr.ib(default=DEFAULT_SUBTREES_KEY)
+    default_items_key: str = attr.ib(default=DEFAULT_ITEMS_KEY)
 
     def get_subtrees_key(self, depth: int) -> str:
-        """Get the subtrees key name for this depth in the ToC
+        """Get the subtrees key name for this depth in the ToC.
 
         :param depth: recursive depth (starts at 0)
+        :type depth: str
+        :return: subtrees key name
+        :rtype: str
         """
         try:
             return self.subtrees_keys[depth]
@@ -46,9 +49,12 @@ class FileFormat:
             return self.default_subtrees_key
 
     def get_items_key(self, depth: int) -> str:
-        """Get the items key name for this depth in the ToC
+        """Get the items key name for this depth in the ToC.
 
         :param depth: recursive depth (starts at 0)
+        :type depth: str
+        :return: items key name
+        :rtype: str
         """
         try:
             return self.items_keys[depth]
@@ -72,18 +78,32 @@ FILE_FORMATS: Dict[str, FileFormat] = {
 
 
 class MalformedError(Exception):
-    """Raised if toc file is malformed."""
+    """Raised if the `_toc.yml` file is malformed."""
 
 
 def parse_toc_yaml(path: Union[str, Path], encoding: str = "utf8") -> SiteMap:
-    """Parse the ToC file."""
+    """Parse the ToC file.
+
+    :param path: `_toc.yml` file path
+    :type path: str or pathlib.Path
+    :param encoding: `_toc.yml` file character encoding
+    :type encoding: str
+    :return: parsed site map
+    :rtype: `SiteMap`
+    """
     with Path(path).open(encoding=encoding) as handle:
         data = yaml.safe_load(handle)
     return parse_toc_data(data)
 
 
 def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
-    """Parse a dictionary of the ToC."""
+    """Parse a dictionary of the ToC.
+
+    :param data: ToC data dictionary
+    :type data: Dict[str, Any]
+    :return: parsed site map
+    :rtype: `SiteMap`
+    """
     if not isinstance(data, Mapping):
         raise MalformedError(f"toc is not a mapping: {type(data)}")
 
@@ -95,14 +115,19 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
             f"'{data.get(FILE_FORMAT_KEY, 'default')}'"
         )
 
-    defaults: Dict[str, Any] = {**file_format.toc_defaults, **data.get("defaults", {})}
+    defaults: Dict[str, Any] = {
+        **file_format.toc_defaults,
+        **data.get("defaults", {}),
+    }
 
     doc_item, docs_list = _parse_doc_item(
         data, defaults, "/", depth=0, is_root=True, file_format=file_format
     )
 
     site_map = SiteMap(
-        root=doc_item, meta=data.get("meta"), file_format=data.get(FILE_FORMAT_KEY)
+        root=doc_item,
+        meta=data.get("meta"),
+        file_format=data.get(FILE_FORMAT_KEY),
     )
 
     _parse_docs_list(
@@ -121,7 +146,24 @@ def _parse_doc_item(
     file_format: FileFormat,
     is_root: bool = False,
 ) -> Tuple[Document, Sequence[Tuple[str, Dict[str, Any]]]]:
-    """Parse a single doc item."""
+    """Parse a single doc item.
+
+    :param data: doc item dictionary
+    :type data: Dict[str, Any]
+    :param defaults: doc item defaults dictionary
+    :type defaults: Dict[str, Any]
+    :param path: doc item file path
+    :type path: str
+    :param depth: recursive depth (starts at 0)
+    :type depth: int
+    :param file_format: doc item file format
+    :type file_format: FileFormat
+    :param is_root: whether this is the root item, defaults to False
+    :type is_root: bool, optional
+    :raises MalformedError: invalid doc item
+    :return: parsed doc item
+    :rtype: Tuple[Document, Sequence[Tuple[str, Dict[str, Any]]]]
+    """
     file_key = ROOT_KEY if is_root else FILE_KEY
     if file_key not in data:
         raise MalformedError(f"'{file_key}' key not found @ '{path}'")
@@ -154,12 +196,16 @@ def _parse_doc_item(
             raise MalformedError(
                 f"Both '{subtrees_key}' and '{items_key}' found @ '{path}'"
             )
-        subtrees_data = [{items_key: data[items_key], **data.get("options", {})}]
+        subtrees_data = [
+            {items_key: data[items_key], **data.get("options", {})}
+        ]
         shorthand_used = True
     elif subtrees_key in data:
         subtrees_data = data[subtrees_key]
         if not (isinstance(subtrees_data, Sequence) and subtrees_data):
-            raise MalformedError(f"'{subtrees_key}' not a non-empty list @ '{path}'")
+            raise MalformedError(
+                f"'{subtrees_key}' not a non-empty list @ '{path}'"
+            )
         path = f"{path}{subtrees_key}/"
     else:
         subtrees_data = []
@@ -179,7 +225,9 @@ def _parse_doc_item(
         items_data = toc_data[items_key]
 
         if not (isinstance(items_data, Sequence) and items_data):
-            raise MalformedError(f"'{items_key}' not a non-empty list @ '{toc_path}'")
+            raise MalformedError(
+                f"'{items_key}' not a non-empty list @ '{toc_path}'"
+            )
 
         # generate items list
         items: List[Union[GlobItem, FileItem, UrlItem]] = []
@@ -217,7 +265,9 @@ def _parse_doc_item(
                 elif link_keys == {GLOB_KEY}:
                     items.append(GlobItem(item_data[GLOB_KEY]))
                 elif link_keys == {URL_KEY}:
-                    items.append(UrlItem(item_data[URL_KEY], item_data.get("title")))
+                    items.append(
+                        UrlItem(item_data[URL_KEY], item_data.get("title"))
+                    )
             except (ValueError, TypeError) as exc:
                 exc_arg = exc.args[0] if exc.args else ""
                 raise MalformedError(
@@ -270,18 +320,36 @@ def _parse_docs_list(
     docs_list: Sequence[Tuple[str, Dict[str, Any]]],
     site_map: SiteMap,
     defaults: Dict[str, Any],
-    path: str,
     *,
     depth: int,
     file_format: FileFormat,
 ):
-    """Parse a list of docs."""
+    """Parse a list of docs.
+
+    :param docs_list: sequence of doc items
+    :type docs_list: Sequence[Tuple[str, Dict[str, Any]]]
+    :param site_map: site map
+    :type site_map: SiteMap
+    :param defaults: default doc item values
+    :type defaults: Dict[str, Any]
+    :param depth: recursive depth (starts at 0)
+    :type depth: int
+    :param file_format: doc item file format
+    :type file_format: FileFormat
+    :raises MalformedError: doc file used multiple times
+    """
     for child_path, doc_data in docs_list:
         docname = doc_data[FILE_KEY]
         if docname in site_map:
-            raise MalformedError(f"document file used multiple times: '{docname}'")
+            raise MalformedError(
+                f"document file used multiple times: '{docname}'"
+            )
         child_item, child_docs_list = _parse_doc_item(
-            doc_data, defaults, child_path, depth=depth, file_format=file_format
+            doc_data,
+            defaults,
+            child_path,
+            depth=depth,
+            file_format=file_format,
         )
         site_map[docname] = child_item
 
@@ -295,12 +363,25 @@ def _parse_docs_list(
         )
 
 
-def create_toc_dict(site_map: SiteMap, *, skip_defaults: bool = True) -> Dict[str, Any]:
-    """Create the Toc dictionary from a site-map."""
+def create_toc_dict(
+    site_map: SiteMap, *, skip_defaults: bool = True
+) -> Dict[str, Any]:
+    """Create the ToC dictionary from a site-map.
+
+    :param site_map: site map
+    :type site_map: SiteMap
+    :param skip_defaults: do not add key/values for values that are already the default
+    :type skip_defaults: bool, optional
+    :raises KeyError: invalid file format
+    :return: ToC dictionary
+    :rtype: Dict[str, Any]
+    """
     try:
         file_format = FILE_FORMATS[site_map.file_format or "default"]
     except KeyError:
-        raise KeyError(f"File format not recognised @ '{site_map.file_format}'")
+        raise KeyError(
+            f"File format not recognised @ '{site_map.file_format}'"
+        )
     data = _docitem_to_dict(
         site_map.root,
         site_map,
@@ -327,10 +408,27 @@ def _docitem_to_dict(
     is_root: bool = False,
     parsed_docnames: Optional[Set[str]] = None,
 ) -> Dict[str, Any]:
-    """
+    """Create ToC dictionary from a `Document` and a `SiteMap`.
 
+    :param doc_item: document instance
+    :type doc_item: Document
+    :param site_map: site map
+    :type site_map: SiteMap
+    :param depth: recursive depth (starts at 0)
+    :type depth: int
+    :param file_format: doc item file format
+    :type file_format: FileFormat
     :param skip_defaults: do not add key/values for values that are already the default
-
+    :type skip_defaults: bool, optional
+    :param is_root: whether this is the root item, defaults to False
+    :type is_root: bool, optional
+    :param parsed_docnames: parsed document names cache used to prevent infinite
+        recursion
+    :type parsed_docnames: Optional[Set[str]], optional
+    :raises RecursionError: site map recursion
+    :raises TypeError: invalid ToC item
+    :return: parsed ToC dictionary
+    :rtype: Dict[str, Any]
     """
     file_key = ROOT_KEY if is_root else FILE_KEY
     subtrees_key = file_format.get_subtrees_key(depth)
@@ -339,7 +437,9 @@ def _docitem_to_dict(
     # protect against infinite recursion
     parsed_docnames = parsed_docnames or set()
     if doc_item.docname in parsed_docnames:
-        raise RecursionError(f"{doc_item.docname!r} in site-map multiple times")
+        raise RecursionError(
+            f"{doc_item.docname!r} in site-map multiple times"
+        )
     parsed_docnames.add(doc_item.docname)
 
     data: Dict[str, Any] = {}
@@ -378,7 +478,8 @@ def _docitem_to_dict(
         toctree_data = {
             key: getattr(toctree, key)
             for key in TOCTREE_OPTIONS
-            if (not skip_defaults) or getattr(toctree, key) != fields[key].default
+            if (not skip_defaults)
+            or getattr(toctree, key) != fields[key].default
         }
         toctree_data[items_key] = [_parse_item(s) for s in toctree.items]
         data[subtrees_key].append(toctree_data)
