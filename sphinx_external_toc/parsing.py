@@ -121,9 +121,7 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
         file_format=data.get(FILE_FORMAT_KEY),
     )
 
-    _parse_docs_list(
-        docs_list, site_map, defaults, "/", depth=1, file_format=file_format
-    )
+    _parse_docs_list(docs_list, site_map, defaults, depth=1, file_format=file_format)
 
     return site_map
 
@@ -296,7 +294,6 @@ def _parse_docs_list(
     docs_list: Sequence[Tuple[str, Dict[str, Any]]],
     site_map: SiteMap,
     defaults: Dict[str, Any],
-    path: str,
     *,
     depth: int,
     file_format: FileFormat,
@@ -306,7 +303,6 @@ def _parse_docs_list(
     :param docs_list: sequence of doc items
     :param site_map: site map
     :param defaults: default doc item values
-    :param path: file path, unused
     :param depth: recursive depth (starts at 0)
     :param file_format: doc item file format
     :raises MalformedError: doc file used multiple times
@@ -328,7 +324,6 @@ def _parse_docs_list(
             child_docs_list,
             site_map,
             defaults,
-            child_path,
             depth=depth + 1,
             file_format=file_format,
         )
