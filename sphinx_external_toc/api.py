@@ -5,13 +5,15 @@ from typing import Any, Dict, Iterator, List, Optional, Set, Union
 import attr
 from attr.validators import deep_iterable, instance_of, matches_re, optional
 
+#: Pattern used to match URL items.
+URL_PATTERN: str = r".+://.*"
+
 
 class FileItem(str):
     """A document path in a toctree list.
 
-    This should be in Posix format (folders split by ``/``),
-    relative to the source directory,
-    and can be with or without extension.
+    This should be in POSIX format (folders split by ``/``), relative to the
+    source directory, and can be with or without an extension.
     """
 
 
@@ -24,7 +26,7 @@ class UrlItem:
     """A URL in a toctree."""
 
     # regex should match sphinx.util.url_re
-    url: str = attr.ib(validator=[instance_of(str), matches_re(r".+://.*")])
+    url: str = attr.ib(validator=[instance_of(str), matches_re(URL_PATTERN)])
     title: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
 
 
@@ -39,20 +41,28 @@ class TocTree:
         )
     )
     caption: Optional[str] = attr.ib(
-        None, kw_only=True, validator=optional(instance_of(str))
+        default=None, kw_only=True, validator=optional(instance_of(str))
     )
-    hidden: bool = attr.ib(True, kw_only=True, validator=instance_of(bool))
-    maxdepth: int = attr.ib(-1, kw_only=True, validator=instance_of(int))
+    hidden: bool = attr.ib(default=True, kw_only=True, validator=instance_of(bool))
+    maxdepth: int = attr.ib(default=-1, kw_only=True, validator=instance_of(int))
     numbered: Union[bool, int] = attr.ib(
-        False, kw_only=True, validator=instance_of((bool, int))
+        default=False, kw_only=True, validator=instance_of((bool, int))
     )
-    reversed: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
-    titlesonly: bool = attr.ib(False, kw_only=True, validator=instance_of(bool))
+    reversed: bool = attr.ib(default=False, kw_only=True, validator=instance_of(bool))
+    titlesonly: bool = attr.ib(default=False, kw_only=True, validator=instance_of(bool))
 
     def files(self) -> List[str]:
+        """Returns a list of file items included in this ToC tree.
+
+        :return: file items
+        """
         return [str(item) for item in self.items if isinstance(item, FileItem)]
 
     def globs(self) -> List[str]:
+        """Returns a list of glob items included in this ToC tree.
+
+        :return: glob items
+        """
         return [str(item) for item in self.items if isinstance(item, GlobItem)]
 
 
@@ -60,19 +70,26 @@ class TocTree:
 class Document:
     """A document in the site map."""
 
-    docname: str = attr.ib(validator=instance_of(str))
-    title: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
     # TODO validate uniqueness of docnames across all parts (and none should be the docname)
+    docname: str = attr.ib(validator=instance_of(str))
     subtrees: List[TocTree] = attr.ib(
-        factory=list, validator=deep_iterable(instance_of(TocTree), instance_of(list))
+        factory=list,
+        validator=deep_iterable(instance_of(TocTree), instance_of(list)),
     )
+    title: Optional[str] = attr.ib(default=None, validator=optional(instance_of(str)))
 
     def child_files(self) -> List[str]:
-        """Return all children files."""
+        """Return all children files.
+
+        :return: child files
+        """
         return [name for tree in self.subtrees for name in tree.files()]
 
     def child_globs(self) -> List[str]:
-        """Return all children globs."""
+        """Return all children globs.
+
+        :return: child globs
+        """
         return [name for tree in self.subtrees for name in tree.globs()]
 
 
@@ -93,17 +110,26 @@ class SiteMap(MutableMapping):
 
     @property
     def root(self) -> Document:
-        """Return the root document."""
+        """Return the root document of the ToC tree.
+
+        :return: root document
+        """
         return self._root
 
     @property
     def meta(self) -> Dict[str, Any]:
-        """Return the site-map metadata."""
+        """Return the site-map metadata.
+
+        :return: metadata dictionary
+        """
         return self._meta
 
     @property
     def file_format(self) -> Optional[str]:
-        """Return the format of the file to write to."""
+        """Return the format of the file to write to.
+
+        :return: output file format
+        """
         return self._file_format
 
     @file_format.setter
@@ -116,21 +142,45 @@ class SiteMap(MutableMapping):
         return {glob for item in self._docs.values() for glob in item.child_globs()}
 
     def __getitem__(self, docname: str) -> Document:
+        """Enable retrieving a document by name using the indexing operator.
+
+        :param docname: document name
+        :return: document instance
+        """
         return self._docs[docname]
 
     def __setitem__(self, docname: str, item: Document) -> None:
+        """Enable setting a document by name using the indexing operator.
+
+        :param docname: document name
+        :param item: document instance
+        """
         assert item.docname == docname
         self._docs[docname] = item
 
-    def __delitem__(self, docname: str):
+    def __delitem__(self, docname: str) -> None:
+        """Enable removing a document by name.
+
+        :param docname: document name
+        """
         assert docname != self._root.docname, "cannot delete root doc item"
         del self._docs[docname]
 
     def __iter__(self) -> Iterator[str]:
+        """Enable iterating the names of the documents the site map is composed
+        of.
+
+        :yield: document name
+        """
         for docname in self._docs:
             yield docname
 
     def __len__(self) -> int:
+        """Enable using Python's built-in `len()` function to return the number
+        of documents contained in a site map.
+
+        :return: number of documents in this site map
+        """
         return len(self._docs)
 
     @staticmethod
@@ -151,7 +201,11 @@ class SiteMap(MutableMapping):
             else self._docs[k]
             for k in sorted(self._docs)
         }
-        data = {"root": self.root.docname, "documents": doc_dict, "meta": self.meta}
+        data = {
+            "root": self.root.docname,
+            "documents": doc_dict,
+            "meta": self.meta,
+        }
         if self.file_format:
             data["file_format"] = self.file_format
         return data
@@ -159,7 +213,7 @@ class SiteMap(MutableMapping):
     def get_changed(self, previous: "SiteMap") -> Set[str]:
         """Compare this sitemap to another and return a list of changed documents.
 
-        Note: for sphinx, file extensions should be removed to get docnames
+        .. note:: for Sphinx, file extensions should be removed to get docnames.
         """
         changed_docs = set()
         # check if the root document has changed
