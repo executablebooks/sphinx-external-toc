@@ -12,7 +12,7 @@ In normal Sphinx documentation, the documentation site-map is defined *via* a bo
 
 This extension facilitates a **top-down** approach to defining the site-map structure, within a single YAML file.
 
-![ToC graphic](docs/toc-graphic.png)
+![ToC graphic](https://raw.githubusercontent.com/executablebooks/sphinx-external-toc/main/docs/toc-graphic.png)
 
 It also allows for documents not specified in the ToC to be auto-excluded.
 

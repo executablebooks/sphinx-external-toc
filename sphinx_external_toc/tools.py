@@ -30,16 +30,15 @@ def create_site_from_toc(
     """Create the files defined in the external toc file.
 
     Additional files can also be created by defining them in
-    `meta`/`create_files` of the toc.
-    Text can also be appended to files, by defining them in `meta`/`create_append`
-    (ass a mapping of files -> text)
+    `meta`/`create_files` of the toc. Text can also be appended to files, by
+    defining them in `meta`/`create_append` (as a mapping from files to text).
 
-    :param toc_path: Path to ToC.
-    :param root_path: The root directory , or use ToC file directory.
-    :param default_ext: The default file extension to use.
-    :param encoding: Encoding for writing files
-    :param overwrite: Overwrite existing files (otherwise raise ``IOError``).
-    :param toc_name: Copy toc file to root with this name
+    :param toc_path: path to ToC file
+    :param root_path: the root directory, or use ToC file directory
+    :param default_ext: default file extension to use
+    :param encoding: encoding for writing files
+    :param overwrite: overwrite existing files (otherwise raise ``IOError``)
+    :param toc_name: copy ToC file to root with this name
 
     """
     assert default_ext in {".rst", ".md"}
@@ -101,16 +100,16 @@ def create_site_map_from_path(
 ) -> SiteMap:
     """Create the site-map from a folder structure.
 
-    Files and folders are sorted in natural order,
-    see: https://en.wikipedia.org/wiki/Natural_sort_order
+    Files and folders are sorted in natural order, see:
+    https://en.wikipedia.org/wiki/Natural_sort_order.
 
-    :param suffixes: File suffixes to consider as documents
-    :param default_index: File name (without suffix) considered as the index file
-        for a folder, if not found then the first file is taken as the index
-    :param ignore_matches: file/folder names which match one of these will be ignored,
-        uses fnmatch Unix shell-style wildcards,
-        defaults to ignoring hidden files (starting with a dot)
-
+    :param suffixes: file suffixes to consider as documents
+    :param default_index: file name (without suffix) considered as the index
+        file for a folder, if not found then the first file is taken as the
+        index
+    :param ignore_matches: file/folder names which match one of these will be
+        ignored, uses fnmatch Unix shell-style wildcards, defaults to ignoring
+        hidden files (starting with a dot)
     """
     root_path = Path(root_path)
     # assess root
@@ -141,7 +140,12 @@ def create_site_map_from_path(
 
     # while there are subfolders add them to the site-map
     while indexed_folders:
-        sub_path, child_index, child_files, child_folders = indexed_folders.pop(0)
+        (
+            sub_path,
+            child_index,
+            child_files,
+            child_folders,
+        ) = indexed_folders.pop(0)
         for child_file in child_files:
             child_docname = (sub_path / child_file).relative_to(root_path).as_posix()
             assert child_docname not in site_map
@@ -221,9 +225,7 @@ def _assess_folder(
     default_index: str,
     ignore_matches: Sequence[str],
 ) -> Tuple[Optional[str], Sequence[str], Sequence[str]]:
-    """Assess the folder for ToC items.
-
-    strips suffixes from file names,
+    """Assess the folder for ToC items. Strips suffixes from file names and
     sorts file/folder names by natural order.
 
     :returns: (index file name, other file names, folders)
