@@ -131,6 +131,7 @@ def add_changed_toctrees(
     """Add docs with new or changed toctrees to changed list."""
     previous_map = getattr(app.env, "external_site_map", None)
     # move external_site_map from config to env
+    site_map: SiteMap
     app.env.external_site_map = site_map = app.config.external_site_map
     # Compare to previous map, to record docnames with new or changed toctrees
     if not previous_map:
@@ -287,11 +288,14 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
     if toc_placeholders:
         toc_placeholders[0].replace_self(node_list)
-    else:
+    elif doctree.children and isinstance(doctree.children[-1], nodes.section):
         # note here the toctree cannot not just be appended to the end of the doc,
         # since `TocTreeCollector.process_doc` expects it in a section
+        # otherwise it will result in the child documents being on the same level as this document
         # TODO check if there is this is always ok
         doctree.children[-1].extend(node_list)
+    else:
+        doctree.children.extend(node_list)
 
 
 class InsertToctrees(SphinxTransform):

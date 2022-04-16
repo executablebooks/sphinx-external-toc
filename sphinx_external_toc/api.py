@@ -239,7 +239,7 @@ class SiteMap(MutableMapping):
         """
         changed_docs = set()
         # check if the root document has changed
-        if self.root.docname != previous.root.docname:
+        if self.root != previous.root:
             changed_docs.add(self.root.docname)
         for name, doc in self._docs.items():
             if name not in previous:
