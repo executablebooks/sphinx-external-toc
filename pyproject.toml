@@ -1,6 +1,80 @@
 [build-system]
-requires = ["setuptools>=46.4.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "sphinx_external_toc"
+dynamic = ["version"]
+description = "A sphinx extension that allows the site-map to be defined in a single YAML file."
+readme = "README.md"
+authors = [{name = "Chris Sewell", email = "chrisj_sewell@hotmail.com"}]
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Sphinx :: Extension",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
+]
+keywords = ["sphinx","extension", "toc"]
+requires-python = "~=3.6"
+dependencies = [
+    "attrs>=20.3,<22",
+    "click>=7.1,<9",
+    "pyyaml",
+    "sphinx>=3,<5",
+]
+
+[project.urls]
+Homepage = "https://github.com/executablebooks/sphinx-external-toc"
+Documentation = "https://sphinx-external-toc.readthedocs.io"
+
+[project.entry-points]
+"jb.cmdline" = {toc = "sphinx_external_toc.cli:main"}
+
+[project.optional-dependencies]
+code_style = ["pre-commit~=2.12"]
+rtd = [
+    "myst-parser~=0.15.0",
+    "sphinx-book-theme>=0.0.36",
+]
+testing = [
+    "coverage",
+    "pytest>=3.6,<4",
+    "pytest-cov",
+    "pytest-regressions",
+]
+
+[project.scripts]
+sphinx-etoc = "sphinx_external_toc.cli:main"
+
+[tool.flit.sdist]
+exclude = [
+    "docs/",
+    "tests/",
+]
+
+[tool.mypy]
+show_error_codes = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+no_implicit_optional = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = ["docutils.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["yaml.*"]
+ignore_missing_imports = true
 
 [tool.isort]
 profile = "black"
