@@ -4,6 +4,8 @@
 
 - ⬆️ UPGRADE: Drop python 3.6 support (#75)
 - ♻️ REFACTOR: Replace `attrs` with built-in `dataclasses` (#76)
+- 🐛 FIX: gettext builder compatibility
+- 🐛 FIX: Inserting toctree into empty document (#77)
 - 🔧 MAINTAIN: Move from setuptools to flit, for PEP 621 packaging (#74)
 
 ## 0.2.4 - 2022-02-10
