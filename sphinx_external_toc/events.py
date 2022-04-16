@@ -153,7 +153,9 @@ class TableofContents(SphinxDirective):
     # TODO allow for name option of tableofcontents (to reference it)
     def run(self) -> List[TableOfContentsNode]:
         """Insert a ``TableOfContentsNode`` node."""
-        return [TableOfContentsNode()]
+        node = TableOfContentsNode()
+        self.set_source_info(node)
+        return [node]
 
 
 def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
@@ -220,7 +222,8 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
         subnode = toctree_node()
         subnode["parent"] = app.env.docname
-        subnode.source = doctree.source
+        subnode.source = doctree["source"]
+        subnode.line = 1
         subnode["entries"] = []
         subnode["includefiles"] = []
         subnode["maxdepth"] = toctree.maxdepth
