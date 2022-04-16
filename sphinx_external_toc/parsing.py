@@ -1,11 +1,12 @@
 """Parse the ToC to a `SiteMap` object."""
 from collections.abc import Mapping
+from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
 
-import attr
 import yaml
 
+from ._compat import DC_SLOTS, field
 from .api import Document, FileItem, GlobItem, SiteMap, TocTree, UrlItem
 
 DEFAULT_SUBTREES_KEY = "subtrees"
@@ -25,15 +26,15 @@ TOCTREE_OPTIONS = (
 )
 
 
-@attr.s(slots=True)
+@dataclass(**DC_SLOTS)
 class FileFormat:
     """Mapping of keys for subtrees and items, dependant on depth in the ToC."""
 
-    toc_defaults: Dict[str, Any] = attr.ib(factory=dict)
-    subtrees_keys: Sequence[str] = attr.ib(default=())
-    items_keys: Sequence[str] = attr.ib(default=())
-    default_subtrees_key: str = attr.ib(default=DEFAULT_SUBTREES_KEY)
-    default_items_key: str = attr.ib(default=DEFAULT_ITEMS_KEY)
+    toc_defaults: Dict[str, Any] = field(default_factory=dict)
+    subtrees_keys: Sequence[str] = ()
+    items_keys: Sequence[str] = ()
+    default_subtrees_key: str = DEFAULT_SUBTREES_KEY
+    default_items_key: str = DEFAULT_ITEMS_KEY
 
     def get_subtrees_key(self, depth: int) -> str:
         """Get the subtrees key name for this depth in the ToC.
@@ -421,13 +422,14 @@ def _docitem_to_dict(
         raise TypeError(item)
 
     data[subtrees_key] = []
-    fields = attr.fields_dict(TocTree)
+    # TODO handle default_factory
+    _defaults = {f.name: f.default for f in fields(TocTree)}
     for toctree in doc_item.subtrees:
         # only add these keys if their value is not the default
         toctree_data = {
             key: getattr(toctree, key)
             for key in TOCTREE_OPTIONS
-            if (not skip_defaults) or getattr(toctree, key) != fields[key].default
+            if (not skip_defaults) or getattr(toctree, key) != _defaults[key]
         }
         toctree_data[items_key] = [_parse_item(s) for s in toctree.items]
         data[subtrees_key].append(toctree_data)
