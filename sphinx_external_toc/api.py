@@ -1,9 +1,17 @@
 """Defines the `SiteMap` object, for storing the parsed ToC."""
 from collections.abc import MutableMapping
+from dataclasses import asdict, dataclass
 from typing import Any, Dict, Iterator, List, Optional, Set, Union
 
-import attr
-from attr.validators import deep_iterable, instance_of, matches_re, optional
+from ._compat import (
+    DC_SLOTS,
+    deep_iterable,
+    field,
+    instance_of,
+    matches_re,
+    optional,
+    validate_fields,
+)
 
 #: Pattern used to match URL items.
 URL_PATTERN: str = r".+://.*"
@@ -21,35 +29,41 @@ class GlobItem(str):
     """A document glob in a toctree list."""
 
 
-@attr.s(slots=True)
+@dataclass(**DC_SLOTS)
 class UrlItem:
     """A URL in a toctree."""
 
     # regex should match sphinx.util.url_re
-    url: str = attr.ib(validator=[instance_of(str), matches_re(URL_PATTERN)])
-    title: Optional[str] = attr.ib(None, validator=optional(instance_of(str)))
+    url: str = field(validator=[instance_of(str), matches_re(URL_PATTERN)])
+    title: Optional[str] = field(default=None, validator=optional(instance_of(str)))
+
+    def __post_init__(self):
+        validate_fields(self)
 
 
-@attr.s(slots=True)
+@dataclass(**DC_SLOTS)
 class TocTree:
     """An individual toctree within a document."""
 
     # TODO validate uniqueness of docnames (at least one item)
-    items: List[Union[GlobItem, FileItem, UrlItem]] = attr.ib(
+    items: List[Union[GlobItem, FileItem, UrlItem]] = field(
         validator=deep_iterable(
             instance_of((GlobItem, FileItem, UrlItem)), instance_of(list)
         )
     )
-    caption: Optional[str] = attr.ib(
+    caption: Optional[str] = field(
         default=None, kw_only=True, validator=optional(instance_of(str))
     )
-    hidden: bool = attr.ib(default=True, kw_only=True, validator=instance_of(bool))
-    maxdepth: int = attr.ib(default=-1, kw_only=True, validator=instance_of(int))
-    numbered: Union[bool, int] = attr.ib(
+    hidden: bool = field(default=True, kw_only=True, validator=instance_of(bool))
+    maxdepth: int = field(default=-1, kw_only=True, validator=instance_of(int))
+    numbered: Union[bool, int] = field(
         default=False, kw_only=True, validator=instance_of((bool, int))
     )
-    reversed: bool = attr.ib(default=False, kw_only=True, validator=instance_of(bool))
-    titlesonly: bool = attr.ib(default=False, kw_only=True, validator=instance_of(bool))
+    reversed: bool = field(default=False, kw_only=True, validator=instance_of(bool))
+    titlesonly: bool = field(default=False, kw_only=True, validator=instance_of(bool))
+
+    def __post_init__(self):
+        validate_fields(self)
 
     def files(self) -> List[str]:
         """Returns a list of file items included in this ToC tree.
@@ -66,17 +80,20 @@ class TocTree:
         return [str(item) for item in self.items if isinstance(item, GlobItem)]
 
 
-@attr.s(slots=True)
+@dataclass(**DC_SLOTS)
 class Document:
     """A document in the site map."""
 
     # TODO validate uniqueness of docnames across all parts (and none should be the docname)
-    docname: str = attr.ib(validator=instance_of(str))
-    subtrees: List[TocTree] = attr.ib(
-        factory=list,
+    docname: str = field(validator=instance_of(str))
+    subtrees: List[TocTree] = field(
+        default_factory=list,
         validator=deep_iterable(instance_of(TocTree), instance_of(list)),
     )
-    title: Optional[str] = attr.ib(default=None, validator=optional(instance_of(str)))
+    title: Optional[str] = field(default=None, validator=optional(instance_of(str)))
+
+    def __post_init__(self):
+        validate_fields(self)
 
     def child_files(self) -> List[str]:
         """Return all children files.
@@ -183,24 +200,29 @@ class SiteMap(MutableMapping):
         """
         return len(self._docs)
 
-    @staticmethod
-    def _serializer(inst: Any, field: attr.Attribute, value: Any) -> Any:
-        """Serialize to JSON compatible value.
-
-        (parsed to ``attr.asdict``)
-        """
-        if isinstance(value, (GlobItem, FileItem)):
-            return str(value)
-        return value
-
     def as_json(self) -> Dict[str, Any]:
         """Return JSON serialized site-map representation."""
         doc_dict = {
-            k: attr.asdict(self._docs[k], value_serializer=self._serializer)
-            if self._docs[k]
-            else self._docs[k]
+            k: asdict(self._docs[k]) if self._docs[k] else self._docs[k]
             for k in sorted(self._docs)
         }
+
+        def _replace_items(d: Dict[str, Any]) -> Dict[str, Any]:
+            for k, v in d.items():
+                if isinstance(v, dict):
+                    d[k] = _replace_items(v)
+                elif isinstance(v, (list, tuple)):
+                    d[k] = [
+                        _replace_items(i)
+                        if isinstance(i, dict)
+                        else (str(i) if isinstance(i, str) else i)
+                        for i in v
+                    ]
+                elif isinstance(v, str):
+                    d[k] = str(v)
+            return d
+
+        doc_dict = _replace_items(doc_dict)
         data = {
             "root": self.root.docname,
             "documents": doc_dict,
