@@ -19,8 +19,9 @@ JB_TOC_FILES = list(
     "path", TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES]
 )
 def test_file_to_sitemap(path: Path, tmp_path: Path, data_regression):
-    create_site_from_toc(path, root_path=tmp_path)
-    file_list = [p.relative_to(tmp_path).as_posix() for p in tmp_path.glob("**/*")]
+    site_path = tmp_path.joinpath("site")
+    create_site_from_toc(path, root_path=site_path)
+    file_list = [p.relative_to(site_path).as_posix() for p in site_path.glob("**/*")]
     data_regression.check(sorted(file_list))
 
 
