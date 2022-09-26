@@ -44,10 +44,11 @@ def parse_toc(toc_file):
     help="The default file extension to use.",
 )
 @click.option("-o", "--overwrite", is_flag=True, help="Overwrite existing files.")
-def create_site(toc_file, path, extension, overwrite):
+@click.option("-i", "--ignore", is_flag=True, help="Ignore existing files.")
+def create_site(toc_file, path, extension, overwrite, ignore):
     """Create a project directory from a ToC file."""
     create_site_from_toc(
-        toc_file, root_path=path, default_ext="." + extension, overwrite=overwrite
+        toc_file, root_path=path, default_ext="." + extension, overwrite=overwrite, ignore=ignore
     )
     # TODO option to add basic conf.py?
     click.secho("SUCCESS!", fg="green")

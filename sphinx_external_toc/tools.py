@@ -25,6 +25,7 @@ def create_site_from_toc(
     default_ext: str = ".rst",
     encoding: str = "utf8",
     overwrite: bool = False,
+    ignore: bool = False,
     toc_name: Optional[str] = "_toc.yml",
 ) -> SiteMap:
     """Create the files defined in the external toc file.
@@ -37,7 +38,8 @@ def create_site_from_toc(
     :param root_path: the root directory, or use ToC file directory
     :param default_ext: default file extension to use
     :param encoding: encoding for writing files
-    :param overwrite: overwrite existing files (otherwise raise ``IOError``)
+    :param overwrite: overwrite existing files (otherwise raise ``IOError`` if not ignore)
+    :param ignore: ignore existing files (otherwise raise ``IOError`` if not overwrite)
     :param toc_name: copy ToC file to root with this name
 
     """
@@ -65,6 +67,8 @@ def create_site_from_toc(
         if not any(docname.endswith(ext) for ext in {".rst", ".md"}):
             filename += default_ext
         docpath = root_path.joinpath(PurePosixPath(filename))
+        if docpath.exists() and ignore:
+            continue
         if docpath.exists() and not overwrite:
             raise IOError(f"Path already exists: {docpath}")
         docpath.parent.mkdir(parents=True, exist_ok=True)
