@@ -28,7 +28,7 @@ requires-python = "~=3.7"
 dependencies = [
     "click>=7.1,<9",
     "pyyaml",
-    "sphinx>=3,<5",
+    "sphinx>=3,<6",
 ]
 
 [project.urls]
