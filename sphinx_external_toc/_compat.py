@@ -139,7 +139,9 @@ def deep_iterable(
 
     return _validator
 
+
 # Docutils compatibility
+
 
 def findall(node: Element):
     # findall replaces traverse in docutils v0.18

@@ -14,9 +14,8 @@ from sphinx.util import logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
-
-from .api import Document, FileItem, GlobItem, SiteMap, UrlItem
 from ._compat import findall
+from .api import Document, FileItem, GlobItem, SiteMap, UrlItem
 from .parsing import parse_toc_yaml
 
 logger = logging.getLogger(__name__)
