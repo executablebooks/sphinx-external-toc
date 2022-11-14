@@ -6,6 +6,8 @@ import re
 import sys
 from typing import Any, Callable, Pattern, Type
 
+from docutils.nodes import Element
+
 if sys.version_info >= (3, 10):
     DC_SLOTS: dict = {"slots": True}
 else:
@@ -136,3 +138,10 @@ def deep_iterable(
             member_validator(inst, attr, member)
 
     return _validator
+
+# Docutils compatibility
+
+def findall(node: Element):
+    # findall replaces traverse in docutils v0.18
+    # note a difference is that findall is an iterator
+    return getattr(node, "findall", node.traverse)
