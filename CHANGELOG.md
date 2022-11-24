@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.1 - 2022-11-25
+
+- ⬆️ UPGRADE: Support `sphinx5` [#85](https://github.com/executablebooks/sphinx-external-toc/pull/85)
+
 ## 0.3.0 - 2022-04-16
 
 - ⬆️ UPGRADE: Drop python 3.6 support (#75)
