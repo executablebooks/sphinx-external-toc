@@ -1,6 +1,6 @@
 """A sphinx extension that allows the project toctree to be defined in a single file."""
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 from typing import TYPE_CHECKING
