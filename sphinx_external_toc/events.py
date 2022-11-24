@@ -14,6 +14,7 @@ from sphinx.util import logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
+from ._compat import findall
 from .api import Document, FileItem, GlobItem, SiteMap, UrlItem
 from .parsing import parse_toc_yaml
 
@@ -164,7 +165,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     Adapted from `sphinx/directives/other.py::TocTree`
     """
     # check for existing toctrees and raise warning
-    for node in doctree.traverse(toctree_node):
+    for node in findall(doctree)(toctree_node):
         create_warning(
             app,
             doctree,
@@ -174,7 +175,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         )
 
     toc_placeholders: List[TableOfContentsNode] = list(
-        doctree.traverse(TableOfContentsNode)
+        findall(doctree)(TableOfContentsNode)
     )
 
     site_map: SiteMap = app.env.external_site_map
