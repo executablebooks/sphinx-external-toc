@@ -1,5 +1,35 @@
 # Change Log
 
+## 0.3.1 - 2022-11-25
+
+- ⬆️ UPGRADE: Support `sphinx5` [#85](https://github.com/executablebooks/sphinx-external-toc/pull/85)
+
+## 0.3.0 - 2022-04-16
+
+- ⬆️ UPGRADE: Drop python 3.6 support (#75)
+- ♻️ REFACTOR: Replace `attrs` with built-in `dataclasses` (#76)
+- 🐛 FIX: gettext builder compatibility
+- 🐛 FIX: Inserting toctree into empty document (#77)
+- 🔧 MAINTAIN: Move from setuptools to flit, for PEP 621 packaging (#74)
+
+## 0.2.4 - 2022-02-10
+
+### What's Changed
+
+- ⬆️ UPGRADE: allow click v8  by @lukasbindreiter in https://github.com/executablebooks/sphinx-external-toc/pull/69
+- 📚: Fix ToC graphic link by @ZviBaratz in https://github.com/executablebooks/sphinx-external-toc/pull/63
+- 🔧 MAINTAIN: Updated parser docstrings by @ZviBaratz in https://github.com/executablebooks/sphinx-external-toc/pull/61
+- 🔧 MAINTAIN: Removed unused argument by @ZviBaratz in https://github.com/executablebooks/sphinx-external-toc/pull/66
+- 🔧 MAINTAIN: Updated `api` docstrings by @ZviBaratz in https://github.com/executablebooks/sphinx-external-toc/pull/64
+- 🔧: Docstring updates by @ZviBaratz in https://github.com/executablebooks/sphinx-external-toc/pull/67
+
+### New Contributors
+
+- @ZviBaratz made their first contribution in https://github.com/executablebooks/sphinx-external-toc/pull/61
+- @lukasbindreiter made their first contribution in https://github.com/executablebooks/sphinx-external-toc/pull/69
+
+**Full Changelog**: https://github.com/executablebooks/sphinx-external-toc/compare/v0.2.3...v0.2.4
+
 ## 0.2.3 - 2021-07-29
 
 🔧 MAINTAIN: Update `attrs` minimum version to `20.3`, when `value_serializer` was introduced (required here).

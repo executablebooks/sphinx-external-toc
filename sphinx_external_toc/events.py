@@ -14,6 +14,7 @@ from sphinx.util import logging
 from sphinx.util.docutils import SphinxDirective
 from sphinx.util.matching import Matcher, patfilter, patmatch
 
+from ._compat import findall
 from .api import Document, FileItem, GlobItem, SiteMap, UrlItem
 from .parsing import parse_toc_yaml
 
@@ -131,6 +132,7 @@ def add_changed_toctrees(
     """Add docs with new or changed toctrees to changed list."""
     previous_map = getattr(app.env, "external_site_map", None)
     # move external_site_map from config to env
+    site_map: SiteMap
     app.env.external_site_map = site_map = app.config.external_site_map
     # Compare to previous map, to record docnames with new or changed toctrees
     if not previous_map:
@@ -152,7 +154,9 @@ class TableofContents(SphinxDirective):
     # TODO allow for name option of tableofcontents (to reference it)
     def run(self) -> List[TableOfContentsNode]:
         """Insert a ``TableOfContentsNode`` node."""
-        return [TableOfContentsNode()]
+        node = TableOfContentsNode()
+        self.set_source_info(node)
+        return [node]
 
 
 def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
@@ -161,7 +165,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     Adapted from `sphinx/directives/other.py::TocTree`
     """
     # check for existing toctrees and raise warning
-    for node in doctree.traverse(toctree_node):
+    for node in findall(doctree)(toctree_node):
         create_warning(
             app,
             doctree,
@@ -171,7 +175,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         )
 
     toc_placeholders: List[TableOfContentsNode] = list(
-        doctree.traverse(TableOfContentsNode)
+        findall(doctree)(TableOfContentsNode)
     )
 
     site_map: SiteMap = app.env.external_site_map
@@ -219,7 +223,8 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
         subnode = toctree_node()
         subnode["parent"] = app.env.docname
-        subnode.source = doctree.source
+        subnode.source = doctree["source"]
+        subnode.line = 1
         subnode["entries"] = []
         subnode["includefiles"] = []
         subnode["maxdepth"] = toctree.maxdepth
@@ -287,11 +292,14 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
 
     if toc_placeholders:
         toc_placeholders[0].replace_self(node_list)
-    else:
+    elif doctree.children and isinstance(doctree.children[-1], nodes.section):
         # note here the toctree cannot not just be appended to the end of the doc,
         # since `TocTreeCollector.process_doc` expects it in a section
+        # otherwise it will result in the child documents being on the same level as this document
         # TODO check if there is this is always ok
         doctree.children[-1].extend(node_list)
+    else:
+        doctree.children.extend(node_list)
 
 
 class InsertToctrees(SphinxTransform):

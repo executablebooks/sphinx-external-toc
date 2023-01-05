@@ -81,6 +81,24 @@ def test_success(path: Path, tmp_path: Path, sphinx_build_factory, file_regressi
         file_regression.check(doctree.pformat(), extension=".xml", encoding="utf8")
 
 
+def test_gettext(tmp_path: Path, sphinx_build_factory):
+    """Test the gettext builder runs correctly."""
+    src_dir = tmp_path / "srcdir"
+    # write document files
+    toc_path = Path(__file__).parent.joinpath("_toc_files", "basic.yml")
+    create_site_from_toc(toc_path, root_path=src_dir, toc_name=None)
+    # write conf.py
+    content = f"""
+extensions = ["sphinx_external_toc"]
+external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
+
+"""
+    src_dir.joinpath("conf.py").write_text(content, encoding="utf8")
+    # run sphinx
+    builder = sphinx_build_factory(src_dir, buildername="gettext")
+    builder.build()
+
+
 @pytest.mark.parametrize(
     "path", TOC_FILES_WARN, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES_WARN]
 )
