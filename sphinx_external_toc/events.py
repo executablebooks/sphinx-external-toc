@@ -251,10 +251,8 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
                 subnode["entries"].append((entry.title, entry.url))
 
             elif isinstance(entry, FileItem):
-
-                child_doc_item = site_map[entry]
-                docname = str(entry)
-                title = child_doc_item.title
+                docname = entry.path
+                title = entry.title
 
                 docname = remove_suffix(docname, app.config.source_suffix)
 

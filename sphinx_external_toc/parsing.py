@@ -238,7 +238,7 @@ def _parse_doc_item(
 
             try:
                 if link_keys == {FILE_KEY}:
-                    items.append(FileItem(item_data[FILE_KEY]))
+                    items.append(FileItem(item_data[FILE_KEY], item_data.get("title")))
                 elif link_keys == {GLOB_KEY}:
                     items.append(GlobItem(item_data[GLOB_KEY]))
                 elif link_keys == {URL_KEY}:
@@ -403,16 +403,16 @@ def _docitem_to_dict(
 
     def _parse_item(item):
         if isinstance(item, FileItem):
-            if item in site_map:
+            if item.path in site_map:
                 return _docitem_to_dict(
-                    site_map[item],
+                    site_map[item.path],
                     site_map,
                     depth=depth + 1,
                     file_format=file_format,
                     skip_defaults=skip_defaults,
                     parsed_docnames=parsed_docnames,
                 )
-            return {FILE_KEY: str(item)}
+            return {FILE_KEY: item.path}
         if isinstance(item, GlobItem):
             return {GLOB_KEY: str(item)}
         if isinstance(item, UrlItem):

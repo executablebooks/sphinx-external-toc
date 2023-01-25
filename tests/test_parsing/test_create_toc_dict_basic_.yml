@@ -1,5 +1,6 @@
 entries:
 - file: doc1
+  title: custom
 - file: doc2
 - entries:
   - file: subfolder/doc4

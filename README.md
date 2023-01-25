@@ -414,7 +414,8 @@ documents:
       numbered: true
       reversed: false
       items:
-      - doc1
+      - path: doc1
+        title: null
       titlesonly: true
     title: null
 meta: {}

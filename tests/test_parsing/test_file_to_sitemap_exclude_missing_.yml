@@ -9,7 +9,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - doc1
+      - path: doc1
+        title: null
       - subfolder/other*
       maxdepth: -1
       numbered: false

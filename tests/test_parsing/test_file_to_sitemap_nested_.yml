@@ -13,7 +13,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - folder/subfolder/doc4
+      - path: folder/subfolder/doc4
+        title: null
       - folder/globfolder/*
       maxdepth: -1
       numbered: false
@@ -30,9 +31,12 @@ documents:
     - caption: null
       hidden: true
       items:
-      - folder/doc1
-      - folder/doc2
-      - folder/doc3
+      - path: folder/doc1
+        title: null
+      - path: folder/doc2
+        title: null
+      - path: folder/doc3
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false
