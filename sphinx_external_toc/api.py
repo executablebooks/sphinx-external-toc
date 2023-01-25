@@ -16,6 +16,7 @@ from ._compat import (
 #: Pattern used to match URL items.
 URL_PATTERN: str = r".+://.*"
 
+
 @dataclass(**DC_SLOTS)
 class FileItem:
     """A document path in a toctree list.
@@ -23,11 +24,13 @@ class FileItem:
     This should be in POSIX format (folders split by ``/``), relative to the
     source directory, and can be with or without an extension.
     """
+
     path: str = field(validator=[instance_of(str)])
     title: Optional[str] = field(default=None, validator=optional(instance_of(str)))
-    
+
     def __post_init__(self):
         validate_fields(self)
+
 
 class GlobItem(str):
     """A document glob in a toctree list."""
