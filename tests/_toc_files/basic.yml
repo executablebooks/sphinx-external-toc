@@ -6,6 +6,7 @@ subtrees:
     numbered: true
     entries:
     - file: doc1
+      title: "custom"
     - file: doc2
     - file: doc3
       subtrees:

@@ -2,7 +2,7 @@ documents:
   doc1:
     docname: doc1
     subtrees: []
-    title: null
+    title: custom
   doc2:
     docname: doc2
     subtrees: []
@@ -29,7 +29,7 @@ documents:
       hidden: true
       items:
       - path: doc1
-        title: null
+        title: custom
       - path: doc2
         title: null
       - path: doc3
