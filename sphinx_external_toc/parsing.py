@@ -238,7 +238,7 @@ def _parse_doc_item(
 
             try:
                 if link_keys == {FILE_KEY}:
-                    items.append(FileItem(item_data[FILE_KEY]))
+                    items.append(FileItem(item_data[FILE_KEY], item_data.get("title")))
                 elif link_keys == {GLOB_KEY}:
                     items.append(GlobItem(item_data[GLOB_KEY]))
                 elif link_keys == {URL_KEY}:
