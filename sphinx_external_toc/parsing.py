@@ -1,9 +1,9 @@
 """Parse the ToC to a `SiteMap` object."""
+import logging
 from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
-import logging
 
 import yaml
 
