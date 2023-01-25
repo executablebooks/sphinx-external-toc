@@ -3,6 +3,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, Union
+import logging
 
 import yaml
 
@@ -403,16 +404,16 @@ def _docitem_to_dict(
 
     def _parse_item(item):
         if isinstance(item, FileItem):
-            if item in site_map:
+            if item.path in site_map:
                 return _docitem_to_dict(
-                    site_map[item],
+                    site_map[item.path],
                     site_map,
                     depth=depth + 1,
                     file_format=file_format,
                     skip_defaults=skip_defaults,
                     parsed_docnames=parsed_docnames,
                 )
-            return {FILE_KEY: str(item)}
+            return {FILE_KEY: item.path}
         if isinstance(item, GlobItem):
             return {GLOB_KEY: str(item)}
         if isinstance(item, UrlItem):

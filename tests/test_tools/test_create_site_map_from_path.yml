@@ -13,12 +13,18 @@ documents:
     - caption: null
       hidden: true
       items:
-      - 1_other
-      - 11_other
-      - subfolder1/index
-      - subfolder2/index
-      - subfolder3/no_index1
-      - subfolder14/index
+      - path: 1_other
+        title: null
+      - path: 11_other
+        title: null
+      - path: subfolder1/index
+        title: null
+      - path: subfolder2/index
+        title: null
+      - path: subfolder3/no_index1
+        title: null
+      - path: subfolder14/index
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false
@@ -34,7 +40,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - subfolder14/subsubfolder/index
+      - path: subfolder14/subsubfolder/index
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false
@@ -46,7 +53,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - subfolder14/subsubfolder/other
+      - path: subfolder14/subsubfolder/other
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false
@@ -62,7 +70,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - subfolder2/other
+      - path: subfolder2/other
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false
@@ -78,7 +87,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - subfolder3/no_index2
+      - path: subfolder3/no_index2
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false

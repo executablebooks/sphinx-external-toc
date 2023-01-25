@@ -13,7 +13,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - doc1
+      - path: doc1
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false
@@ -21,7 +22,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - doc2
+      - path: doc2
+        title: null
       maxdepth: -1
       numbered: false
       reversed: false

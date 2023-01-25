@@ -13,7 +13,8 @@ documents:
     - caption: null
       hidden: true
       items:
-      - subfolder/doc4
+      - path: subfolder/doc4
+        title: null
       - title: null
         url: https://example.com
       maxdepth: -1
@@ -27,9 +28,12 @@ documents:
     - caption: Part Caption
       hidden: true
       items:
-      - doc1
-      - doc2
-      - doc3
+      - path: doc1
+        title: null
+      - path: doc2
+        title: null
+      - path: doc3
+        title: null
       maxdepth: -1
       numbered: true
       reversed: false
