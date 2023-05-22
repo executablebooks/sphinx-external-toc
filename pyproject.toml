@@ -28,7 +28,7 @@ requires-python = "~=3.7"
 dependencies = [
     "click>=7.1,<9",
     "pyyaml",
-    "sphinx>=4,<6",
+    "sphinx>=5,<8",
 ]
 
 [project.urls]
@@ -39,14 +39,14 @@ Documentation = "https://sphinx-external-toc.readthedocs.io"
 "jb.cmdline" = {toc = "sphinx_external_toc.cli:main"}
 
 [project.optional-dependencies]
-code_style = ["pre-commit~=2.12"]
+code_style = ["pre-commit~=3.3.2"]
 rtd = [
-    "myst-parser~=0.17.0",
-    "sphinx-book-theme>=0.0.36",
+    "myst-parser~=1.0.0",
+    "sphinx-book-theme>=1.0.1",
 ]
 testing = [
     "coverage",
-    "pytest~=7.1",
+    "pytest~=7.3",
     "pytest-cov",
     "pytest-regressions",
 ]
