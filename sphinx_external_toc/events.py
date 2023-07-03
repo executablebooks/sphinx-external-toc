@@ -330,9 +330,14 @@ def ensure_index_file(app: Sphinx, exception: Optional[Exception]) -> None:
         or index_path.exists()
     ):
         return
+    
     root_name = remove_suffix(app.config.master_doc, app.config.source_suffix)
-    # TODO the other way to do this would be to
-    # simply copy the contents of the root file? (this method was taken from jupyter-book)
-    redirect_text = f'<meta http-equiv="Refresh" content="0; url={root_name}.html" />\n'
+    
+    if app.builder.name == 'html':
+        redirect_url = f"{root_name}.html" 
+    elif app.builder.name == 'dirhtml':
+        redirect_url = f"{root_name}/index.html" 
+        
+    redirect_text = f'<meta http-equiv="Refresh" content="0; url={redirect_url}" />\n'
     index_path.write_text(redirect_text, encoding="utf8")
     logger.info("[etoc] missing index.html written as redirect to '%s.html'", root_name)
