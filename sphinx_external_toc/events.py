@@ -220,7 +220,6 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     node_list: List[nodes.Element] = []
 
     for toctree in doc_item.subtrees:
-
         subnode = toctree_node()
         subnode["parent"] = app.env.docname
         subnode.source = doctree["source"]
@@ -245,13 +244,10 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         wrappernode.append(subnode)
 
         for entry in toctree.items:
-
             if isinstance(entry, UrlItem):
-
                 subnode["entries"].append((entry.title, entry.url))
 
             elif isinstance(entry, FileItem):
-
                 child_doc_item = site_map[entry]
                 docname = str(entry)
                 title = child_doc_item.title
@@ -326,18 +322,18 @@ def ensure_index_file(app: Sphinx, exception: Optional[Exception]) -> None:
         exception is not None
         or "html" not in app.builder.format
         or app.config.master_doc == "index"
-        # TODO rewrite the redirect if master_doc has changed since last build
+        # TODO: rewrite the redirect if master_doc has changed since last build
         or index_path.exists()
     ):
         return
-    
+
     root_name = remove_suffix(app.config.master_doc, app.config.source_suffix)
-    
-    if app.builder.name == 'html':
-        redirect_url = f"{root_name}.html" 
-    elif app.builder.name == 'dirhtml':
-        redirect_url = f"{root_name}/index.html" 
-        
+
+    if app.builder.name == "html":
+        redirect_url = f"{root_name}.html"
+    elif app.builder.name == "dirhtml":
+        redirect_url = f"{root_name}/index.html"
+
     redirect_text = f'<meta http-equiv="Refresh" content="0; url={redirect_url}" />\n'
     index_path.write_text(redirect_text, encoding="utf8")
     logger.info("[etoc] missing index.html written as redirect to '%s.html'", root_name)
