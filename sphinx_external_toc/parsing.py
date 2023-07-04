@@ -193,7 +193,6 @@ def _parse_doc_item(
 
     toctrees = []
     for toc_idx, toc_data in enumerate(subtrees_data):
-
         toc_path = path if shorthand_used else f"{path}{toc_idx}/"
 
         if not (isinstance(toc_data, Mapping) and items_key in toc_data):
@@ -209,7 +208,6 @@ def _parse_doc_item(
         # generate items list
         items: List[Union[GlobItem, FileItem, UrlItem]] = []
         for item_idx, item_data in enumerate(items_data):
-
             if not isinstance(item_data, Mapping):
                 raise MalformedError(
                     f"entry not a mapping type @ '{toc_path}{items_key}/{item_idx}'"

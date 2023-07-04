@@ -1,4 +1,4 @@
-# Contributing 
+# Contributing
 
 `sphinx-external-toc` is part of the executablebooks project, who also are responsible for `jupyter-book`.
 
