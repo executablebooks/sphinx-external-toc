@@ -1,11 +1,19 @@
 import os
+from importlib.metadata import version
 from pathlib import Path
 
 import pytest
-from sphinx.testing.path import path as sphinx_path
 from sphinx.testing.util import SphinxTestApp
 
 from sphinx_external_toc.tools import create_site_from_toc
+
+major, minor, _ = version("sphinx").split(".")
+if (major, minor) < ("7", "2"):
+    from sphinx.testing.path import path
+
+    _path = path
+else:
+    _path = Path
 
 TOC_FILES = list(Path(__file__).parent.joinpath("_toc_files").glob("*.yml"))
 TOC_FILES_WARN = list(
@@ -47,7 +55,7 @@ class SphinxBuild:
 @pytest.fixture()
 def sphinx_build_factory(make_app):
     def _func(src_path: Path, **kwargs) -> SphinxBuild:
-        app = make_app(srcdir=sphinx_path(os.path.abspath(str(src_path))), **kwargs)
+        app = make_app(srcdir=_path(os.path.abspath(str(src_path))), **kwargs)
         return SphinxBuild(app, src_path)
 
     yield _func
@@ -78,6 +86,7 @@ def test_success(path: Path, tmp_path: Path, sphinx_build_factory, file_regressi
     if "regress" in site_map.meta:
         doctree = builder.app.env.get_doctree(site_map.meta["regress"])
         doctree["source"] = site_map.meta["regress"]
+        doctree.setdefault("translation_progress", {"total": 0, "translated": 0})
         file_regression.check(doctree.pformat(), extension=".xml", encoding="utf8")
 
 
