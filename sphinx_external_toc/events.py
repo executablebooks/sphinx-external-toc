@@ -220,7 +220,6 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
     node_list: List[nodes.Element] = []
 
     for toctree in doc_item.subtrees:
-
         subnode = toctree_node()
         subnode["parent"] = app.env.docname
         subnode.source = doctree["source"]
@@ -245,13 +244,10 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         wrappernode.append(subnode)
 
         for entry in toctree.items:
-
             if isinstance(entry, UrlItem):
-
                 subnode["entries"].append((entry.title, entry.url))
 
             elif isinstance(entry, FileItem):
-
                 child_doc_item = site_map[entry]
                 docname = str(entry)
                 title = child_doc_item.title
