@@ -59,7 +59,6 @@ def create_site_from_toc(
 
     # create files
     for docname in chain(site_map, additional_files):
-
         # create document
         filename = docname
         if not any(docname.endswith(ext) for ext in {".rst", ".md"}):
