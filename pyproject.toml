@@ -71,6 +71,6 @@ strict_equality = true
 module = ["docutils.*", "yaml.*"]
 ignore_missing_imports = true
 
-[tool.isort]
-profile = "black"
-src_paths = ["sphinx_external_toc", "tests"]
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
