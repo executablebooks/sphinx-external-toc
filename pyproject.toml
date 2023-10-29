@@ -15,20 +15,20 @@ classifiers = [
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Text Processing :: Markup",
 ]
 keywords = ["sphinx","extension", "toc"]
-requires-python = "~=3.7"
+requires-python = ">=3.9"
 dependencies = [
-    "click>=7.1,<9",
+    "click>=7.1",
     "pyyaml",
-    "sphinx>=4,<6",
+    "sphinx>=5",
 ]
 
 [project.urls]
@@ -39,14 +39,14 @@ Documentation = "https://sphinx-external-toc.readthedocs.io"
 "jb.cmdline" = {toc = "sphinx_external_toc.cli:main"}
 
 [project.optional-dependencies]
-code_style = ["pre-commit~=2.12"]
+code_style = ["pre-commit>=2.12"]
 rtd = [
-    "myst-parser~=0.17.0",
+    "myst-parser>=1.0.0",
     "sphinx-book-theme>=0.0.36",
 ]
 testing = [
     "coverage",
-    "pytest~=7.1",
+    "pytest>=7.1",
     "pytest-cov",
     "pytest-regressions",
 ]
