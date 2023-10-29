@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 import pytest
-from sphinx.testing.path import path as sphinx_path
+from sphinx import version_info as sphinx_version_info
 from sphinx.testing.util import SphinxTestApp
 
 from sphinx_external_toc.tools import create_site_from_toc
@@ -47,7 +47,16 @@ class SphinxBuild:
 @pytest.fixture()
 def sphinx_build_factory(make_app):
     def _func(src_path: Path, **kwargs) -> SphinxBuild:
-        app = make_app(srcdir=sphinx_path(os.path.abspath(str(src_path))), **kwargs)
+        # For compatibility with multiple versions of sphinx, convert pathlib.Path to
+        # sphinx.testing.path.path here.
+        if sphinx_version_info >= (7, 2):
+            app_srcdir = src_path
+        else:
+            from sphinx.testing.path import path
+
+            app_srcdir = path(os.fspath(src_path))
+
+        app = make_app(srcdir=app_srcdir, **kwargs)
         return SphinxBuild(app, src_path)
 
     yield _func
