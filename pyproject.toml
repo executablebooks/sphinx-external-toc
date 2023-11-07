@@ -42,7 +42,7 @@ Documentation = "https://sphinx-external-toc.readthedocs.io"
 code_style = ["pre-commit>=2.12"]
 rtd = [
     "myst-parser>=1.0.0",
-    "sphinx-book-theme>=0.0.36",
+    "sphinx-book-theme>=1.0.0",
 ]
 testing = [
     "coverage",
