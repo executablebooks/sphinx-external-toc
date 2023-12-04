@@ -1,5 +1,23 @@
 # Change Log
 
+## 1.0.0 - 2023-11-08
+
+([full changelog](https://github.com/executablebooks/sphinx-external-toc/compare/v0.3.1...9e8cc1f92d84fed6eb9602371709b6a88e47f688))
+
+### Merged PRs
+
+- maint: add ruff [#101](https://github.com/executablebooks/sphinx-external-toc/pull/101) ([@agoose77](https://github.com/agoose77))
+- Bump actions/checkout from 3 to 4 [#98](https://github.com/executablebooks/sphinx-external-toc/pull/98) ([@dependabot](https://github.com/dependabot))
+- chore: update versioning [#97](https://github.com/executablebooks/sphinx-external-toc/pull/97) ([@agoose77](https://github.com/agoose77))
+- fixes https://github.com/executablebooks/jupyter-book/issues/1414 [#94](https://github.com/executablebooks/sphinx-external-toc/pull/94) ([@jdsalaro](https://github.com/jdsalaro))
+- [pre-commit.ci] pre-commit autoupdate [#82](https://github.com/executablebooks/sphinx-external-toc/pull/82) ([@pre-commit-ci](https://github.com/pre-commit-ci))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/executablebooks/sphinx-external-toc/graphs/contributors?from=2022-11-24&to=2023-12-04&type=c))
+
+[@agoose77](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Aagoose77+updated%3A2022-11-24..2023-12-04&type=Issues) | [@codecov](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Acodecov+updated%3A2022-11-24..2023-12-04&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Adependabot+updated%3A2022-11-24..2023-12-04&type=Issues) | [@jdsalaro](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Ajdsalaro+updated%3A2022-11-24..2023-12-04&type=Issues) | [@mmcky](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Ammcky+updated%3A2022-11-24..2023-12-04&type=Issues) | [@pre-commit-ci](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Apre-commit-ci+updated%3A2022-11-24..2023-12-04&type=Issues) | [@welcome](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Awelcome+updated%3A2022-11-24..2023-12-04&type=Issues)
+
 ## 0.3.1 - 2022-11-25
 
 - ⬆️ UPGRADE: Support `sphinx5` [#85](https://github.com/executablebooks/sphinx-external-toc/pull/85)
