@@ -1,5 +1,31 @@
 # Change Log
 
+## v1.0.1 - 2023-12-12
+
+([full changelog](https://github.com/executablebooks/sphinx-external-toc/compare/v1.0.0...21adcf94ca0e09e7fbce21bf87734435520169f2))
+
+### Bugs fixed
+
+- FIX: rework 104 to support e.g. PDFHTML [#105](https://github.com/executablebooks/sphinx-external-toc/pull/105) ([@agoose77](https://github.com/agoose77))
+- FIX: exit if non-html builder [#104](https://github.com/executablebooks/sphinx-external-toc/pull/104) ([@agoose77](https://github.com/agoose77))
+- FIX: simple grammatical error in `index.md` [#100](https://github.com/executablebooks/sphinx-external-toc/pull/100) ([@kallewesterling](https://github.com/kallewesterling))
+
+### Maintenance and upkeep improvements
+
+- MAINT: update changelog via github-activity [#102](https://github.com/executablebooks/sphinx-external-toc/pull/102) ([@agoose77](https://github.com/agoose77))
+
+### Other merged PRs
+
+- Bump actions/setup-python from 4 to 5 [#103](https://github.com/executablebooks/sphinx-external-toc/pull/103) ([@dependabot](https://github.com/dependabot))
+
+### Contributors to this release
+
+([GitHub contributors page for this release](https://github.com/executablebooks/sphinx-external-toc/graphs/contributors?from=2023-11-08&to=2023-12-12&type=c))
+
+[@agoose77](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Aagoose77+updated%3A2023-11-08..2023-12-12&type=Issues) | [@codecov](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Acodecov+updated%3A2023-11-08..2023-12-12&type=Issues) | [@dependabot](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Adependabot+updated%3A2023-11-08..2023-12-12&type=Issues) | [@kallewesterling](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Akallewesterling+updated%3A2023-11-08..2023-12-12&type=Issues) | [@welcome](https://github.com/search?q=repo%3Aexecutablebooks%2Fsphinx-external-toc+involves%3Awelcome+updated%3A2023-11-08..2023-12-12&type=Issues)
+
+
+
 ## 1.0.0 - 2023-11-08
 
 ([full changelog](https://github.com/executablebooks/sphinx-external-toc/compare/v0.3.1...9e8cc1f92d84fed6eb9602371709b6a88e47f688))
