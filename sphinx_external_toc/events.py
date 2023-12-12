@@ -333,6 +333,8 @@ def ensure_index_file(app: Sphinx, exception: Optional[Exception]) -> None:
         redirect_url = f"{root_name}.html"
     elif app.builder.name == "dirhtml":
         redirect_url = f"{root_name}/index.html"
+    else:
+        return
 
     redirect_text = f'<meta http-equiv="Refresh" content="0; url={redirect_url}" />\n'
     index_path.write_text(redirect_text, encoding="utf8")
