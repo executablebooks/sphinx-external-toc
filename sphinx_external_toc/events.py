@@ -329,10 +329,11 @@ def ensure_index_file(app: Sphinx, exception: Optional[Exception]) -> None:
 
     root_name = remove_suffix(app.config.master_doc, app.config.source_suffix)
 
-    if app.builder.name == "html":
-        redirect_url = f"{root_name}.html"
-    elif app.builder.name == "dirhtml":
+    if app.builder.name == "dirhtml":
         redirect_url = f"{root_name}/index.html"
+    else:
+        # Assume a single index for all non dir-HTML builders
+        redirect_url = f"{root_name}.html"
 
     redirect_text = f'<meta http-equiv="Refresh" content="0; url={redirect_url}" />\n'
     index_path.write_text(redirect_text, encoding="utf8")
