@@ -1,4 +1,5 @@
 """Parse the ToC to a `SiteMap` object."""
+
 from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from pathlib import Path

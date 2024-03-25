@@ -1,4 +1,5 @@
 """Sphinx event functions and directives."""
+
 import glob
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Set
