@@ -1,4 +1,5 @@
 """Compatibility for using dataclasses instead of attrs."""
+
 from __future__ import annotations
 
 import dataclasses as dc
