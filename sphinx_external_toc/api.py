@@ -11,6 +11,7 @@ from ._compat import (
     matches_re,
     optional,
     validate_fields,
+    validate_style,
 )
 
 #: Pattern used to match URL items.
@@ -65,13 +66,7 @@ class TocTree:
     style: str = field(
         default="numerical",
         kw_only=True,
-        validator=[
-            instance_of(str),
-            lambda s,f,g: s in {"numerical", "roman_upper", "roman_lower", "letter_upper", "letter_lower"}
-            or ValueError(
-                f"Invalid style '{s}'. Must be one of: numerical, roman_upper, roman_lower, letter_upper, letter_lower"
-            ),
-        ],
+        validator=validate_style
     )
 
     def __post_init__(self):

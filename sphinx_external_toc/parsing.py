@@ -23,6 +23,7 @@ TOCTREE_OPTIONS = (
     "numbered",
     "reversed",
     "titlesonly",
+    "style",
 )
 
 

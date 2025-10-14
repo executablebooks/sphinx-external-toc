@@ -147,3 +147,9 @@ def findall(node: Element):
     # findall replaces traverse in docutils v0.18
     # note a difference is that findall is an iterator
     return getattr(node, "findall", node.traverse)
+
+
+def validate_style(instance, attribute, value):
+    allowed = ["numerical", "romanupper", "romanlower", "alphaupper", "alphalower"]
+    if value not in allowed:
+        raise ValueError(f"{attribute.name} must be one of {allowed}, not {value!r}")
