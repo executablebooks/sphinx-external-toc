@@ -67,7 +67,7 @@ class TocTree:
         kw_only=True,
         validator=[
             instance_of(str),
-            lambda s: s in {"numerical", "roman_upper", "roman_lower", "letter_upper", "letter_lower"}
+            lambda s,f,g: s in {"numerical", "roman_upper", "roman_lower", "letter_upper", "letter_lower"}
             or ValueError(
                 f"Invalid style '{s}'. Must be one of: numerical, roman_upper, roman_lower, letter_upper, letter_lower"
             ),
