@@ -5,6 +5,10 @@ __version__ = "1.0.1"
 
 from typing import TYPE_CHECKING
 
+from sphinx.util import logging
+logger = logging.getLogger(__name__)
+
+
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
@@ -18,6 +22,8 @@ def setup(app: "Sphinx") -> dict:
         ensure_index_file,
         parse_toc_to_env,
     )
+
+    logger.warning("[FORKED] Initializing sphinx_external_toc extension")
 
     # variables
     app.add_config_value("external_toc_path", "_toc.yml", "env")
