@@ -61,6 +61,18 @@ class TocTree:
     )
     reversed: bool = field(default=False, kw_only=True, validator=instance_of(bool))
     titlesonly: bool = field(default=False, kw_only=True, validator=instance_of(bool))
+    # Add extra field for style of toctree rendering
+    style: str = field(
+        default="numerical",
+        kw_only=True,
+        validator=[
+            instance_of(str),
+            lambda s: s in {"numerical", "roman_upper", "roman_lower", "letter_upper", "letter_lower"}
+            or ValueError(
+                f"Invalid style '{s}'. Must be one of: numerical, roman_upper, roman_lower, letter_upper, letter_lower"
+            ),
+        ],
+    )
 
     def __post_init__(self):
         validate_fields(self)
