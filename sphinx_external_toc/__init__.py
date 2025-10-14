@@ -22,8 +22,16 @@ def setup(app: "Sphinx") -> dict:
         ensure_index_file,
         parse_toc_to_env,
     )
+    from .collectors import (
+        disable_builtin_toctree_collector,
+        TocTreeCollectorWithAppendices
+    )
 
     logger.warning("[FORKED] Initializing sphinx_external_toc extension")
+
+    # collectors
+    disable_builtin_toctree_collector(app)
+    app.add_env_collector(TocTreeCollectorWithAppendices)
 
     # variables
     app.add_config_value("external_toc_path", "_toc.yml", "env")
