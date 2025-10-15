@@ -127,6 +127,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         else:
             pass
         # convert the rest of the numbers to the corresponding styles
+        logger.warning(f"[FORKED] Renumbering {number_set} with styles {style_set}")
+        logger.warning(f"[FORKED] Renumbering {min(len(number_set), len(style_set))} levels")
         for i in range(1, min(len(number_set), len(style_set))):
             if style_set[i] == "numerical":
                 continue  # keep as is
