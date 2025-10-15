@@ -24,6 +24,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         logger.warning("[FORKED] Enabling new TocTreeCollectorWithStyles")
         super().__init__(*args, **kwargs)
 
+        self.__numerical_count = 0
         self.__romanupper_count = 0
         self.__romanlower_count = 0
         self.__alphaupper_count = 0
@@ -41,23 +42,24 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             doctree = env.get_doctree(docname)
             for toctree in doctree.findall(sphinxnodes.toctree):
                 style = toctree.get("style", "numerical")
-                if style != "numerical":
-                    logger.warning(f"[FORKED] Found toctree {toctree.get('caption','NAMELESS')} with non-numerical style {style}")
-                    # convert the section numbers to the new style
-                    for _, ref in toctree["entries"]:
-                        logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
-                        env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
-                        logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
+                # convert the section numbers to the new style
+                for _, ref in toctree["entries"]:
+                    logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
+                    env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
+                    logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
 
         return result
 
     def __renumber(self, number,style):
-        if not number or not style or style == "numerical":
+        if not number or not style:
             return number
         
         if not isinstance(style, str):
             style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
+        if style == "numerical":
+            self.__numerical_count += 1
+            number[0] = self.__numerical_count
         if style == "romanupper":
             self.__romanupper_count += 1
             number[0] = self.__to_roman(self.__romanupper_count).upper()
