@@ -152,6 +152,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
         elif isinstance(node, sphinxnodes.toctree):
             logger.warning(f"[FORKED] Found nested toctree in {ref}:\n{node.pformat()}")
+            raise RuntimeError("[FORKED] Nested toctrees are not (yet) supported.")
 
         else:
             for child in node.children:
