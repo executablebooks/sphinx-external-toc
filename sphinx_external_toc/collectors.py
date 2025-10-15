@@ -45,6 +45,18 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                 style = toctree.get("style", "numerical")
                 # convert the section numbers to the new style
                 for _, ref in toctree["entries"]:
+                    if style == "numerical":
+                        self.__numerical_count += 1
+                    if style == "romanupper":
+                        self.__romanupper_count += 1
+                    elif style == "romanlower":
+                        self.__romanlower_count += 1
+                    elif style == "alphaupper":
+                        self.__alphaupper_count += 1
+                    elif style == "alphalower":
+                        self.__alphalower_count += 1
+                    else:
+                        pass
                     logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
                     env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
@@ -61,19 +73,14 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
         if style == "numerical":
-            self.__numerical_count += 1
             number[0] = self.__numerical_count
         if style == "romanupper":
-            self.__romanupper_count += 1
             number[0] = self.__to_roman(self.__romanupper_count).upper()
         elif style == "romanlower":
-            self.__romanlower_count += 1
             number[0] = self.__to_roman(self.__romanlower_count).lower()
         elif style == "alphaupper":
-            self.__alphaupper_count += 1
             number[0] = self.__to_alpha(self.__alphaupper_count).upper()
         elif style == "alphalower":
-            self.__alphalower_count += 1
             number[0] = self.__to_alpha(self.__alphalower_count).lower()
         else:
             pass
