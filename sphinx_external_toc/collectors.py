@@ -65,7 +65,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
                     self.__map_old_to_new[str(old_secnumber)] = new_secnumber
                     env.titles[ref]["secnumber"] = new_secnumber
-                    logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")                    
+                    logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
+
+        logger.warning(f"[FORKED] Map of old to new section numbers: {self.__map_old_to_new}")
 
         return result
 
