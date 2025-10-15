@@ -24,10 +24,12 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         logger.warning("[FORKED] Enabling new TocTreeCollectorWithStyles")
         super().__init__(*args, **kwargs)
 
-    def process_doc(self, app, doctree: Node):
-        # First, call the original process_doc to get the default behavior
-        logger.warning("[FORKED] Calling original TocTreeCollector.process_doc")
-        super().process_doc(app, doctree)
+    def assign_section_numbers(self, env):
+        # First, call the original assign_section_numbers to get the default behavior
+        logger.warning("[FORKED] Calling original TocTreeCollector.assign_section_numbers")
+        result = super().assign_section_numbers(env)
 
         # Then, add any additional processing for styles here
         logger.warning("[FORKED] Processing styles")
+
+        return result
