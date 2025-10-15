@@ -5,6 +5,12 @@
 [![Code style: black][black-badge]][black-link]
 [![PyPI][pypi-badge]][pypi-link]
 
+> [!NOTE]
+> Currently, this is a *forked* version of `sphinx-external-toc` that implements:
+>
+> - Defining section numbering styles (e.g. numerical, roman (upper/lower), alphabetic (upper/lower)) per any level in the ToC.
+> - Restarting the upper level section numbering for each subtree for the selected numbering style.
+
 A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
 As used by [Jupyter Book](https://jupyterbook.org)!
 
@@ -118,6 +124,20 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
 - `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order (default `False`).
   This can be useful when using `glob` entries.
 - `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level (default `False`).
+- `style` (string or list of strings): The section numbering style to use for this subtree (default `numerical`).
+  If a single string is given, this will be used for the top level of the subtree.
+  If a list of strings is given, then each entry will be used for the corresponding level of section numbering.
+  If styles are not given for all levels, then the remaining levels will be `numerical`.
+  If too many styles are given, the extra ones will be ignored.
+  The first time a style is used at the top level in a subtree, the numbering will start from 1, 'a', 'A', 'I' or 'i' depending on the style.
+  Subsequent times the same style is used at the top level in a subtree, the numbering will continue from the last number used for that style, unless `restart_numbering` is set to `True`.
+  Available styles:
+  - `numerical`: 1, 2, 3, ...
+  - `romanlower`: i, ii, iii, iv, v, ...
+  - `romanupper`: I, II, III, IV, V, ...
+  - `alphalower`: a, b, c, d, e, ..., aa, ab, ...
+  - `alphaupper`: A, B, C, D, E, ..., AA, AB, ...
+- `restart_numbering` (boolean): If `True`, the section numbering for the top level of this subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style) (default `False`).
 
 These options can be set at the level of the subtree:
 
@@ -130,6 +150,8 @@ subtrees:
   numbered: True
   reversed: False
   titlesonly: True
+  style: [alphaupper, romanlower]
+  restart_numbering: True
   entries:
   - file: doc1
     subtrees:
@@ -149,6 +171,8 @@ options:
   numbered: True
   reversed: False
   titlesonly: True
+  style: [alphaupper, romanlower]
+  restart_numbering: True
 entries:
 - file: doc1
   options:
@@ -169,20 +193,13 @@ options:
   maxdepth: 1
   numbered: True
   reversed: False
+  style: [alphaupper, romanlower]
+  restart_numbering: True
 entries:
 - file: doc1
   entries:
   - file: doc2
 ```
-
-:::{warning}
-`numbered` should not generally be used as a default, since numbering cannot be changed by nested subtrees, and sphinx will log a warning.
-:::
-
-:::{note}
-By default, title numbering restarts for each subtree.
-If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
-:::
 
 ### Using different key-mappings
 
