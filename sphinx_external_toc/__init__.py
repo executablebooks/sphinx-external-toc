@@ -5,10 +5,6 @@ __version__ = "1.0.1"
 
 from typing import TYPE_CHECKING
 
-from sphinx.util import logging
-logger = logging.getLogger(__name__)
-
-
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
@@ -29,8 +25,6 @@ def setup(app: "Sphinx") -> dict:
         disable_builtin_toctree_collector,
         TocTreeCollectorWithStyles
     )
-
-    logger.warning("[FORKED] Initializing sphinx_external_toc extension")
 
     # collectors
     disable_builtin_toctree_collector(app)
