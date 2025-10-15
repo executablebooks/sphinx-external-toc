@@ -41,5 +41,13 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     # convert the section numbers to the new style
                     for _, ref in toctree["entries"]:
                         logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
+                        env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"])
+                        logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
 
         return result
+
+    def __renumber(self, number,style):
+        if not number or not style or style == "numerical":
+            return number
+
+        return number
