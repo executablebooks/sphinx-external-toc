@@ -59,14 +59,19 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         self.__alphalower_count += 1
                     else:
                         pass
-                    old_secnumber = env.titles[ref]["secnumber"][0]
+                    old_secnumber = env.titles[ref]["secnumber"]
                     logger.warning(f"[FORKED] Old section number of {ref}: {old_secnumber}")
-                    new_secnumber = self.__renumber(old_secnumber,style)
+                    new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
-                    self.__map_old_to_new[str(old_secnumber)] = new_secnumber
-                    env.titles[ref]["secnumber"] = [new_secnumber]
+                    env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
 
-        logger.warning(f"[FORKED] Map of old to new section numbers: {self.__map_old_to_new}")
+                    # STORE THE MAP
+                    if isinstance(old_secnumber, list):
+                        old_secnumber = old_secnumber[0]
+                    if isinstance(old_secnumber, list):
+                        old_secnumber = old_secnumber[0]
+                    self.__map_old_to_new[old_secnumber] = new_secnumber
+
 
         return result
 
@@ -76,19 +81,17 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         
         if not isinstance(style, str):
             style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
-        if not isinstance(number, int):
-            number = number[0]  # if multiple numbers are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
         if style == "numerical":
-            number = self.__numerical_count
+            number[0] = self.__numerical_count
         if style == "romanupper":
-            number = self.__to_roman(self.__romanupper_count).upper()
+            number[0] = self.__to_roman(self.__romanupper_count).upper()
         elif style == "romanlower":
-            number = self.__to_roman(self.__romanlower_count).lower()
+            number[0] = self.__to_roman(self.__romanlower_count).lower()
         elif style == "alphaupper":
-            number = self.__to_alpha(self.__alphaupper_count).upper()
+            number[0] = self.__to_alpha(self.__alphaupper_count).upper()
         elif style == "alphalower":
-            number = self.__to_alpha(self.__alphalower_count).lower()
+            number[0] = self.__to_alpha(self.__alphalower_count).lower()
         else:
             pass
 
