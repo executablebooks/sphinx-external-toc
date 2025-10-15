@@ -153,6 +153,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         # elif isinstance(node, sphinxnodes.toctree):
         #     raise RuntimeError("nested toctrees are not supported")
 
-        # else:
-        #     for child in node.children:
-        #         self.__replace_toc(env, ref, child,"numerical")  # nested toctrees are not supported, so reset style to numerical
+        else:
+            for child in node.children:
+                self.__replace_toc(env, ref, child,style)
