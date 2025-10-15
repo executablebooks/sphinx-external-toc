@@ -155,4 +155,5 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
         else:
             for child in node.children:
+                logger.warning(f"[FORKED] Recursing into child of {type(node)}")
                 self.__replace_toc(env, ref, child,style)
