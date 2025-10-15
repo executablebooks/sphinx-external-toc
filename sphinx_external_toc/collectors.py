@@ -1,5 +1,4 @@
 from sphinx.environment.collectors.toctree import TocTreeCollector
-from docutils.nodes import Node
 import gc
 from sphinx.util import logging
 
@@ -31,5 +30,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
         # Then, add any additional processing for styles here
         logger.warning("[FORKED] Processing styles")
+        for docname in env.numbered_toctrees:
+            logger.warning(f"[FORKED] Processing docname: {docname}")
+            doctree = env.get_doctree(docname)
 
         return result
