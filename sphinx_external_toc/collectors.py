@@ -150,8 +150,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             node["secnumber"] = fixed_number
             env.toc_secnumbers[ref][node["anchorname"]] = fixed_number
 
-        # elif isinstance(node, sphinxnodes.toctree):
-        #     raise RuntimeError("nested toctrees are not supported")
+        elif isinstance(node, sphinxnodes.toctree):
+            logger.warning(f"[FORKED] Found nested toctree in {ref}:\n{node.pformat()}")
 
         else:
             for child in node.children:
