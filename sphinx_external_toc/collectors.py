@@ -46,30 +46,32 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             doctree = env.get_doctree(docname)
             for toctree in doctree.findall(sphinxnodes.toctree):
                 style = toctree.get("style", "numerical")
+                if not isinstance(style, list):
+                    style = [style]
                 restart = toctree.get("restart_numbering", False)
                 if restart:
                     logger.warning(f"[FORKED] Restarting numbering for style {style}")
-                    if style == "numerical":
+                    if style[0] == "numerical":
                         self.__numerical_count = 0
-                    elif style == "romanupper":
+                    elif style[0] == "romanupper":
                         self.__romanupper_count = 0
-                    elif style == "romanlower":
+                    elif style[0] == "romanlower":
                         self.__romanlower_count = 0
-                    elif style == "alphaupper":
+                    elif style[0] == "alphaupper":
                         self.__alphaupper_count = 0
-                    elif style == "alphalower":
+                    elif style[0] == "alphalower":
                         self.__alphalower_count = 0
                 # convert the section numbers to the new style
                 for _, ref in toctree["entries"]:
-                    if style == "numerical":
+                    if style[0] == "numerical":
                         self.__numerical_count += 1
-                    if style == "romanupper":
+                    if style[0] == "romanupper":
                         self.__romanupper_count += 1
-                    elif style == "romanlower":
+                    elif style[0] == "romanlower":
                         self.__romanlower_count += 1
-                    elif style == "alphaupper":
+                    elif style[0] == "alphaupper":
                         self.__alphaupper_count += 1
-                    elif style == "alphalower":
+                    elif style[0] == "alphalower":
                         self.__alphalower_count += 1
                     else:
                         pass
@@ -103,27 +105,27 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
         return result
 
-    def __renumber(self, number,style):
-        if not number or not style:
-            return number
-        
-        if not isinstance(style, str):
-            style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
+    def __renumber(self, number_set,style_set):
+        if not number_set or not style_set:
+            return number_set
+
+        if not isinstance(style_set, list):
+            style_set = [style_set]  # if multiple styles are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
-        if style == "numerical":
-            number[0] = self.__numerical_count
-        if style == "romanupper":
-            number[0] = self.__to_roman(self.__romanupper_count).upper()
-        elif style == "romanlower":
-            number[0] = self.__to_roman(self.__romanlower_count).lower()
-        elif style == "alphaupper":
-            number[0] = self.__to_alpha(self.__alphaupper_count).upper()
-        elif style == "alphalower":
-            number[0] = self.__to_alpha(self.__alphalower_count).lower()
+        if style_set[0] == "numerical":
+            number_set[0] = self.__numerical_count
+        if style_set[0] == "romanupper":
+            number_set[0] = self.__to_roman(self.__romanupper_count).upper()
+        elif style_set[0] == "romanlower":
+            number_set[0] = self.__to_roman(self.__romanlower_count).lower()
+        elif style_set[0] == "alphaupper":
+            number_set[0] = self.__to_alpha(self.__alphaupper_count).upper()
+        elif style_set[0] == "alphalower":
+            number_set[0] = self.__to_alpha(self.__alphalower_count).lower()
         else:
             pass
 
-        return number
+        return number_set
     
     def __to_roman(self, n):
         """Convert an integer to a Roman numeral."""

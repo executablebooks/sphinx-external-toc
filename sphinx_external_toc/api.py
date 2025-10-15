@@ -63,7 +63,7 @@ class TocTree:
     reversed: bool = field(default=False, kw_only=True, validator=instance_of(bool))
     titlesonly: bool = field(default=False, kw_only=True, validator=instance_of(bool))
     # Add extra field for style of toctree rendering
-    style: str = field(
+    style: Union[List[str],str] = field(
         default="numerical",
         kw_only=True,
         validator=validate_style
