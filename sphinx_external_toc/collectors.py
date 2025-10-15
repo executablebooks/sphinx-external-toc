@@ -35,6 +35,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             logger.warning(f"[FORKED] Processing docname: {docname}")
             doctree = env.get_doctree(docname)
             for toctree in doctree.findall(sphinxnodes.toctree):
-                logger.warning(f"[FORKED] Found toctree: {toctree}")
+                style = toctree.get("style", "numerical")
+                if style != "numerical":
+                    logger.warning(f"[FORKED] Found toctree with non-numerical style: {style}")
 
         return result
