@@ -2,6 +2,7 @@ from sphinx.environment.collectors.toctree import TocTreeCollector
 import gc
 from sphinx.util import logging
 from sphinx import addnodes as sphinxnodes
+from docutils import nodes
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +48,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
                     env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
+                    if ref in env.tocs:
+                        self.__replace_toc(env, ref, env.tocs[ref],style)
 
         return result
 
@@ -108,3 +111,16 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             result = chr(n % 26 + ord('A')) + result
             n //= 26
         return result
+    
+    def __replace_toc(self, env, ref, node,style):
+        if isinstance(node, nodes.reference):
+            fixed_number = self.__renumber(node["secnumber"],style)
+            node["secnumber"] = fixed_number
+            env.toc_secnumbers[ref][node["anchorname"]] = fixed_number
+
+        elif isinstance(node, sphinxnodes.toctree):
+            raise RuntimeError("nested toctrees are not supported")
+
+        else:
+            for child in node.children:
+                self.__replace_toc(env, ref, child,style)
