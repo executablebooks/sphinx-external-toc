@@ -50,7 +50,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         if not number or not style or style == "numerical":
             return number
         
-        if len(style) != 1:
+        if not isinstance(style, str):
             style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
         first = number[0]
