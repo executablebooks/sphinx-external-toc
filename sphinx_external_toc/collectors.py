@@ -152,9 +152,20 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
         elif isinstance(node, sphinxnodes.toctree):
             logger.warning(f"[FORKED] Found nested toctree in {ref}:\n{node.pformat()}")
-            raise RuntimeError("[FORKED] Nested toctrees are not (yet) supported.")
+            self.__fix_nested_toc(env, node, style)
+            # raise RuntimeError("[FORKED] Nested toctrees are not (yet) supported.")
 
         else:
             for child in node.children:
                 logger.warning(f"[FORKED] Recursing into child of {type(node)}")
                 self.__replace_toc(env, ref, child,style)
+
+    def __fix_nested_toc(self, env, toctree, style):
+        for _, ref in toctree["entries"]:
+            old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
+            logger.warning(f"[FORKED-NESTED] Old section number of {ref}: {old_secnumber}")
+            new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
+            logger.warning(f"[FORKED-NESTED] New section number of {ref}: {new_secnumber}")
+            env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
+            if ref in env.tocs:
+                self.__replace_toc(env, ref, env.tocs[ref],style)
