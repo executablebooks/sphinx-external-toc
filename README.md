@@ -8,8 +8,9 @@
 > [!NOTE]
 > Currently, this is a *forked* version of `sphinx-external-toc` that implements:
 >
-> - Defining section numbering styles (e.g. numerical, roman (upper/lower), alphabetic (upper/lower)) per any level in the ToC.
-> - Restarting the upper level section numbering for each subtree for the selected numbering style.
+> - Section numbering styles (e.g. numerical, roman (upper/lower), alphabetic (upper/lower)) per any level in the ToC.
+> - The option to restart the upper level section numbering for each subtree for the selected numbering style.
+> - Automatic inclusion of `sphinx-multitoc-numbering` as the other features depend on continuous section numbering across multiple toctrees. This means that `use_multitoc_numbering: false` in `conf.py` will be ignored in JupyterBooks.
 
 A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
 As used by [Jupyter Book](https://jupyterbook.org)!
