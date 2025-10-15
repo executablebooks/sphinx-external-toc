@@ -76,17 +76,19 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         
         if not isinstance(style, str):
             style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
+        if not isinstance(number, int):
+            number = number[0]  # if multiple numbers are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
         if style == "numerical":
-            number[0] = self.__numerical_count
+            number = self.__numerical_count
         if style == "romanupper":
-            number[0] = self.__to_roman(self.__romanupper_count).upper()
+            number = self.__to_roman(self.__romanupper_count).upper()
         elif style == "romanlower":
-            number[0] = self.__to_roman(self.__romanlower_count).lower()
+            number = self.__to_roman(self.__romanlower_count).lower()
         elif style == "alphaupper":
-            number[0] = self.__to_alpha(self.__alphaupper_count).upper()
+            number = self.__to_alpha(self.__alphaupper_count).upper()
         elif style == "alphalower":
-            number[0] = self.__to_alpha(self.__alphalower_count).lower()
+            number = self.__to_alpha(self.__alphalower_count).lower()
         else:
             pass
 
