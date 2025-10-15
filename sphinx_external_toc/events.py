@@ -241,6 +241,7 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         )
         subnode["titlesonly"] = toctree.titlesonly
         subnode["style"] = toctree.style
+        subnode["restart_numbering"] = toctree.restart_numbering
         wrappernode = nodes.compound(classes=["toctree-wrapper"])
         wrappernode.append(subnode)
 
