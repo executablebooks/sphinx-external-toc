@@ -110,8 +110,10 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             return number_set
 
         if not isinstance(style_set, list):
-            style_set = [style_set]  # if multiple styles are given, use only the first one, the other are used in another method
-        # only convert the first number to the new style
+            style_set = [style_set]  # if not multiple styles are given, convert to list
+        # for each style, convert the corresponding number, where only the first number 
+        # is rebased, the rest are kept as is, but converted.
+        # convert the first number to the new style
         if style_set[0] == "numerical":
             number_set[0] = self.__numerical_count
         if style_set[0] == "romanupper":
@@ -124,6 +126,20 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             number_set[0] = self.__to_alpha(self.__alphalower_count).lower()
         else:
             pass
+        # convert the rest of the numbers to the corresponding styles
+        for i in range(1, min(len(number_set), len(style_set))):
+            if style_set[i] == "numerical":
+                continue  # keep as is
+            if style_set[i] == "romanupper":
+                number_set[i] = self.__to_roman(number_set[i]).upper()
+            elif style_set[i] == "romanlower":
+                number_set[i] = self.__to_roman(number_set[i]).lower()
+            elif style_set[i] == "alphaupper":
+                number_set[i] = self.__to_alpha(number_set[i]).upper()
+            elif style_set[i] == "alphalower":
+                number_set[i] = self.__to_alpha(number_set[i]).lower()
+            else:
+                pass
 
         return number_set
     
@@ -168,7 +184,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         elif isinstance(node, sphinxnodes.toctree):
             logger.warning(f"[FORKED] Found nested toctree in {ref}:\n{node.pformat()}")
             self.__fix_nested_toc(env, node, style)
-            # raise RuntimeError("[FORKED] Nested toctrees are not (yet) supported.")
 
         else:
             for child in node.children:
