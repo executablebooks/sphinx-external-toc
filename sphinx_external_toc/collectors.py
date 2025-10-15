@@ -28,6 +28,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         # First, call the original assign_section_numbers to get the default behavior
         logger.warning("[FORKED] Calling original TocTreeCollector.assign_section_numbers")
         result = super().assign_section_numbers(env)
+        logger.warning(f"[FORKED] Original assign_section_numbers completed with result {result}")
 
         # Then, add any additional processing for styles here
         logger.warning("[FORKED] Processing styles")
