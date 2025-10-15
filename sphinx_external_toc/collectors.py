@@ -1,6 +1,7 @@
 from sphinx.environment.collectors.toctree import TocTreeCollector
 import gc
 from sphinx.util import logging
+from sphinx import addnodes as sphinxnodes
 
 logger = logging.getLogger(__name__)
 
@@ -33,5 +34,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         for docname in env.numbered_toctrees:
             logger.warning(f"[FORKED] Processing docname: {docname}")
             doctree = env.get_doctree(docname)
+            for toctree in doctree.findall(sphinxnodes.toctree):
+                logger.warning(f"[FORKED] Found toctree: {toctree}")
 
         return result
