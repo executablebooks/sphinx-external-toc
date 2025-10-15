@@ -1,4 +1,4 @@
-from shutil import copy
+import copy
 from sphinx.environment.collectors.toctree import TocTreeCollector
 import gc
 from sphinx.util import logging
