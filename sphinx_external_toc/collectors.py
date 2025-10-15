@@ -58,11 +58,13 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         self.__alphalower_count += 1
                     else:
                         pass
-                    logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
+                    logger.warning(f"[FORKED] Current section name: {ref}")
                     env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
-                    if ref in env.tocs:
-                        self.__replace_toc(env, ref, env.tocs[ref],style)
+                    # replace in toc_secnumbers as well
+                    old_secnumbers = env.toc_secnumbers[ref]
+                    logger.warning(f"[FORKED] Old toc_secnumbers: {old_secnumbers}")
+                    
 
         return result
 
