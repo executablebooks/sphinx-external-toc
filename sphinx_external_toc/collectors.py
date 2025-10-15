@@ -113,6 +113,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             style_set = [style_set]  # if not multiple styles are given, convert to list
         # for each style, convert the corresponding number, where only the first number 
         # is rebased, the rest are kept as is, but converted.
+        logger.warning(f"[FORKED] Renumbering {number_set} with styles {style_set}")
         # convert the first number to the new style
         if style_set[0] == "numerical":
             number_set[0] = self.__numerical_count
@@ -127,9 +128,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         else:
             pass
         # convert the rest of the numbers to the corresponding styles
-        logger.warning(f"[FORKED] Renumbering {number_set} with styles {style_set}")
-        logger.warning(f"[FORKED] Renumbering {min(len(number_set), len(style_set))} levels")
+        logger.warning(f"[FORKED] Renumbering {min(len(number_set), len(style_set))-1} secondary levels")
         for i in range(1, min(len(number_set), len(style_set))):
+            logger.warning(f"[FORKED] Renumbering level {i}: {number_set[i]} with style {style_set[i]}")
             if style_set[i] == "numerical":
                 continue  # keep as is
             if style_set[i] == "romanupper":
