@@ -26,6 +26,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
         self.__romanupper_count = 0
         self.__romanlower_count = 0
+        self.__alphaupper_count = 0
+        self.__alphalower_count = 0
 
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
@@ -62,6 +64,12 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         elif style == "romanlower":
             self.__romanlower_count += 1
             number[0] = self.__to_roman(self.__romanlower_count).lower()
+        elif style == "alphaupper":
+            self.__alphaupper_count += 1
+            number[0] = self.__to_alpha(self.__alphaupper_count).upper()
+        elif style == "alphalower":
+            self.__alphalower_count += 1
+            number[0] = self.__to_alpha(self.__alphalower_count).lower()
         else:
             pass
 
@@ -89,3 +97,12 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                 n -= val[i]
             i += 1
         return roman_num
+    
+    def __to_alpha(self, n):
+        """Convert an integer to an alphabetical representation (A, B, ..., Z, AA, AB, ...)."""
+        result = ""
+        while n > 0:
+            n -= 1
+            result = chr(n % 26 + ord('A')) + result
+            n //= 26
+        return result
