@@ -54,30 +54,31 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         self.__alphalower_count = 0
                 # convert the section numbers to the new style
                 for _, ref in toctree["entries"]:
-                    if style[0] == "numerical":
-                        self.__numerical_count += 1
-                    if style[0] == "romanupper":
-                        self.__romanupper_count += 1
-                    elif style[0] == "romanlower":
-                        self.__romanlower_count += 1
-                    elif style[0] == "alphaupper":
-                        self.__alphaupper_count += 1
-                    elif style[0] == "alphalower":
-                        self.__alphalower_count += 1
-                    else:
-                        pass
-                    old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
-                    new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
-                    env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
-                    if ref in env.tocs:
-                        self.__replace_toc(env, ref, env.tocs[ref],style)
+                    if "secnumber" in env.titles[ref]:
+                        if style[0] == "numerical":
+                            self.__numerical_count += 1
+                        if style[0] == "romanupper":
+                            self.__romanupper_count += 1
+                        elif style[0] == "romanlower":
+                            self.__romanlower_count += 1
+                        elif style[0] == "alphaupper":
+                            self.__alphaupper_count += 1
+                        elif style[0] == "alphalower":
+                            self.__alphalower_count += 1
+                        else:
+                            pass
+                        old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
+                        new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
+                        env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
+                        if ref in env.tocs:
+                            self.__replace_toc(env, ref, env.tocs[ref],style)
 
-                    # STORE IN THE MAP
-                    if isinstance(old_secnumber, list):
-                        old_secnumber = old_secnumber[0]
-                    if isinstance(new_secnumber, list):
-                        new_secnumber = new_secnumber[0]
-                    self.__map_old_to_new[old_secnumber] = new_secnumber
+                        # STORE IN THE MAP
+                        if isinstance(old_secnumber, list):
+                            old_secnumber = old_secnumber[0]
+                        if isinstance(new_secnumber, list):
+                            new_secnumber = new_secnumber[0]
+                        self.__map_old_to_new[old_secnumber] = new_secnumber
 
         # Now, replace the section numbers in env.toc_secnumbers
         for docname in env.toc_secnumbers:

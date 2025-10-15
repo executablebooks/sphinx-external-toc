@@ -14,6 +14,9 @@ if TYPE_CHECKING:
 
 
 def setup(app: "Sphinx") -> dict:
+
+    app.setup_extension("sphinx_multitoc_numbering")
+
     """Initialize the Sphinx extension."""
     from .events import (
         InsertToctrees,
