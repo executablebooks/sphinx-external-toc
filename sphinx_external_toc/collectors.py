@@ -1,3 +1,4 @@
+from shutil import copy
 from sphinx.environment.collectors.toctree import TocTreeCollector
 import gc
 from sphinx.util import logging
@@ -59,11 +60,11 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         self.__alphalower_count += 1
                     else:
                         pass
-                    old_secnumber = env.titles[ref]["secnumber"]
+                    old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
                     logger.warning(f"[FORKED] Old section number of {ref}: {old_secnumber}")
                     new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
-                    env.titles[ref]["secnumber"] = new_secnumber
+                    env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
 
                     # STORE IN THE MAP
                     if isinstance(old_secnumber, list):
