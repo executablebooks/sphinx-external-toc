@@ -78,6 +78,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         for docname in env.toc_secnumbers:
             logger.warning(f"[FORKED] Old section numbers in {docname}: {env.toc_secnumbers[docname]}")
             for _, secnumber in env.toc_secnumbers[docname].items():
+                logger.warning(f"[FORKED] Old secnumber: {secnumber}")
                 first_number = secnumber[0]
                 secnumber = (self.__map_old_to_new.get(first_number, first_number), secnumber[1:])
             logger.warning(f"[FORKED] New section numbers in {docname}: {env.toc_secnumbers[docname]}")
