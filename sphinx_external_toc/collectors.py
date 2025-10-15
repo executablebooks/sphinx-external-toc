@@ -65,6 +65,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
                     env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
+                    if ref in env.tocs:
+                        self.__replace_toc(env, ref, env.tocs[ref])
 
                     # STORE IN THE MAP
                     if isinstance(old_secnumber, list):
