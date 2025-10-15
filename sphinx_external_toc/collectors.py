@@ -63,15 +63,16 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     logger.warning(f"[FORKED] Old section number of {ref}: {old_secnumber}")
                     new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
                     logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
-                    env.titles[ref]["secnumber"] = self.__renumber(env.titles[ref]["secnumber"],style)
+                    env.titles[ref]["secnumber"] = new_secnumber
 
-                    # STORE THE MAP
+                    # STORE IN THE MAP
                     if isinstance(old_secnumber, list):
                         old_secnumber = old_secnumber[0]
-                    if isinstance(old_secnumber, list):
-                        old_secnumber = old_secnumber[0]
+                    if isinstance(new_secnumber, list):
+                        new_secnumber = new_secnumber[0]
                     self.__map_old_to_new[old_secnumber] = new_secnumber
 
+        logger.warning(f"[FORKED] Final map:\n{self.__map_old_to_new}")
 
         return result
 
