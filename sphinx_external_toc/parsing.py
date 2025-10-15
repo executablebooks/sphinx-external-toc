@@ -24,6 +24,7 @@ TOCTREE_OPTIONS = (
     "reversed",
     "titlesonly",
     "style",
+    "restart_numbering",
 )
 
 
