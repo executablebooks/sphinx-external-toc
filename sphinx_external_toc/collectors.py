@@ -131,13 +131,13 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             if style_set[i] == "numerical":
                 continue  # keep as is
             if style_set[i] == "romanupper":
-                number_set[i] = self.__to_roman(number_set[i]).upper()
+                number_set[i] = self.__to_roman(int(number_set[i])).upper()
             elif style_set[i] == "romanlower":
-                number_set[i] = self.__to_roman(number_set[i]).lower()
+                number_set[i] = self.__to_roman(int(number_set[i])).lower()
             elif style_set[i] == "alphaupper":
-                number_set[i] = self.__to_alpha(number_set[i]).upper()
+                number_set[i] = self.__to_alpha(int(number_set[i])).upper()
             elif style_set[i] == "alphalower":
-                number_set[i] = self.__to_alpha(number_set[i]).lower()
+                number_set[i] = self.__to_alpha(int(number_set[i])).lower()
             else:
                 pass
 
