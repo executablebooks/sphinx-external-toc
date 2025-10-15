@@ -59,13 +59,12 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         self.__alphalower_count += 1
                     else:
                         pass
-                    old_secnumber = env.titles[ref]["secnumber"]
+                    old_secnumber = env.titles[ref]["secnumber"][0]
                     logger.warning(f"[FORKED] Old section number of {ref}: {old_secnumber}")
-                    new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
+                    new_secnumber = self.__renumber([old_secnumber][0],style)
                     logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
                     self.__map_old_to_new[str(old_secnumber)] = new_secnumber
-                    env.titles[ref]["secnumber"] = new_secnumber
-                    logger.warning(f"[FORKED] New section number: {env.titles[ref]['secnumber']}")
+                    env.titles[ref]["secnumber"] = [new_secnumber]
 
         logger.warning(f"[FORKED] Map of old to new section numbers: {self.__map_old_to_new}")
 
