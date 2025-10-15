@@ -1,5 +1,5 @@
 from sphinx.environment.collectors.toctree import TocTreeCollector
-from docutils.nodes import toctree, Node
+from docutils.nodes import Node
 import gc
 from sphinx.util import logging
 
