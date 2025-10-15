@@ -46,6 +46,19 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             doctree = env.get_doctree(docname)
             for toctree in doctree.findall(sphinxnodes.toctree):
                 style = toctree.get("style", "numerical")
+                restart = toctree.get("restart_numbering", False)
+                if restart:
+                    logger.warning(f"[FORKED] Restarting numbering for style {style}")
+                    if style == "numerical":
+                        self.__numerical_count = 0
+                    elif style == "romanupper":
+                        self.__romanupper_count = 0
+                    elif style == "romanlower":
+                        self.__romanlower_count = 0
+                    elif style == "alphaupper":
+                        self.__alphaupper_count = 0
+                    elif style == "alphalower":
+                        self.__alphalower_count = 0
                 # convert the section numbers to the new style
                 for _, ref in toctree["entries"]:
                     if style == "numerical":
