@@ -27,10 +27,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
         logger.warning("[FORKED] Calling original TocTreeCollector.assign_section_numbers")
-        result = super().assign_section_numbers(env)
-        logger.warning(f"[FORKED] Original assign_section_numbers completed with result {result}")
+        result = super().assign_section_numbers(env) # only needed to maintain functionality
 
-        # Then, add any additional processing for styles here
+        # Processing styles
         logger.warning("[FORKED] Processing styles")
         for docname in env.numbered_toctrees:
             logger.warning(f"[FORKED] Processing docname: {docname}")
@@ -39,5 +38,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                 style = toctree.get("style", "numerical")
                 if style != "numerical":
                     logger.warning(f"[FORKED] Found toctree {toctree.get('caption','NAMELESS')} with non-numerical style {style}")
+                    # convert the section numbers to the new style
+                    for _, ref in toctree["entries"]:
+                        logger.warning(f"[FORKED] Current section number: {env.titles[ref]['secnumber']}")
 
         return result
