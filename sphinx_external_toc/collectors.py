@@ -5,8 +5,6 @@ from sphinx.util import logging
 from sphinx import addnodes as sphinxnodes
 from docutils import nodes
 
-logger = logging.getLogger(__name__)
-
 def disable_builtin_toctree_collector(app):
     for obj in gc.get_objects():
         if not isinstance(obj, TocTreeCollector):
@@ -19,11 +17,9 @@ def disable_builtin_toctree_collector(app):
         if obj.listener_ids is None:
             continue
         obj.disable(app)
-        logger.warning("[FORKED] Disabled built-in TocTreeCollector")
 
 class TocTreeCollectorWithStyles(TocTreeCollector):
     def __init__(self, *args, **kwargs):
-        logger.warning("[FORKED] Enabling new TocTreeCollectorWithStyles")
         super().__init__(*args, **kwargs)
 
         self.__numerical_count = 0
@@ -35,14 +31,10 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
-        logger.warning("[FORKED] Calling original TocTreeCollector.assign_section_numbers")
         result = super().assign_section_numbers(env) # only needed to maintain functionality
-        logger.warning(f"[FORKED] Original TocTreeCollector.assign_section_numbers done.\nResult:\n{result}\nSection numbers:\n{env.toc_secnumbers}")
 
         # Processing styles
-        logger.warning("[FORKED] Processing styles")
         for docname in env.numbered_toctrees:
-            logger.warning(f"[FORKED] Processing docname: {docname}")
             doctree = env.get_doctree(docname)
             for toctree in doctree.findall(sphinxnodes.toctree):
                 style = toctree.get("style", "numerical")
@@ -50,7 +42,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     style = [style]
                 restart = toctree.get("restart_numbering", False)
                 if restart:
-                    logger.warning(f"[FORKED] Restarting numbering for style {style}")
                     if style[0] == "numerical":
                         self.__numerical_count = 0
                     elif style[0] == "romanupper":
@@ -76,9 +67,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                     else:
                         pass
                     old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
-                    logger.warning(f"[FORKED] Old section number of {ref}: {old_secnumber}")
                     new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
-                    logger.warning(f"[FORKED] New section number of {ref}: {new_secnumber}")
                     env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
                     if ref in env.tocs:
                         self.__replace_toc(env, ref, env.tocs[ref],style)
@@ -90,18 +79,12 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         new_secnumber = new_secnumber[0]
                     self.__map_old_to_new[old_secnumber] = new_secnumber
 
-        logger.warning(f"[FORKED] Final map:\n{self.__map_old_to_new}")
         # Now, replace the section numbers in env.toc_secnumbers
         for docname in env.toc_secnumbers:
-            logger.warning(f"[FORKED] Old section numbers in {docname}: {env.toc_secnumbers[docname]}")
             for anchorname, secnumber in env.toc_secnumbers[docname].items():
-                logger.warning(f"[FORKED] Old secnumber: {secnumber}")
                 first_number = secnumber[0]
                 secnumber = (self.__map_old_to_new.get(first_number, first_number), *secnumber[1:])
-                logger.warning(f"[FORKED] New secnumber: {secnumber}")
                 env.toc_secnumbers[docname][anchorname] = copy.deepcopy(secnumber)
-            logger.warning(f"[FORKED] New section numbers in {docname}: {env.toc_secnumbers[docname]}")
-
 
         return result
 
@@ -113,7 +96,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             style_set = [style_set]  # if not multiple styles are given, convert to list
         # for each style, convert the corresponding number, where only the first number 
         # is rebased, the rest are kept as is, but converted.
-        logger.warning(f"[FORKED] Renumbering {number_set} with styles {style_set}")
         # convert the first number to the new style
         if style_set[0] == "numerical":
             number_set[0] = self.__numerical_count
@@ -128,9 +110,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         else:
             pass
         # convert the rest of the numbers to the corresponding styles
-        logger.warning(f"[FORKED] Renumbering {min(len(number_set), len(style_set))-1} secondary levels")
         for i in range(1, min(len(number_set), len(style_set))):
-            logger.warning(f"[FORKED] Renumbering level {i}: {number_set[i]} with style {style_set[i]}")
             if style_set[i] == "numerical" and isinstance(number_set[i], int):
                 continue  # keep as is
             if isinstance(number_set[i], str):
@@ -187,20 +167,16 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             env.toc_secnumbers[ref][node["anchorname"]] = fixed_number
 
         elif isinstance(node, sphinxnodes.toctree):
-            logger.warning(f"[FORKED] Found nested toctree in {ref}:\n{node.pformat()}")
             self.__fix_nested_toc(env, node, style)
 
         else:
             for child in node.children:
-                logger.warning(f"[FORKED] Recursing into child of {type(node)}")
                 self.__replace_toc(env, ref, child,style)
 
     def __fix_nested_toc(self, env, toctree, style):
         for _, ref in toctree["entries"]:
             old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
-            logger.warning(f"[FORKED-NESTED] Old section number of {ref}: {old_secnumber}")
             new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
-            logger.warning(f"[FORKED-NESTED] New section number of {ref}: {new_secnumber}")
             env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
             if ref in env.tocs:
                 self.__replace_toc(env, ref, env.tocs[ref],style)
