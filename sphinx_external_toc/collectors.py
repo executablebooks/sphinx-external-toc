@@ -24,6 +24,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         logger.warning("[FORKED] Enabling new TocTreeCollectorWithStyles")
         super().__init__(*args, **kwargs)
 
+        self.__romanupper_count = 0
+        self.__romanlower_count = 0
+
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
         logger.warning("[FORKED] Calling original TocTreeCollector.assign_section_numbers")
@@ -53,11 +56,12 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         if not isinstance(style, str):
             style = style[0]  # if multiple styles are given, use only the first one, the other are used in another method
         # only convert the first number to the new style
-        first = number[0]
         if style == "romanupper":
-            number[0] = self.__to_roman(first).upper()
+            self.__romanupper_count += 1
+            number[0] = self.__to_roman(self.__romanupper_count).upper()
         elif style == "romanlower":
-            number[0] = self.__to_roman(first).lower()
+            self.__romanlower_count += 1
+            number[0] = self.__to_roman(self.__romanlower_count).lower()
         else:
             pass
 
