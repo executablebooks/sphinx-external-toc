@@ -8,8 +8,8 @@
 > [!NOTE]
 > Currently, this is a *forked* version of `sphinx-external-toc` that implements:
 >
-> - Section numbering styles (e.g. numerical, roman (upper/lower), alphabetic (upper/lower)) per any level in the ToC.
-> - The option to restart the upper level section numbering for each subtree for the selected numbering style.
+> - Section numbering styles (e.g. numerical, roman (upper/lower), alphabetic (upper/lower)) per any level in the ToC by providing a new option `style` per subtree.
+> - The option to restart the upper level section numbering for each subtree for the selected numbering style by providing a new option `restart_numbering` per subtree.
 > - Automatic inclusion of `sphinx-multitoc-numbering` as the other features depend on continuous section numbering across multiple toctrees. This means that `use_multitoc_numbering: false` in `conf.py` will be ignored in JupyterBooks.
 
 A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
@@ -120,8 +120,8 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
   By default it is appended to the end of the document, but see also the `tableofcontents` directive for positioning of the ToC.
 - `maxdepth` (integer): A maximum nesting depth to use when showing the ToC within the document (default -1, meaning infinite).
 - `numbered` (boolean or integer): Automatically add numbers to all documents within a subtree (default `False`).
-  If set to `True`, all sub-trees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
-  or if set to an integer then the numbering will only be applied to that depth.
+  If set to `True`, all subtrees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
+  or if set to an integer then the numbering will only be applied until that depth. Warning: This can lead to unexpected results if not carefully managed, for example references created using `numref` may fail. Internally this options is always converted to an integer, with `True` -> `999` (effectively unlimited depth) and `False` -> `0` (no numbering).
 - `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order (default `False`).
   This can be useful when using `glob` entries.
 - `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level (default `False`).
@@ -138,7 +138,7 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
   - `romanupper`: I, II, III, IV, V, ...
   - `alphalower`: a, b, c, d, e, ..., aa, ab, ...
   - `alphaupper`: A, B, C, D, E, ..., AA, AB, ...
-- `restart_numbering` (boolean): If `True`, the section numbering for the top level of this subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style) (default `False`).
+- `restart_numbering` (boolean): If `True`, the numbering for the top level of this subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style) (default `False`).
 
 These options can be set at the level of the subtree:
 
@@ -442,13 +442,13 @@ meta: {}
 
 Questions / TODOs:
 
-- Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`
+- ~~Add additional top-level keys, e.g. `appendices` (see https://github.com/sphinx-doc/sphinx/issues/2502) and `bibliography`.~~ Can be replaced by setting the numbering style and (possibly) restarting the numbering.
 - Using `external_toc_exclude_missing` to exclude a certain file suffix:
   currently if you had files `doc.md` and `doc.rst`, and put `doc.md` in your ToC,
   it will add `doc.rst` to the excluded patterns but then, when looking for `doc.md`,
   will still select `doc.rst` (since it is first in `source_suffix`).
   Maybe open an issue on sphinx, that `doc2path` should respect exclude patterns.
-- Integrate https://github.com/executablebooks/sphinx-multitoc-numbering into this extension? (or upstream PR)
+- ~~Integrate https://github.com/executablebooks/sphinx-multitoc-numbering into this extension? (or upstream PR).~~ Included and enforced in this fork.
 - document suppressing warnings
 - test against orphan file
 - https://github.com/executablebooks/sphinx-book-theme/pull/304

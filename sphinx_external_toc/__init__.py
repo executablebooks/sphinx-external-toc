@@ -1,8 +1,5 @@
 """A sphinx extension that allows the project toctree to be defined in a single file."""
 
-__version__ = "1.0.1"
-
-
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -43,4 +40,4 @@ def setup(app: "Sphinx") -> dict:
     app.add_transform(InsertToctrees)
     app.connect("build-finished", ensure_index_file)
 
-    return {"version": __version__, "parallel_read_safe": True}
+    return {"parallel_read_safe": True}

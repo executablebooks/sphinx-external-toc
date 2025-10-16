@@ -83,6 +83,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         # Now, replace the section numbers in env.toc_secnumbers
         for docname in env.toc_secnumbers:
             for anchorname, secnumber in env.toc_secnumbers[docname].items():
+                if not secnumber:
+                    continue
                 first_number = secnumber[0]
                 secnumber = (self.__map_old_to_new.get(first_number, first_number), *secnumber[1:])
                 env.toc_secnumbers[docname][anchorname] = copy.deepcopy(secnumber)
@@ -176,7 +178,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
     def __fix_nested_toc(self, env, toctree, style):
         for _, ref in toctree["entries"]:
-            old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
+            if "secnumber" not in env.titles[ref]:
+                continue
             new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
             env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
             if ref in env.tocs:
