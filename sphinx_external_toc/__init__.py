@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
+__version__ = "1.1.0-dev"
 
 def setup(app: "Sphinx") -> dict:
 
@@ -40,4 +41,5 @@ def setup(app: "Sphinx") -> dict:
     app.add_transform(InsertToctrees)
     app.connect("build-finished", ensure_index_file)
 
-    return {"parallel_read_safe": True}
+    return {"version": __version__, "parallel_read_safe": True}
+
