@@ -40,7 +40,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                 if not isinstance(style, list):
                     style = [style]
                 restart = toctree.get("restart_numbering", None)
-                continuous = env.app.config.get("use_multitoc_numbering", True)
+                continuous = env.app.config.use_multitoc_numbering
                 if restart is None:
                     restart = not continuous  # set default behavior
                 if restart:
