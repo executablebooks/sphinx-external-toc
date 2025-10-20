@@ -157,15 +157,6 @@ entries:
   - file: doc2
 ```
 
-:::{warning}
-`numbered` should not generally be used as a default, since numbering cannot be changed by nested subtrees, and sphinx will log a warning.
-:::
-
-:::{note}
-By default, title numbering restarts for each subtree.
-If you want want this numbering to be continuous, check-out the [sphinx-multitoc-numbering extension](https://github.com/executablebooks/sphinx-multitoc-numbering).
-:::
-
 ## Using different key-mappings
 
 For certain use-cases, it is helpful to map the `subtrees`/`entries` keys to mirror e.g. an output [LaTeX structure](https://www.overleaf.com/learn/latex/sections_and_chapters).
