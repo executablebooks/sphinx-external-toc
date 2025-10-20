@@ -13,7 +13,7 @@
 > - Automatic inclusion of `sphinx-multitoc-numbering` as the other features depend on continuous section numbering across multiple toctrees. This means that `use_multitoc_numbering: false` in `conf.py` will be ignored in JupyterBooks.
 
 A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
-As used by default [Jupyter Book](https://jupyterbook.org) (no need to manually add this extension to the extensions in `_config.yml` in a JupyterBook)!
+As used by default by [Jupyter Book](https://jupyterbook.org) (no need to manually add this extension to the extensions in `_config.yml` in a JupyterBook)!
 
 In normal Sphinx documentation, the documentation site-map is defined *via* a bottom-up approach - adding [`toctree` directives](https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html#table-of-contents) within pages of the documentation.
 
