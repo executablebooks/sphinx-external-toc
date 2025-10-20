@@ -10,7 +10,6 @@
 >
 > - Section numbering styles (e.g. numerical, roman (upper/lower), alphabetic (upper/lower)) per any level in the ToC by providing a new option `style` per subtree.
 > - The option to restart the upper level section numbering for each subtree for the selected numbering style by providing a new option `restart_numbering` per subtree.
-> - Automatic inclusion of `sphinx-multitoc-numbering` as the other features depend on continuous section numbering across multiple toctrees. This means that `use_multitoc_numbering: false` in `conf.py` will be ignored in JupyterBooks.
 
 A sphinx extension that allows the documentation site-map (a.k.a Table of Contents) to be defined external to the documentation files.
 As used by default by [Jupyter Book](https://jupyterbook.org) (no need to manually add this extension to the extensions in `_config.yml` in a JupyterBook)!
@@ -31,6 +30,7 @@ Add to your `conf.py`:
 
 ```python
 extensions = ["sphinx_external_toc"]
+use_multitoc_numbering = True  # optional, default: True
 external_toc_path = "_toc.yml"  # optional, default: _toc.yml
 external_toc_exclude_missing = False  # optional, default: False
 ```
@@ -42,6 +42,7 @@ Note the `external_toc_path` is always read as a Unix path, and can either be sp
 This extension is included in your jupyterbook configuration by default, so there's need to add it to the list of extensions. The other options can still be added:
 
 ```yaml
+use_multitoc_numbering: true  # optional, default: true
 external_toc_path: "_toc.yml"  # optional, default: _toc.yml
 external_toc_exclude_missing: False  # optional, default: False
 ```
@@ -149,7 +150,9 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
   - `romanupper`: I, II, III, IV, V, ...
   - `alphalower`: a, b, c, d, e, ..., aa, ab, ...
   - `alphaupper`: A, B, C, D, E, ..., AA, AB, ...
-- `restart_numbering` (boolean): If `True`, the numbering for the top level of this subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style) (default `False`).
+- `restart_numbering` (boolean): If `True`, the numbering for the top level of this subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style). If `False` the numbering for the top level of this subtree will continue from the last letter/number/symbol used in a previous subtree with the same style. The default value of this option is `not use_multitoc_numbering`. This means that:
+  - if `use_multitoc_numbering` is `True` (the default), the numbering for each part will continue from the last letter/number/symbol used in a previous part with the same style, unless `restart_numbering` is explicitly set to `True`.
+  - if `use_multitoc_numbering` is `False`, the numbering of each subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style), unless `restart_numbering` is explicitly set to `False`.
 
 These options can be set at the level of the subtree:
 

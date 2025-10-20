@@ -69,8 +69,9 @@ class TocTree:
         validator=validate_style
     )
     # add extra field for restarting numbering for the set style
-    restart_numbering: bool = field(
-        default=False, kw_only=True, validator=instance_of(bool)
+    # Only allow True, False or None. None is the default value.
+    restart_numbering: Optional[bool] = field(
+        default=None, kw_only=True, validator=optional(instance_of(bool))
     )
 
     def __post_init__(self):
