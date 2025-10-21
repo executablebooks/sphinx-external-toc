@@ -1,7 +1,6 @@
 import copy
 from sphinx.environment.collectors.toctree import TocTreeCollector
 import gc
-from sphinx.util import logging
 from sphinx import addnodes as sphinxnodes
 from docutils import nodes
 
@@ -40,7 +39,10 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                 style = toctree.get("style", "numerical")
                 if not isinstance(style, list):
                     style = [style]
-                restart = toctree.get("restart_numbering", False)
+                restart = toctree.get("restart_numbering", None)
+                continuous = env.app.config.use_multitoc_numbering
+                if restart is None:
+                    restart = not continuous  # set default behavior
                 if restart:
                     if style[0] == "numerical":
                         self.__numerical_count = 0
