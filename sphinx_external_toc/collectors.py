@@ -37,9 +37,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         # Processing styles
         for docname in env.numbered_toctrees:
             doctree = env.get_doctree(docname)
-            count = 0
             for toctree in doctree.findall(sphinxnodes.toctree):
-                count += 1
                 style = toctree.get("style", "numerical")
                 if not isinstance(style, list):
                     style = [style]
@@ -73,7 +71,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                             self.__alphalower_count += 1
                         else:
                             pass
-                        old_secnumber = copy.deepcopy(env.titles[ref]["secnumber"])
                         new_secnumber = self.__renumber(env.titles[ref]["secnumber"],style)
                         env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
                         if ref in env.tocs:
