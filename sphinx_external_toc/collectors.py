@@ -25,10 +25,7 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         self.__romanupper_count = 0
         self.__romanlower_count = 0
         self.__alphaupper_count = 0
-        self.__alphalower_count = 0
-        self.__map_old_to_new = {}
-
-        
+        self.__alphalower_count = 0       
 
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
@@ -81,13 +78,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
                         if ref in env.tocs:
                             self.__replace_toc(env, ref, env.tocs[ref],style)
-
-                        # STORE IN THE MAP
-                        if isinstance(old_secnumber, list):
-                            old_secnumber = old_secnumber[0]
-                        if isinstance(new_secnumber, list):
-                            new_secnumber = new_secnumber[0]
-                        self.__map_old_to_new[old_secnumber] = new_secnumber
 
         # Extract old and new section numbers for mapping and store in toc_secnumbers
         for doc, title in env.titles_old.items():
@@ -142,7 +132,6 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                 env.toc_secnumbers[doc][anchor] = copy.deepcopy(update_secnumber)
 
         # Now, convert all secnumbers in toc_secnumbers to tuples to avoid issues with other steps in the algorithm
-        env.toc_secnumbers_old = copy.deepcopy(env.toc_secnumbers)
         for docname in env.toc_secnumbers:
             for anchorname, secnumber in env.toc_secnumbers[docname].items():
                 if not secnumber:
