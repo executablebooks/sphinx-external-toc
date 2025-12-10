@@ -28,14 +28,21 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         self.__alphalower_count = 0
         self.__map_old_to_new = {}
 
+        
+
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
-        result = super().assign_section_numbers(env) # only needed to maintain functionality
+        result = super().assign_section_numbers(env) # needed to maintain functionality
+        
+        # store current titles for mapping
+        env.titles_old = copy.deepcopy(env.titles)
 
         # Processing styles
         for docname in env.numbered_toctrees:
             doctree = env.get_doctree(docname)
+            count = 0
             for toctree in doctree.findall(sphinxnodes.toctree):
+                count += 1
                 style = toctree.get("style", "numerical")
                 if not isinstance(style, list):
                     style = [style]
@@ -82,15 +89,66 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                             new_secnumber = new_secnumber[0]
                         self.__map_old_to_new[old_secnumber] = new_secnumber
 
-        # Now, replace the section numbers in env.toc_secnumbers
+        # Extract old and new section numbers for mapping and store in toc_secnumbers
+        for doc, title in env.titles_old.items():
+            old_secnumber = title.get("secnumber", None)
+            new_secnumber = env.titles[doc].get("secnumber", None)
+            renumber_depth = len(new_secnumber) if new_secnumber else 0
+            if old_secnumber == new_secnumber:
+                continue  # skip unchanged
+            # get sec_numbers for this doc
+            doc_secnumbers = env.toc_secnumbers.get(doc, {})
+            if doc_secnumbers:
+                for anchor, secnumber in doc_secnumbers.items():
+                    if secnumber is None:
+                        continue # no number, so skip
+                    if secnumber[:renumber_depth] == new_secnumber:
+                        continue  # skip already updated
+                    if len(secnumber) == renumber_depth:
+                        # same length, so probably same numbering depth, so compare one level up
+                        if secnumber[:-1] == new_secnumber[:-1]:
+                            continue # skip already updated
+                    # if this point is reached for any anchor, we need to update this anchors secnumber
+                    # to the new secnumber for the overlapping part
+                    update_secnumber = list(secnumber)  # make a copy
+                    for i in range(renumber_depth):
+                        if secnumber[i] == old_secnumber[i]: # only if the old matches the current
+                            update_secnumber[i] = new_secnumber[i]
+                    env.toc_secnumbers[doc][anchor] = copy.deepcopy(update_secnumber)
+
+        # now iterate over env.toc_secnumbers to ensure all secnumbers are updated
+        # at the same time
+        for docname in env.toc_secnumbers:
+            # get the new and old secnumbers for this docname
+            old_secnumber = env.titles_old.get(docname, {}).get("secnumber", None)
+            new_secnumber = env.titles[docname].get("secnumber", None)
+            renumber_depth = len(new_secnumber) if new_secnumber else 0
+            # iterate over all anchors in this docname
+            for anchorname, secnumber in env.toc_secnumbers[docname].items():
+                if secnumber is None:
+                    continue # no number, so skip
+                if secnumber[:renumber_depth] == new_secnumber:
+                    continue  # skip already updated
+                if len(secnumber) == renumber_depth:
+                    # same length, so probably same numbering depth, so compare one level up
+                    if secnumber[:-1] == new_secnumber[:-1]:
+                        continue # skip already updated
+                # if this point is reached for any anchor, we need to update this anchors secnumber
+                # to the new secnumber for the overlapping part
+                update_secnumber = list(secnumber)  # make a copy
+                for i in range(renumber_depth):
+                    if secnumber[i] == old_secnumber[i]: # only if the old matches the current
+                        update_secnumber[i] = new_secnumber[i]
+                env.toc_secnumbers[doc][anchor] = copy.deepcopy(update_secnumber)
+
+        # Now, convert all secnumbers in toc_secnumbers to tuples to avoid issues with other steps in the algorithm
+        env.toc_secnumbers_old = copy.deepcopy(env.toc_secnumbers)
         for docname in env.toc_secnumbers:
             for anchorname, secnumber in env.toc_secnumbers[docname].items():
                 if not secnumber:
                     continue
-                first_number = secnumber[0]
-                secnumber = (self.__map_old_to_new.get(first_number, first_number), *secnumber[1:])
+                secnumber = (*secnumber,)  # convert to tuple
                 env.toc_secnumbers[docname][anchorname] = copy.deepcopy(secnumber)
-
         return result
 
     def __renumber(self, number_set,style_set):
