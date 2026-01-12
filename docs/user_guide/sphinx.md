@@ -6,6 +6,7 @@ Add to your `conf.py`:
 
 ```python
 extensions = ["sphinx_external_toc"]
+use_multitoc_numbering = True  # optional, default: True
 external_toc_path = "_toc.yml"  # optional, default: _toc.yml
 external_toc_exclude_missing = False  # optional, default: False
 ```
@@ -95,11 +96,27 @@ Each subtree can be configured with a number of options (see also [sphinx `toctr
   By default it is appended to the end of the document, but see also the `tableofcontents` directive for positioning of the ToC.
 - `maxdepth` (integer): A maximum nesting depth to use when showing the ToC within the document (default -1, meaning infinite).
 - `numbered` (boolean or integer): Automatically add numbers to all documents within a subtree (default `False`).
-  If set to `True`, all sub-trees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
+  If set to `True`, all subtrees will also be numbered based on nesting (e.g. with `1.1` or `1.1.1`),
   or if set to an integer then the numbering will only be applied to that depth.
 - `reversed` (boolean): If `True` then the entries in the subtree will be listed in reverse order (default `False`).
   This can be useful when using `glob` entries.
 - `titlesonly` (boolean): If `True` then only the first heading in the document will be shown in the ToC, not other headings of the same level (default `False`).
+- `style` (string or list of strings): The section numbering style to use for this subtree (default `numerical`).
+  If a single string is given, this will be used for the top level of the subtree.
+  If a list of strings is given, then each entry will be used for the corresponding level of section numbering.
+  If styles are not given for all levels, then the remaining levels will be `numerical`.
+  If too many styles are given, the extra ones will be ignored.
+  The first time a style is used at the top level in a subtree, the numbering will start from 1, 'a', 'A', 'I' or 'i' depending on the style.
+  Subsequent times the same style is used at the top level in a subtree, the numbering will continue from the last number used for that style, unless `restart_numbering` is set to `True`.
+  Available styles:
+  - `numerical`: 1, 2, 3, ...
+  - `romanlower`: i, ii, iii, iv, v, ...
+  - `romanupper`: I, II, III, IV, V, ...
+  - `alphalower`: a, b, c, d, e, ..., aa, ab, ...
+  - `alphaupper`: A, B, C, D, E, ..., AA, AB, ...
+- `restart_numbering` (boolean): If `True`, the numbering for the top level of this subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style). If `False` the numbering for the top level of this subtree will continue from the last letter/number/symbol used in a previous subtree with the same style. The default value of this option is `not use_multitoc_numbering`. This means that:
+  - if `use_multitoc_numbering` is `True` (the default), the numbering for each part will continue from the last letter/number/symbol used in a previous part with the same style, unless `restart_numbering` is explicitly set to `True`.
+  - if `use_multitoc_numbering` is `False`, the numbering of each subtree will restart from 1 (or 'a', 'A', 'I' or 'i' depending on the style), unless `restart_numbering` is explicitly set to `False`.
 
 These options can be set at the level of the subtree:
 
@@ -112,6 +129,8 @@ subtrees:
   numbered: True
   reversed: False
   titlesonly: True
+  style: [alphaupper, romanlower]
+  restart_numbering: True
   entries:
   - file: doc1
     subtrees:
@@ -131,6 +150,8 @@ options:
   numbered: True
   reversed: False
   titlesonly: True
+  style: [alphaupper, romanlower]
+  restart_numbering: True
 entries:
 - file: doc1
   options:
@@ -151,6 +172,8 @@ options:
   maxdepth: 1
   numbered: True
   reversed: False
+  style: [alphaupper, romanlower]
+  restart_numbering: True
 entries:
 - file: doc1
   entries:
