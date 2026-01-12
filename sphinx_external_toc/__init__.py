@@ -7,8 +7,8 @@ if TYPE_CHECKING:
 
 __version__ = "1.1.0-dev"
 
-def setup(app: "Sphinx") -> dict:
 
+def setup(app: "Sphinx") -> dict:
     app.setup_extension("sphinx_multitoc_numbering")
 
     """Initialize the Sphinx extension."""
@@ -21,7 +21,7 @@ def setup(app: "Sphinx") -> dict:
     )
     from .collectors import (
         disable_builtin_toctree_collector,
-        TocTreeCollectorWithStyles
+        TocTreeCollectorWithStyles,
     )
 
     # collectors
@@ -42,4 +42,3 @@ def setup(app: "Sphinx") -> dict:
     app.connect("build-finished", ensure_index_file)
 
     return {"version": __version__, "parallel_read_safe": True}
-

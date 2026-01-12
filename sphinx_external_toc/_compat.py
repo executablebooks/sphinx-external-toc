@@ -154,6 +154,8 @@ def validate_style(instance, attribute, value):
     if isinstance(value, list):
         for v in value:
             if v not in allowed:
-                raise ValueError(f"{attribute.name} must be one of {allowed}, not {v!r}")
+                raise ValueError(
+                    f"{attribute.name} must be one of {allowed}, not {v!r}"
+                )
     elif value not in allowed:
         raise ValueError(f"{attribute.name} must be one of {allowed}, not {value!r}")
