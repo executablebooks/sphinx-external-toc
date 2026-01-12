@@ -60,6 +60,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         self.__alphalower_count = 0
                 # convert the section numbers to the new style
                 for _, ref in toctree["entries"]:
+                    # Skip URLs and other refs that aren't documents
+                    if ref not in env.titles:
+                        continue
                     if "secnumber" in env.titles[ref]:
                         if style[0] == "numerical":
                             self.__numerical_count += 1
