@@ -36,7 +36,7 @@ ERROR_MESSAGES = {
     "items_in_glob.yml": "entry contains incompatible keys 'glob' and 'entries' @ '/entries/0'",
     "no_root.yml": "'root' key not found @ '/'",
     "unknown_keys_nested.yml": (
-        "Unknown keys found: {'unknown'}, allow.* " "@ '/subtrees/0/entries/1/'"
+        "Unknown keys found: {'unknown'}, allow.* @ '/subtrees/0/entries/1/'"
     ),
     "empty_subtrees.yml": "'subtrees' not a non-empty list @ '/'",
     "items_in_url.yml": "entry contains incompatible keys 'url' and 'entries' @ '/entries/0'",
