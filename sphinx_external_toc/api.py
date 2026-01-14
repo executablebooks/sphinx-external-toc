@@ -1,4 +1,5 @@
 """Defines the `SiteMap` object, for storing the parsed ToC."""
+
 from collections.abc import MutableMapping
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Iterator, List, Optional, Set, Union
@@ -36,7 +37,9 @@ class UrlItem:
 
     # regex should match sphinx.util.url_re
     url: str = field(validator=[instance_of(str), matches_re(URL_PATTERN)])
-    title: Optional[str] = field(default=None, validator=optional(instance_of(str)))
+    title: Optional[str] = field(
+        default=None, validator=optional(instance_of(str))
+    )
 
     def __post_init__(self):
         validate_fields(self)
@@ -55,13 +58,19 @@ class TocTree:
     caption: Optional[str] = field(
         default=None, kw_only=True, validator=optional(instance_of(str))
     )
-    hidden: bool = field(default=True, kw_only=True, validator=instance_of(bool))
+    hidden: bool = field(
+        default=True, kw_only=True, validator=instance_of(bool)
+    )
     maxdepth: int = field(default=-1, kw_only=True, validator=instance_of(int))
     numbered: Union[bool, int] = field(
         default=False, kw_only=True, validator=instance_of((bool, int))
     )
-    reversed: bool = field(default=False, kw_only=True, validator=instance_of(bool))
-    titlesonly: bool = field(default=False, kw_only=True, validator=instance_of(bool))
+    reversed: bool = field(
+        default=False, kw_only=True, validator=instance_of(bool)
+    )
+    titlesonly: bool = field(
+        default=False, kw_only=True, validator=instance_of(bool)
+    )
     # Add extra field for style of toctree rendering
     style: Union[List[str], str] = field(
         default="numerical", kw_only=True, validator=validate_style
@@ -100,7 +109,9 @@ class Document:
         default_factory=list,
         validator=deep_iterable(instance_of(TocTree), instance_of(list)),
     )
-    title: Optional[str] = field(default=None, validator=optional(instance_of(str)))
+    title: Optional[str] = field(
+        default=None, validator=optional(instance_of(str))
+    )
 
     def __post_init__(self):
         validate_fields(self)
@@ -166,7 +177,9 @@ class SiteMap(MutableMapping):
 
     def globs(self) -> Set[str]:
         """Return set of all globs present across all toctrees."""
-        return {glob for item in self._docs.values() for glob in item.child_globs()}
+        return {
+            glob for item in self._docs.values() for glob in item.child_globs()
+        }
 
     def __getitem__(self, docname: str) -> Document:
         """Enable retrieving a document by name using the indexing operator.
@@ -223,9 +236,11 @@ class SiteMap(MutableMapping):
                     d[k] = _replace_items(v)
                 elif isinstance(v, (list, tuple)):
                     d[k] = [
-                        _replace_items(i)
-                        if isinstance(i, dict)
-                        else (str(i) if isinstance(i, str) else i)
+                        (
+                            _replace_items(i)
+                            if isinstance(i, dict)
+                            else (str(i) if isinstance(i, str) else i)
+                        )
                         for i in v
                     ]
                 elif isinstance(v, str):

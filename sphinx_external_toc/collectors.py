@@ -1,8 +1,9 @@
 import copy
-from sphinx.environment.collectors.toctree import TocTreeCollector
 import gc
-from sphinx import addnodes as sphinxnodes
+
 from docutils import nodes
+from sphinx import addnodes as sphinxnodes
+from sphinx.environment.collectors.toctree import TocTreeCollector
 
 
 def disable_builtin_toctree_collector(app):
@@ -31,7 +32,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
     def assign_section_numbers(self, env):
         # First, call the original assign_section_numbers to get the default behavior
-        result = super().assign_section_numbers(env)  # needed to maintain functionality
+        result = super().assign_section_numbers(
+            env
+        )  # needed to maintain functionality
 
         # store current titles for mapping
         env.titles_old = copy.deepcopy(env.titles)
@@ -79,7 +82,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         new_secnumber = self.__renumber(
                             env.titles[ref]["secnumber"], style
                         )
-                        env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
+                        env.titles[ref]["secnumber"] = copy.deepcopy(
+                            new_secnumber
+                        )
                         if ref in env.tocs:
                             self.__replace_toc(env, ref, env.tocs[ref], style)
 
@@ -102,7 +107,8 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         # same length, so probably same numbering depth, so compare one level up
                         if secnumber[:-1] == new_secnumber[:-1]:
                             continue  # skip already updated
-                    # if this point is reached for any anchor, we need to update this anchors secnumber
+                    # if this point is reached for any anchor,
+                    # we need to update this anchors secnumber
                     # to the new secnumber for the overlapping part
                     update_secnumber = list(secnumber)  # make a copy
                     for i in range(renumber_depth):
@@ -110,13 +116,17 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                             secnumber[i] == old_secnumber[i]
                         ):  # only if the old matches the current
                             update_secnumber[i] = new_secnumber[i]
-                    env.toc_secnumbers[doc][anchor] = copy.deepcopy(update_secnumber)
+                    env.toc_secnumbers[doc][anchor] = copy.deepcopy(
+                        update_secnumber
+                    )
 
         # now iterate over env.toc_secnumbers to ensure all secnumbers are updated
         # at the same time
         for docname in env.toc_secnumbers:
             # get the new and old secnumbers for this docname
-            old_secnumber = env.titles_old.get(docname, {}).get("secnumber", None)
+            old_secnumber = env.titles_old.get(docname, {}).get(
+                "secnumber", None
+            )
             new_secnumber = env.titles[docname].get("secnumber", None)
             renumber_depth = len(new_secnumber) if new_secnumber else 0
             # iterate over all anchors in this docname
@@ -137,15 +147,20 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
                         secnumber[i] == old_secnumber[i]
                     ):  # only if the old matches the current
                         update_secnumber[i] = new_secnumber[i]
-                env.toc_secnumbers[doc][anchor] = copy.deepcopy(update_secnumber)
+                env.toc_secnumbers[doc][anchor] = copy.deepcopy(
+                    update_secnumber
+                )
 
-        # Now, convert all secnumbers in toc_secnumbers to tuples to avoid issues with other steps in the algorithm
+        # Now, convert all secnumbers in toc_secnumbers to tuples
+        # to avoid issues with other steps in the algorithm
         for docname in env.toc_secnumbers:
             for anchorname, secnumber in env.toc_secnumbers[docname].items():
                 if not secnumber:
                     continue
                 secnumber = (*secnumber,)  # convert to tuple
-                env.toc_secnumbers[docname][anchorname] = copy.deepcopy(secnumber)
+                env.toc_secnumbers[docname][anchorname] = copy.deepcopy(
+                    secnumber
+                )
         return result
 
     def __renumber(self, number_set, style_set):
@@ -153,7 +168,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
             return number_set
 
         if not isinstance(style_set, list):
-            style_set = [style_set]  # if not multiple styles are given, convert to list
+            style_set = [
+                style_set
+            ]  # if not multiple styles are given, convert to list
         # for each style, convert the corresponding number, where only the first number
         # is rebased, the rest are kept as is, but converted.
         # convert the first number to the new style
@@ -191,7 +208,21 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
     def __to_roman(self, n):
         """Convert an integer to a Roman numeral."""
         val = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1]
-        syms = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"]
+        syms = [
+            "M",
+            "CM",
+            "D",
+            "CD",
+            "C",
+            "XC",
+            "L",
+            "XL",
+            "X",
+            "IX",
+            "V",
+            "IV",
+            "I",
+        ]
         roman_num = ""
         i = 0
         while n > 0:
@@ -227,7 +258,9 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
         for _, ref in toctree["entries"]:
             if "secnumber" not in env.titles[ref]:
                 continue
-            new_secnumber = self.__renumber(env.titles[ref]["secnumber"], style)
+            new_secnumber = self.__renumber(
+                env.titles[ref]["secnumber"], style
+            )
             env.titles[ref]["secnumber"] = copy.deepcopy(new_secnumber)
             if ref in env.tocs:
                 self.__replace_toc(env, ref, env.tocs[ref], style)

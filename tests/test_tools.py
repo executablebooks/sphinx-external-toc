@@ -21,7 +21,9 @@ JB_TOC_FILES = list(
 def test_file_to_sitemap(path: Path, tmp_path: Path, data_regression):
     site_path = tmp_path.joinpath("site")
     create_site_from_toc(path, root_path=site_path)
-    file_list = [p.relative_to(site_path).as_posix() for p in site_path.glob("**/*")]
+    file_list = [
+        p.relative_to(site_path).as_posix() for p in site_path.glob("**/*")
+    ]
     data_regression.check(sorted(file_list))
 
 
@@ -53,7 +55,9 @@ def test_create_site_map_from_path(tmp_path: Path, data_regression):
 
 
 @pytest.mark.parametrize(
-    "path", JB_TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in JB_TOC_FILES]
+    "path",
+    JB_TOC_FILES,
+    ids=[path.name.rsplit(".", 1)[0] for path in JB_TOC_FILES],
 )
 def test_migrate_jb(path, data_regression):
     toc = migrate_jupyter_book(Path(path))

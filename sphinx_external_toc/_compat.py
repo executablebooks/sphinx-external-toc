@@ -1,4 +1,5 @@
 """Compatibility for using dataclasses instead of attrs."""
+
 from __future__ import annotations
 
 import dataclasses as dc
@@ -18,7 +19,9 @@ def field(**kwargs: Any):
     if sys.version_info < (3, 10):
         kwargs.pop("kw_only", None)
     if "validator" in kwargs:
-        kwargs.setdefault("metadata", {})["validator"] = kwargs.pop("validator")
+        kwargs.setdefault("metadata", {})["validator"] = kwargs.pop(
+            "validator"
+        )
     return dc.field(**kwargs)
 
 
@@ -92,7 +95,9 @@ def matches_re(regex: str | Pattern, flags: int = 0) -> ValidatorType:
     if fullmatch:
         match_func = pattern.fullmatch
     else:  # Python 2 fullmatch emulation (https://bugs.python.org/issue16203)
-        pattern = re.compile(r"(?:{})\Z".format(pattern.pattern), pattern.flags)
+        pattern = re.compile(
+            r"(?:{})\Z".format(pattern.pattern), pattern.flags
+        )
         match_func = pattern.match
 
     def _validator(inst, attr, value):
@@ -121,7 +126,8 @@ def optional(validator: ValidatorType) -> ValidatorType:
 
 
 def deep_iterable(
-    member_validator: ValidatorType, iterable_validator: ValidatorType | None = None
+    member_validator: ValidatorType,
+    iterable_validator: ValidatorType | None = None,
 ) -> ValidatorType:
     """
     A validator that performs deep validation of an iterable.
@@ -150,7 +156,13 @@ def findall(node: Element):
 
 
 def validate_style(instance, attribute, value):
-    allowed = ["numerical", "romanupper", "romanlower", "alphaupper", "alphalower"]
+    allowed = [
+        "numerical",
+        "romanupper",
+        "romanlower",
+        "alphaupper",
+        "alphalower",
+    ]
     if isinstance(value, list):
         for v in value:
             if v not in allowed:
@@ -158,4 +170,6 @@ def validate_style(instance, attribute, value):
                     f"{attribute.name} must be one of {allowed}, not {v!r}"
                 )
     elif value not in allowed:
-        raise ValueError(f"{attribute.name} must be one of {allowed}, not {value!r}")
+        raise ValueError(
+            f"{attribute.name} must be one of {allowed}, not {value!r}"
+        )

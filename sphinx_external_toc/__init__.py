@@ -12,16 +12,16 @@ def setup(app: "Sphinx") -> dict:
     app.setup_extension("sphinx_multitoc_numbering")
 
     """Initialize the Sphinx extension."""
+    from .collectors import (
+        TocTreeCollectorWithStyles,
+        disable_builtin_toctree_collector,
+    )
     from .events import (
         InsertToctrees,
         TableofContents,
         add_changed_toctrees,
         ensure_index_file,
         parse_toc_to_env,
-    )
-    from .collectors import (
-        disable_builtin_toctree_collector,
-        TocTreeCollectorWithStyles,
     )
 
     # collectors

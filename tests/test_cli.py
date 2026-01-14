@@ -29,7 +29,9 @@ def test_version(invoke_cli):
 
 
 def test_parse_toc(invoke_cli):
-    path = os.path.abspath(Path(__file__).parent.joinpath("_toc_files", "basic.yml"))
+    path = os.path.abspath(
+        Path(__file__).parent.joinpath("_toc_files", "basic.yml")
+    )
     result = invoke_cli(parse_toc, [path])
     assert "intro" in result.output
 
@@ -61,7 +63,9 @@ def test_create_toc(tmp_path, invoke_cli, file_regression):
 
 def test_migrate_toc(invoke_cli):
     path = os.path.abspath(
-        Path(__file__).parent.joinpath("_jb_migrate_toc_files", "simple_list.yml")
+        Path(__file__).parent.joinpath(
+            "_jb_migrate_toc_files", "simple_list.yml"
+        )
     )
     result = invoke_cli(migrate_toc, [path])
     assert "root: index" in result.output

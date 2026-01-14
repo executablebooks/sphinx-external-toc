@@ -1,4 +1,5 @@
 """Sphinx event functions and directives."""
+
 import glob
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Set
@@ -39,7 +40,9 @@ def create_warning(
     message = f"{message} [{wtype}.{category}]"
     kwargs = {"line": line} if line is not None else {}
 
-    if not logging.is_suppressed_warning(wtype, category, app.config.suppress_warnings):
+    if not logging.is_suppressed_warning(
+        wtype, category, app.config.suppress_warnings
+    ):
         msg_node = doctree.reporter.warning(message, **kwargs)
         if append_to is not None:
             append_to.append(msg_node)
@@ -67,9 +70,13 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
     else:
         path = Path(str(external_toc_path))
     if not path.exists():
-        raise ExtensionError(f"[etoc] `external_toc_path` does not exist: {path}")
+        raise ExtensionError(
+            f"[etoc] `external_toc_path` does not exist: {path}"
+        )
     if not path.is_file():
-        raise ExtensionError(f"[etoc] `external_toc_path` is not a file: {path}")
+        raise ExtensionError(
+            f"[etoc] `external_toc_path` is not a file: {path}"
+        )
     try:
         site_map = parse_toc_yaml(path)
     except Exception as exc:
@@ -110,16 +117,24 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
                         for i in range(len(components))
                     )
                     # don't exclude docnames matching globs
-                    or any(patmatch(posix_no_suffix, pat) for pat in site_map.globs())
+                    or any(
+                        patmatch(posix_no_suffix, pat)
+                        for pat in site_map.globs()
+                    )
                 ):
                     new_excluded.append(posix)
         if new_excluded:
             logger.info(
-                "[etoc] Excluded %s extra file(s) not in toc", len(new_excluded)
+                "[etoc] Excluded %s extra file(s) not in toc",
+                len(new_excluded),
             )
-            logger.debug("[etoc] Excluded extra file(s) not in toc: %r", new_excluded)
+            logger.debug(
+                "[etoc] Excluded extra file(s) not in toc: %r", new_excluded
+            )
             # Note, don't `extend` list, as it alters the default `Config.config_values`
-            config["exclude_patterns"] = config["exclude_patterns"] + new_excluded
+            config["exclude_patterns"] = (
+                config["exclude_patterns"] + new_excluded
+            )
 
 
 def add_changed_toctrees(
@@ -138,7 +153,9 @@ def add_changed_toctrees(
     if not previous_map:
         return set()
     filenames = site_map.get_changed(previous_map)
-    return {remove_suffix(name, app.config.source_suffix) for name in filenames}
+    return {
+        remove_suffix(name, app.config.source_suffix) for name in filenames
+    }
 
 
 class TableOfContentsNode(nodes.Element):
@@ -231,7 +248,9 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         # TODO this wasn't in the original code,
         # but alabaster theme intermittently raised `KeyError('rawcaption')`
         subnode["rawcaption"] = toctree.caption or ""
-        subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.items)
+        subnode["glob"] = any(
+            isinstance(entry, GlobItem) for entry in toctree.items
+        )
         subnode["hidden"] = False if toc_placeholders else toctree.hidden
         subnode["includehidden"] = False
         subnode["numbered"] = (
@@ -262,7 +281,9 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
                     else:
                         message = f"toctree contains reference to nonexisting document {docname!r}"
 
-                    create_warning(app, doctree, "ref", message, append_to=node_list)
+                    create_warning(
+                        app, doctree, "ref", message, append_to=node_list
+                    )
                     app.env.note_reread()
                 else:
                     subnode["entries"].append((title, docname))
@@ -276,10 +297,10 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
                     subnode["entries"].append((None, docname))
                     subnode["includefiles"].append(docname)
                 if not docnames:
-                    message = (
-                        f"toctree glob pattern '{entry}' didn't match any documents"
+                    message = f"toctree glob pattern '{entry}' didn't match any documents"
+                    create_warning(
+                        app, doctree, "glob", message, append_to=node_list
                     )
-                    create_warning(app, doctree, "glob", message, append_to=node_list)
 
         # reversing entries can be useful when globbing
         if toctree.reversed:
@@ -337,6 +358,10 @@ def ensure_index_file(app: Sphinx, exception: Optional[Exception]) -> None:
         # Assume a single index for all non dir-HTML builders
         redirect_url = f"{root_name}.html"
 
-    redirect_text = f'<meta http-equiv="Refresh" content="0; url={redirect_url}" />\n'
+    redirect_text = (
+        f'<meta http-equiv="Refresh" content="0; url={redirect_url}" />\n'
+    )
     index_path.write_text(redirect_text, encoding="utf8")
-    logger.info("[etoc] missing index.html written as redirect to '%s.html'", root_name)
+    logger.info(
+        "[etoc] missing index.html written as redirect to '%s.html'", root_name
+    )

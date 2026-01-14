@@ -65,7 +65,9 @@ def sphinx_build_factory(make_app):
 @pytest.mark.parametrize(
     "path", TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES]
 )
-def test_success(path: Path, tmp_path: Path, sphinx_build_factory, file_regression):
+def test_success(
+    path: Path, tmp_path: Path, sphinx_build_factory, file_regression
+):
     """Test successful builds."""
     src_dir = tmp_path / "srcdir"
     # write document files
@@ -87,7 +89,9 @@ def test_success(path: Path, tmp_path: Path, sphinx_build_factory, file_regressi
     if "regress" in site_map.meta:
         doctree = builder.app.env.get_doctree(site_map.meta["regress"])
         doctree["source"] = site_map.meta["regress"]
-        file_regression.check(doctree.pformat(), extension=".xml", encoding="utf8")
+        file_regression.check(
+            doctree.pformat(), extension=".xml", encoding="utf8"
+        )
 
 
 def test_gettext(tmp_path: Path, sphinx_build_factory):
@@ -109,7 +113,9 @@ external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
 
 
 @pytest.mark.parametrize(
-    "path", TOC_FILES_WARN, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES_WARN]
+    "path",
+    TOC_FILES_WARN,
+    ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES_WARN],
 )
 def test_warning(path: Path, tmp_path: Path, sphinx_build_factory):
     src_dir = tmp_path / "srcdir"
@@ -147,8 +153,12 @@ def test_file_extensions(tmp_path: Path, sphinx_build_factory):
     src_dir.mkdir(exist_ok=True)
     # write documents
     src_dir.joinpath("intro.rst").write_text("Head\n====\n", encoding="utf8")
-    src_dir.joinpath("markdown.rst").write_text("Head\n====\n", encoding="utf8")
-    src_dir.joinpath("notebooks.rst").write_text("Head\n====\n", encoding="utf8")
+    src_dir.joinpath("markdown.rst").write_text(
+        "Head\n====\n", encoding="utf8"
+    )
+    src_dir.joinpath("notebooks.rst").write_text(
+        "Head\n====\n", encoding="utf8"
+    )
     # write toc
     toc_path = tmp_path / "toc.yml"
     toc_path.write_text(
