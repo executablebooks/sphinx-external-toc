@@ -27,11 +27,7 @@ def main():
 def parse_toc(toc_file):
     """Parse a ToC file to a site-map YAML."""
     site_map = parse_toc_yaml(toc_file)
-    click.echo(
-        yaml.dump(
-            site_map.as_json(), sort_keys=False, default_flow_style=False
-        )
-    )
+    click.echo(yaml.dump(site_map.as_json(), sort_keys=False, default_flow_style=False))
 
 
 @main.command("to-project")
@@ -51,9 +47,7 @@ def parse_toc(toc_file):
     show_default=True,
     help="The default file extension to use.",
 )
-@click.option(
-    "-o", "--overwrite", is_flag=True, help="Overwrite existing files."
-)
+@click.option("-o", "--overwrite", is_flag=True, help="Overwrite existing files.")
 def create_site(toc_file, path, extension, overwrite):
     """Create a project directory from a ToC file."""
     create_site_from_toc(
@@ -107,9 +101,7 @@ def create_site(toc_file, path, extension, overwrite):
     show_default=True,
     help="The key-mappings to use.",
 )
-def create_toc(
-    site_dir, extension, index, skip_match, guess_titles, file_format
-):
+def create_toc(site_dir, extension, index, skip_match, guess_titles, file_format):
     """Create a ToC file from a project directory."""
     site_map = create_site_map_from_path(
         site_dir,
@@ -125,19 +117,11 @@ def create_toc(
                 continue
             filepath = PurePosixPath(docname)
             # use the folder name for index files
-            name = (
-                filepath.parent.name
-                if filepath.name == index
-                else filepath.name
-            )
+            name = filepath.parent.name if filepath.name == index else filepath.name
             # split into words
             words = name.split("_")
             # remove first word if is an integer
-            words = (
-                words[1:]
-                if words and all(c.isdigit() for c in words[0])
-                else words
-            )
+            words = words[1:] if words and all(c.isdigit() for c in words[0]) else words
             site_map[docname].title = " ".join(words).capitalize()
     data = create_toc_dict(site_map)
     click.echo(yaml.dump(data, sort_keys=False, default_flow_style=False))
@@ -154,9 +138,7 @@ def create_toc(
 @click.option(
     "-o",
     "--output",
-    type=click.Path(
-        allow_dash=True, exists=False, file_okay=True, dir_okay=False
-    ),
+    type=click.Path(allow_dash=True, exists=False, file_okay=True, dir_okay=False),
     help="Write to a file path.",
 )
 def migrate_toc(toc_file, format, output):

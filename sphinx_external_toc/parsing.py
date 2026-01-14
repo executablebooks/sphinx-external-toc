@@ -125,9 +125,7 @@ def parse_toc_data(data: Dict[str, Any]) -> SiteMap:
         file_format=data.get(FILE_FORMAT_KEY),
     )
 
-    _parse_docs_list(
-        docs_list, site_map, defaults, depth=1, file_format=file_format
-    )
+    _parse_docs_list(docs_list, site_map, defaults, depth=1, file_format=file_format)
 
     return site_map
 
@@ -184,16 +182,12 @@ def _parse_doc_item(
             raise MalformedError(
                 f"Both '{subtrees_key}' and '{items_key}' found @ '{path}'"
             )
-        subtrees_data = [
-            {items_key: data[items_key], **data.get("options", {})}
-        ]
+        subtrees_data = [{items_key: data[items_key], **data.get("options", {})}]
         shorthand_used = True
     elif subtrees_key in data:
         subtrees_data = data[subtrees_key]
         if not (isinstance(subtrees_data, Sequence) and subtrees_data):
-            raise MalformedError(
-                f"'{subtrees_key}' not a non-empty list @ '{path}'"
-            )
+            raise MalformedError(f"'{subtrees_key}' not a non-empty list @ '{path}'")
         path = f"{path}{subtrees_key}/"
     else:
         subtrees_data = []
@@ -212,9 +206,7 @@ def _parse_doc_item(
         items_data = toc_data[items_key]
 
         if not (isinstance(items_data, Sequence) and items_data):
-            raise MalformedError(
-                f"'{items_key}' not a non-empty list @ '{toc_path}'"
-            )
+            raise MalformedError(f"'{items_key}' not a non-empty list @ '{toc_path}'")
 
         # generate items list
         items: List[Union[GlobItem, FileItem, UrlItem]] = []
@@ -251,9 +243,7 @@ def _parse_doc_item(
                 elif link_keys == {GLOB_KEY}:
                     items.append(GlobItem(item_data[GLOB_KEY]))
                 elif link_keys == {URL_KEY}:
-                    items.append(
-                        UrlItem(item_data[URL_KEY], item_data.get("title"))
-                    )
+                    items.append(UrlItem(item_data[URL_KEY], item_data.get("title")))
             except (ValueError, TypeError) as exc:
                 exc_arg = exc.args[0] if exc.args else ""
                 raise MalformedError(
@@ -324,9 +314,7 @@ def _parse_docs_list(
     for child_path, doc_data in docs_list:
         docname = doc_data[FILE_KEY]
         if docname in site_map:
-            raise MalformedError(
-                f"document file used multiple times: '{docname}'"
-            )
+            raise MalformedError(f"document file used multiple times: '{docname}'")
         child_item, child_docs_list = _parse_doc_item(
             doc_data,
             defaults,
@@ -345,9 +333,7 @@ def _parse_docs_list(
         )
 
 
-def create_toc_dict(
-    site_map: SiteMap, *, skip_defaults: bool = True
-) -> Dict[str, Any]:
+def create_toc_dict(site_map: SiteMap, *, skip_defaults: bool = True) -> Dict[str, Any]:
     """Create the ToC dictionary from a site-map.
 
     :param site_map: site map
@@ -358,9 +344,7 @@ def create_toc_dict(
     try:
         file_format = FILE_FORMATS[site_map.file_format or "default"]
     except KeyError:
-        raise KeyError(
-            f"File format not recognised @ '{site_map.file_format}'"
-        )
+        raise KeyError(f"File format not recognised @ '{site_map.file_format}'")
     data = _docitem_to_dict(
         site_map.root,
         site_map,
@@ -408,9 +392,7 @@ def _docitem_to_dict(
     # protect against infinite recursion
     parsed_docnames = parsed_docnames or set()
     if doc_item.docname in parsed_docnames:
-        raise RecursionError(
-            f"{doc_item.docname!r} in site-map multiple times"
-        )
+        raise RecursionError(f"{doc_item.docname!r} in site-map multiple times")
     parsed_docnames.add(doc_item.docname)
 
     data: Dict[str, Any] = {}

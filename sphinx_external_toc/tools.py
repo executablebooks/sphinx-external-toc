@@ -49,13 +49,9 @@ def create_site_from_toc(
 
     # retrieve and validate meta variables
     additional_files = site_map.meta.get("create_files", [])
-    assert isinstance(
-        additional_files, Sequence
-    ), "'create_files' should be a list"
+    assert isinstance(additional_files, Sequence), "'create_files' should be a list"
     append_text = site_map.meta.get("create_append", {})
-    assert isinstance(
-        append_text, Mapping
-    ), "'create_append' should be a mapping"
+    assert isinstance(append_text, Mapping), "'create_append' should be a mapping"
 
     # copy toc file to root
     if toc_name and not root_path.joinpath(toc_name).exists():
@@ -150,9 +146,7 @@ def create_site_map_from_path(
             child_folders,
         ) = indexed_folders.pop(0)
         for child_file in child_files:
-            child_docname = (
-                (sub_path / child_file).relative_to(root_path).as_posix()
-            )
+            child_docname = (sub_path / child_file).relative_to(root_path).as_posix()
             assert child_docname not in site_map
             site_map[child_docname] = Document(child_docname)
         doc_item, new_indexed_folders = _doc_item_from_path(
@@ -198,9 +192,7 @@ def _doc_item_from_path(
         if not child_index:
             # TODO handle folders with no files, but files in sub-folders
             continue
-        indexed_folders.append(
-            (sub_folder, child_index, child_files, child_folders)
-        )
+        indexed_folders.append((sub_folder, child_index, child_files, child_folders))
         index_items.append(
             FileItem((sub_folder / child_index).relative_to(root).as_posix())
         )
@@ -257,11 +249,7 @@ def _assess_folder(
                     for path in folder.iterdir()
                     if path.is_file()
                     and any(path.name.endswith(suffix) for suffix in suffixes)
-                    and (
-                        not any(
-                            fnmatch(path.name, pat) for pat in ignore_matches
-                        )
-                    )
+                    and (not any(fnmatch(path.name, pat) for pat in ignore_matches))
                 ]
             )
         )
@@ -315,9 +303,7 @@ def migrate_jupyter_book(
                     top_items_key = key
                     items = toc_updated.pop(key)
                     if not isinstance(items, Sequence):
-                        raise MalformedError(
-                            f"First list item '{key}' is not a list"
-                        )
+                        raise MalformedError(f"First list item '{key}' is not a list")
                     first_items += items
 
             # add list items after to same level
@@ -329,13 +315,9 @@ def migrate_jupyter_book(
             )
             contains_file = any("file" in item for item in first_items)
             if contains_part and contains_file:
-                raise MalformedError(
-                    "top-level contains mixed 'part' and 'file' keys"
-                )
+                raise MalformedError("top-level contains mixed 'part' and 'file' keys")
 
-            toc_updated["parts" if contains_part else top_items_key] = (
-                first_items
-            )
+            toc_updated["parts" if contains_part else top_items_key] = first_items
 
         toc = toc_updated
     elif not isinstance(toc, dict):
@@ -370,9 +352,7 @@ def migrate_jupyter_book(
     while dicts:
         dct = dicts.pop(0)
         if "chapters" in dct and "sections" in dct:
-            raise MalformedError(
-                f"both 'chapters' and 'sections' in same dict: {dct}"
-            )
+            raise MalformedError(f"both 'chapters' and 'sections' in same dict: {dct}")
         if "parts" in dct:
             dct[DEFAULT_SUBTREES_KEY] = dct.pop("parts")
         if "sections" in dct:

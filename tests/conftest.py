@@ -30,6 +30,10 @@ class FileRegression:
         for ig in self.ignores:
             data = re.sub(ig, "", data)
         # Normalize boolean values: convert 0/1 to False/True for consistency across platforms
-        data = re.sub(r'((?:glob|hidden|includehidden|titlesonly)=")0(")', r'\1False\2', data)
-        data = re.sub(r'((?:glob|hidden|includehidden|titlesonly)=")1(")', r'\1True\2', data)
+        data = re.sub(
+            r'((?:glob|hidden|includehidden|titlesonly)=")0(")', r"\1False\2", data
+        )
+        data = re.sub(
+            r'((?:glob|hidden|includehidden|titlesonly)=")1(")', r"\1True\2", data
+        )
         return data

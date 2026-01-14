@@ -28,9 +28,7 @@ def test_create_toc_dict(path: Path, data_regression):
     data_regression.check(data)
 
 
-TOC_FILES_BAD = list(
-    Path(__file__).parent.joinpath("_bad_toc_files").glob("*.yml")
-)
+TOC_FILES_BAD = list(Path(__file__).parent.joinpath("_bad_toc_files").glob("*.yml"))
 ERROR_MESSAGES = {
     "bad_option_value.yml": "toctree validation @ '/': 'titlesonly'",
     "bad_url.yml": "entry validation @ '/entries/0': 'url' must match regex",
@@ -42,8 +40,7 @@ ERROR_MESSAGES = {
     "items_in_glob.yml": "entry contains incompatible keys 'glob' and 'entries' @ '/entries/0'",
     "no_root.yml": "'root' key not found @ '/'",
     "unknown_keys_nested.yml": (
-        "Unknown keys found: {'unknown'}, allow.* "
-        "@ '/subtrees/0/entries/1/'"
+        "Unknown keys found: {'unknown'}, allow.* @ '/subtrees/0/entries/1/'"
     ),
     "empty_subtrees.yml": "'subtrees' not a non-empty list @ '/'",
     "items_in_url.yml": "entry contains incompatible keys 'url' and 'entries' @ '/entries/0'",
