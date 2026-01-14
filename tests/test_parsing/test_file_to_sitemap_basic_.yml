@@ -18,7 +18,9 @@ documents:
         url: https://example.com
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: true
     title: null
   intro:
@@ -32,7 +34,9 @@ documents:
       - doc3
       maxdepth: -1
       numbered: true
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: true
     title: null
   subfolder/doc4:

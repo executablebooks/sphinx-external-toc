@@ -16,7 +16,9 @@ documents:
       - doc1
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     - caption: null
       hidden: true
@@ -24,7 +26,9 @@ documents:
       - doc2
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
 meta:

@@ -13,7 +13,9 @@ documents:
       - subfolder/other*
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
 meta:

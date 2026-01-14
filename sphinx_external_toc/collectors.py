@@ -256,6 +256,10 @@ class TocTreeCollectorWithStyles(TocTreeCollector):
 
     def __fix_nested_toc(self, env, toctree, style):
         for _, ref in toctree["entries"]:
+            # Only process internal document references
+            if ref not in env.titles:
+                continue
+
             if "secnumber" not in env.titles[ref]:
                 continue
             new_secnumber = self.__renumber(
