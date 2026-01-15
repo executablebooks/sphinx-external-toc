@@ -343,9 +343,9 @@ class TestTocTreeCollectorWithStyles:
         ]
         for num, expected in test_cases:
             result = collector._TocTreeCollectorWithStyles__to_roman(num)
-            assert result == expected, (
-                f"Failed for {num}: got {result}, expected {expected}"
-            )
+            assert (
+                result == expected
+            ), f"Failed for {num}: got {result}, expected {expected}"
 
     def test_to_alpha_comprehensive(self, collector):
         """Test alphabetical conversion comprehensively."""
@@ -364,9 +364,9 @@ class TestTocTreeCollectorWithStyles:
         ]
         for num, expected in test_cases:
             result = collector._TocTreeCollectorWithStyles__to_alpha(num)
-            assert result == expected, (
-                f"Failed for {num}: got {result}, expected {expected}"
-            )
+            assert (
+                result == expected
+            ), f"Failed for {num}: got {result}, expected {expected}"
 
     def test_disable_builtin_multiple_collectors(self):
         """Test disabling with multiple collectors in memory."""
