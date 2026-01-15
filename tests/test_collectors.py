@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from sphinx_external_toc.collectors import (
     TocTreeCollectorWithStyles,
     disable_builtin_toctree_collector,
@@ -200,7 +200,7 @@ class TestTocTreeCollectorWithStyles:
         with patch.object(
             TocTreeCollector, "assign_section_numbers", return_value=None
         ):
-            result = collector.assign_section_numbers(mock_env)
+            collector.assign_section_numbers(mock_env)
             assert "doc1" in mock_env.titles_old
 
     def test_assign_section_numbers_preserves_old_titles(self, collector):
@@ -428,7 +428,6 @@ class TestTocTreeCollectorWithStyles:
 
     def test_assign_section_numbers_toc_secnumbers_processing(self, collector):
         """Test that toc_secnumbers are properly processed."""
-        from docutils import nodes
         from sphinx import addnodes as sphinxnodes
 
         mock_env = Mock()
