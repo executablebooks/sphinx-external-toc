@@ -495,7 +495,6 @@ class TestCompatCoverageLinesSpecific:
 
     def test_matches_re_fullmatch_available(self):
         """Test matches_re line 96-97 - fullmatch existence check."""
-        import re
 
         # This tests the fullmatch check on line 96
         validator = _compat.matches_re(r"^test$")
@@ -642,7 +641,6 @@ class TestCompatFinal:
     def test_field_metadata_with_multiple_validators(self):
         """Test field metadata with validator."""
         v1 = _compat.instance_of(str)
-        v2 = _compat.matches_re(r"test")
 
         f = _compat.field(default="test", validator=v1)
         assert "validator" in f.metadata
