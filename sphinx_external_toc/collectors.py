@@ -1,6 +1,5 @@
-import copy
 import gc
-
+import copy
 from docutils import nodes
 from sphinx import addnodes as sphinxnodes
 from sphinx.environment.collectors.toctree import TocTreeCollector
