@@ -95,6 +95,7 @@ def test_migrate_toc_with_output_file(tmp_path, invoke_cli):
         Path(__file__).parent.joinpath("_jb_migrate_toc_files", "simple_list.yml")
     )
     output_file = tmp_path / "output.yml"
+    _ = invoke_cli(migrate_toc, [toc_file, "-o", str(output_file)])
     assert output_file.exists()
     assert "root: index" in output_file.read_text()
 
