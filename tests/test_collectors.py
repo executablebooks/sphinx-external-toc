@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, patch
 from sphinx_external_toc.collectors import (
     TocTreeCollectorWithStyles,
     disable_builtin_toctree_collector,
@@ -11,11 +11,18 @@ class TestDisableBuiltinToctreeCollector:
         """Test disabling an enabled collector."""
         mock_app = Mock()
         from sphinx.environment.collectors.toctree import TocTreeCollector
+
         mock_collector = Mock(spec=TocTreeCollector)
         mock_collector.listener_ids = ["id1", "id2"]
-        
-        with patch("sphinx_external_toc.collectors.gc.get_objects", return_value=[mock_collector]):
-            with patch("sphinx_external_toc.collectors.TocTreeCollector", TocTreeCollector):
+
+        with patch(
+            "sphinx_external_toc.collectors.gc.get_objects",
+            return_value=[mock_collector],
+        ):
+            with patch(
+                "sphinx_external_toc.collectors.TocTreeCollector",
+                TocTreeCollector,
+            ):
                 disable_builtin_toctree_collector(mock_app)
                 mock_collector.disable.assert_called_once_with(mock_app)
 
@@ -23,18 +30,25 @@ class TestDisableBuiltinToctreeCollector:
         """Test that already disabled collectors are skipped."""
         mock_app = Mock()
         from sphinx.environment.collectors.toctree import TocTreeCollector
+
         mock_collector = Mock(spec=TocTreeCollector)
         mock_collector.listener_ids = None
-        
-        with patch("sphinx_external_toc.collectors.gc.get_objects", return_value=[mock_collector]):
+
+        with patch(
+            "sphinx_external_toc.collectors.gc.get_objects",
+            return_value=[mock_collector],
+        ):
             disable_builtin_toctree_collector(mock_app)
             mock_collector.disable.assert_not_called()
 
     def test_skip_non_toctree_collectors(self):
         """Test that non-TocTreeCollector objects are skipped."""
         mock_app = Mock()
-        
-        with patch("sphinx_external_toc.collectors.gc.get_objects", return_value=["not a collector", 123]):
+
+        with patch(
+            "sphinx_external_toc.collectors.gc.get_objects",
+            return_value=["not a collector", 123],
+        ):
             disable_builtin_toctree_collector(mock_app)
             # Should not raise any errors
 
@@ -62,7 +76,9 @@ class TestTocTreeCollectorWithStyles:
     def test_renumber_numerical(self, collector):
         """Test renumbering with numerical style."""
         collector._TocTreeCollectorWithStyles__numerical_count = 5
-        result = collector._TocTreeCollectorWithStyles__renumber([1, 2, 3], ["numerical"])
+        result = collector._TocTreeCollectorWithStyles__renumber(
+            [1, 2, 3], ["numerical"]
+        )
         assert result[0] == 5
 
     def test_renumber_romanupper(self, collector):
