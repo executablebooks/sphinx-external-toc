@@ -53,7 +53,9 @@ def test_create_site_map_from_path(tmp_path: Path, data_regression):
 
 
 @pytest.mark.parametrize(
-    "path", JB_TOC_FILES, ids=[path.name.rsplit(".", 1)[0] for path in JB_TOC_FILES]
+    "path",
+    JB_TOC_FILES,
+    ids=[path.name.rsplit(".", 1)[0] for path in JB_TOC_FILES],
 )
 def test_migrate_jb(path, data_regression):
     toc = migrate_jupyter_book(Path(path))

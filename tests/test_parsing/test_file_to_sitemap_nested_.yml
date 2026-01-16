@@ -17,7 +17,9 @@ documents:
       - folder/globfolder/*
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
   folder/subfolder/doc4:
@@ -35,7 +37,9 @@ documents:
       - folder/doc3
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
 meta:

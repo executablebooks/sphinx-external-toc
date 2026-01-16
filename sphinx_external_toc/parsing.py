@@ -1,4 +1,5 @@
 """Parse the ToC to a `SiteMap` object."""
+
 from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from pathlib import Path
@@ -23,6 +24,8 @@ TOCTREE_OPTIONS = (
     "numbered",
     "reversed",
     "titlesonly",
+    "style",
+    "restart_numbering",
 )
 
 
@@ -273,9 +276,11 @@ def _parse_doc_item(
     # list of docs that need to be parsed recursively (and path)
     docs_to_be_parsed_list = [
         (
-            f"{path}/{items_key}/{ii}/"
-            if shorthand_used
-            else f"{path}{ti}/{items_key}/{ii}/",
+            (
+                f"{path}/{items_key}/{ii}/"
+                if shorthand_used
+                else f"{path}{ti}/{items_key}/{ii}/"
+            ),
             item_data,
         )
         for ti, toc_data in enumerate(subtrees_data)

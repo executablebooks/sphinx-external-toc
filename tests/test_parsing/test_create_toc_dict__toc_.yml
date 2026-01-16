@@ -1,0 +1,16 @@
+entries:
+- file: doc1
+- file: doc2
+- entries:
+  - file: subfolder/doc4
+  - url: https://example.com
+  file: doc3
+  options:
+    titlesonly: true
+meta:
+  regress: intro
+options:
+  caption: Part Caption
+  numbered: true
+  titlesonly: true
+root: intro

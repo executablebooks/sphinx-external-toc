@@ -3,4 +3,4 @@
         <title>
             Heading: intro.rst
         <compound classes="toctree-wrapper">
-            <toctree caption="True" entries="(None,\ 'doc1') (None,\ 'doc2') (None,\ 'doc3')" glob="False" hidden="True" includefiles="doc1 doc2 doc3" includehidden="False" maxdepth="-1" numbered="999" parent="intro" rawcaption="" titlesonly="True">
+            <toctree caption="True" entries="(None,\ 'doc1') (None,\ 'doc2') (None,\ 'doc3')" glob="False" hidden="True" includefiles="doc1 doc2 doc3" includehidden="False" maxdepth="-1" numbered="999" parent="intro" rawcaption="" restart_numbering="True" style="numerical" titlesonly="True">

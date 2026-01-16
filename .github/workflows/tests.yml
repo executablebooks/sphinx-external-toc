@@ -18,10 +18,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.9","3.10", "3.11", "3.12", "3.13","3.14"]
         include:
         - os: windows-latest
-          python-version: 3.9
+          python-version: "3.9"
+        - os: windows-latest
+          python-version: "3.14"
 
     runs-on: ${{ matrix.os }}
 
@@ -39,13 +41,13 @@ jobs:
       run: |
         pytest --cov=sphinx_external_toc --cov-report=xml --cov-report=term-missing
     - name: Upload to Codecov
-      if: matrix.python-version == 3.11
-      uses: codecov/codecov-action@v3
+      if: matrix.python-version == '3.14'
+      uses: codecov/codecov-action@v4
       with:
-        name: pytests-py3.11
+        name: pytests-py3.14
         flags: pytests
         file: ./coverage.xml
-        fail_ci_if_error: true
+        fail_ci_if_error: false # uploading coverage should not fail the tests
 
   publish:
 

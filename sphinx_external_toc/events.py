@@ -1,4 +1,5 @@
 """Sphinx event functions and directives."""
+
 import glob
 from pathlib import Path, PurePosixPath
 from typing import Any, List, Optional, Set
@@ -115,7 +116,8 @@ def parse_toc_to_env(app: Sphinx, config: Config) -> None:
                     new_excluded.append(posix)
         if new_excluded:
             logger.info(
-                "[etoc] Excluded %s extra file(s) not in toc", len(new_excluded)
+                "[etoc] Excluded %s extra file(s) not in toc",
+                len(new_excluded),
             )
             logger.debug("[etoc] Excluded extra file(s) not in toc: %r", new_excluded)
             # Note, don't `extend` list, as it alters the default `Config.config_values`
@@ -240,6 +242,8 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
             else (999 if toctree.numbered is True else int(toctree.numbered))
         )
         subnode["titlesonly"] = toctree.titlesonly
+        subnode["style"] = toctree.style
+        subnode["restart_numbering"] = toctree.restart_numbering
         wrappernode = nodes.compound(classes=["toctree-wrapper"])
         wrappernode.append(subnode)
 

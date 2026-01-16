@@ -1,4 +1,5 @@
 """Defines the `SiteMap` object, for storing the parsed ToC."""
+
 from collections.abc import MutableMapping
 from dataclasses import asdict, dataclass
 from typing import Any, Dict, Iterator, List, Optional, Set, Union
@@ -11,6 +12,7 @@ from ._compat import (
     matches_re,
     optional,
     validate_fields,
+    validate_style,
 )
 
 #: Pattern used to match URL items.
@@ -61,6 +63,15 @@ class TocTree:
     )
     reversed: bool = field(default=False, kw_only=True, validator=instance_of(bool))
     titlesonly: bool = field(default=False, kw_only=True, validator=instance_of(bool))
+    # Add extra field for style of toctree rendering
+    style: Union[List[str], str] = field(
+        default="numerical", kw_only=True, validator=validate_style
+    )
+    # add extra field for restarting numbering for the set style
+    # Only allow True, False or None. None is the default value.
+    restart_numbering: Optional[bool] = field(
+        default=None, kw_only=True, validator=optional(instance_of(bool))
+    )
 
     def __post_init__(self):
         validate_fields(self)
@@ -213,9 +224,11 @@ class SiteMap(MutableMapping):
                     d[k] = _replace_items(v)
                 elif isinstance(v, (list, tuple)):
                     d[k] = [
-                        _replace_items(i)
-                        if isinstance(i, dict)
-                        else (str(i) if isinstance(i, str) else i)
+                        (
+                            _replace_items(i)
+                            if isinstance(i, dict)
+                            else (str(i) if isinstance(i, str) else i)
+                        )
                         for i in v
                     ]
                 elif isinstance(v, str):

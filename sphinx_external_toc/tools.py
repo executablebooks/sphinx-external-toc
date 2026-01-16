@@ -199,9 +199,11 @@ def _doc_item_from_path(
 
     doc_item = Document(
         docname=(folder / index_docname).relative_to(root).as_posix(),
-        subtrees=[TocTree(items=file_items + index_items)]  # type: ignore[arg-type]
-        if (file_items or index_items)
-        else [],
+        subtrees=(
+            [TocTree(items=file_items + index_items)]  # type: ignore[arg-type]
+            if (file_items or index_items)
+            else []
+        ),
     )
     return doc_item, indexed_folders
 

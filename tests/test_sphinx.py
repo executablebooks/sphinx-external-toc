@@ -109,7 +109,9 @@ external_toc_path = {Path(os.path.abspath(toc_path)).as_posix()!r}
 
 
 @pytest.mark.parametrize(
-    "path", TOC_FILES_WARN, ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES_WARN]
+    "path",
+    TOC_FILES_WARN,
+    ids=[path.name.rsplit(".", 1)[0] for path in TOC_FILES_WARN],
 )
 def test_warning(path: Path, tmp_path: Path, sphinx_build_factory):
     src_dir = tmp_path / "srcdir"

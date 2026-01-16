@@ -21,7 +21,9 @@ documents:
       - subfolder14/index
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
   subfolder1/index:
@@ -37,7 +39,9 @@ documents:
       - subfolder14/subsubfolder/index
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
   subfolder14/subsubfolder/index:
@@ -49,7 +53,9 @@ documents:
       - subfolder14/subsubfolder/other
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
   subfolder14/subsubfolder/other:
@@ -65,7 +71,9 @@ documents:
       - subfolder2/other
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
   subfolder2/other:
@@ -81,7 +89,9 @@ documents:
       - subfolder3/no_index2
       maxdepth: -1
       numbered: false
+      restart_numbering: null
       reversed: false
+      style: numerical
       titlesonly: false
     title: null
   subfolder3/no_index2:

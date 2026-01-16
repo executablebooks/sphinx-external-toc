@@ -29,6 +29,7 @@ dependencies = [
     "click>=7.1",
     "pyyaml",
     "sphinx>=5",
+    "sphinx-multitoc-numbering>=0.1.3"
 ]
 
 [project.urls]
