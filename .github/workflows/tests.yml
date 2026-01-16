@@ -48,6 +48,7 @@ jobs:
         flags: pytests
         file: ./coverage.xml
         fail_ci_if_error: false # uploading coverage should not fail the tests
+        token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
 
