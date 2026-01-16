@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from sphinx.application import Sphinx
 
-__version__ = "1.1.0-dev"
+__version__ = "1.1.0"
 
 
 def setup(app: "Sphinx") -> dict:

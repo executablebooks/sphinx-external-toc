@@ -42,7 +42,7 @@ jobs:
         pytest --cov=sphinx_external_toc --cov-report=xml --cov-report=term-missing
     - name: Upload to Codecov
       if: matrix.python-version == '3.14'
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v3
       with:
         name: pytests-py3.14
         flags: pytests
