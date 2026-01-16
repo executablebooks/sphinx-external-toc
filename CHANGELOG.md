@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.1.0 - 2025-01-16
+
+([full changelog](https://github.com/executablebooks/sphinx-external-toc/compare/v1.0.1...v1.1.0))
+
+### Added
+
+- NEW: Advanced section numbering customization by @douden in https://github.com/executablebooks/sphinx-external-toc/pull/112
+
 ## v1.0.1 - 2023-12-12
 
 ([full changelog](https://github.com/executablebooks/sphinx-external-toc/compare/v1.0.0...21adcf94ca0e09e7fbce21bf87734435520169f2))
