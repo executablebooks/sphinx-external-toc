@@ -230,9 +230,9 @@ def insert_toctrees(app: Sphinx, doctree: nodes.document) -> None:
         subnode["includefiles"] = []
         subnode["maxdepth"] = toctree.maxdepth
         subnode["caption"] = toctree.caption
-        # TODO this wasn't in the original code,
-        # but alabaster theme intermittently raised `KeyError('rawcaption')`
-        subnode["rawcaption"] = toctree.caption or ""
+        # fix #118: only set rawcaption when a caption is present
+        if toctree.caption:
+            subnode["rawcaption"] = toctree.caption
         subnode["glob"] = any(isinstance(entry, GlobItem) for entry in toctree.items)
         subnode["hidden"] = False if toc_placeholders else toctree.hidden
         subnode["includehidden"] = False
