@@ -1,0 +1,35 @@
+documents:
+  doc1:
+    docname: doc1
+    subtrees: []
+    title: Overview
+  doc2:
+    docname: doc2
+    subtrees: []
+    title: General model
+  intro:
+    docname: intro
+    subtrees:
+    - caption: Script shaping
+      hidden: true
+      items:
+      - doc1
+      maxdepth: 2
+      numbered: false
+      restart_numbering: null
+      reversed: false
+      style: numerical
+      titlesonly: false
+    - caption: Indic
+      hidden: true
+      items:
+      - doc2
+      maxdepth: 2
+      numbered: 3
+      restart_numbering: null
+      reversed: false
+      style: numerical
+      titlesonly: false
+    title: null
+meta: {}
+root: intro
