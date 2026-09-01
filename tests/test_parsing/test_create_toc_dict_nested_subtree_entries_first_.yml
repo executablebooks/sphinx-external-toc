@@ -1,0 +1,12 @@
+root: intro
+subtrees:
+- entries:
+  - file: doc1
+    title: Overview
+  maxdepth: 1
+- caption: Indic
+  entries:
+  - file: doc2
+    title: General model
+  maxdepth: 2
+  numbered: 3

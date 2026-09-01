@@ -195,6 +195,7 @@ def _parse_doc_item(
     _known_link_keys = {FILE_KEY, GLOB_KEY, URL_KEY}
 
     toctrees = []
+    nested_docs_to_be_parsed: List[Tuple[str, Dict[str, Any]]] = []
     for toc_idx, toc_data in enumerate(subtrees_data):
         toc_path = path if shorthand_used else f"{path}{toc_idx}/"
 
@@ -208,8 +209,28 @@ def _parse_doc_item(
         if not (isinstance(items_data, Sequence) and items_data):
             raise MalformedError(f"'{items_key}' not a non-empty list @ '{toc_path}'")
 
+        # generate toc key-word arguments
+        keywords = {k: toc_data[k] for k in TOCTREE_OPTIONS if k in toc_data}
+        for key in defaults:
+            if key not in keywords:
+                keywords[key] = defaults[key]
+
         # generate items list
         items: List[Union[GlobItem, FileItem, UrlItem]] = []
+
+        def _emit_toctree() -> None:
+            if not items:
+                return
+            try:
+                toc_item = TocTree(items=list(items), **keywords)
+            except (ValueError, TypeError) as exc:
+                exc_arg = exc.args[0] if exc.args else ""
+                raise MalformedError(
+                    f"toctree validation @ '{toc_path}': {exc_arg}"
+                ) from exc
+            toctrees.append(toc_item)
+            items.clear()
+
         for item_idx, item_data in enumerate(items_data):
             if not isinstance(item_data, Mapping):
                 raise MalformedError(
@@ -220,6 +241,21 @@ def _parse_doc_item(
 
             # validation checks
             if not link_keys:
+                # Nested subtrees without a file/glob/url attach to this document.
+                if subtrees_key in item_data or items_key in item_data:
+                    _emit_toctree()
+                    nested_path = f"{toc_path}{items_key}/{item_idx}/"
+                    nested_data = {FILE_KEY: data[file_key], **item_data}
+                    nested_doc, nested_docs_list = _parse_doc_item(
+                        nested_data,
+                        defaults,
+                        nested_path,
+                        depth=depth,
+                        file_format=file_format,
+                    )
+                    toctrees.extend(nested_doc.subtrees)
+                    nested_docs_to_be_parsed.extend(nested_docs_list)
+                    continue
                 raise MalformedError(
                     f"entry does not contain one of "
                     f"{_known_link_keys!r} @ '{toc_path}{items_key}/{item_idx}'"
@@ -250,20 +286,7 @@ def _parse_doc_item(
                     f"entry validation @ '{toc_path}{items_key}/{item_idx}': {exc_arg}"
                 ) from exc
 
-        # generate toc key-word arguments
-        keywords = {k: toc_data[k] for k in TOCTREE_OPTIONS if k in toc_data}
-        for key in defaults:
-            if key not in keywords:
-                keywords[key] = defaults[key]
-
-        try:
-            toc_item = TocTree(items=items, **keywords)
-        except (ValueError, TypeError) as exc:
-            exc_arg = exc.args[0] if exc.args else ""
-            raise MalformedError(
-                f"toctree validation @ '{toc_path}': {exc_arg}"
-            ) from exc
-        toctrees.append(toc_item)
+        _emit_toctree()
 
     try:
         doc_item = Document(
@@ -287,6 +310,7 @@ def _parse_doc_item(
         for ii, item_data in enumerate(toc_data[items_key])
         if FILE_KEY in item_data
     ]
+    docs_to_be_parsed_list.extend(nested_docs_to_be_parsed)
 
     return (
         doc_item,
