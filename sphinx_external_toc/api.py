@@ -1,8 +1,8 @@
 """Defines the `SiteMap` object, for storing the parsed ToC."""
 
-from collections.abc import MutableMapping
+from collections.abc import Iterator, MutableMapping
 from dataclasses import asdict, dataclass
-from typing import Any, Dict, Iterator, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Set, Union
 
 from ._compat import (
     DC_SLOTS,
