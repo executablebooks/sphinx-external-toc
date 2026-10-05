@@ -1,9 +1,10 @@
-import re
-import shutil
+from collections.abc import Mapping, Sequence
 from fnmatch import fnmatch
 from itertools import chain
 from pathlib import Path, PurePosixPath
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
+import re
+import shutil
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
 
@@ -61,11 +62,11 @@ def create_site_from_toc(
     for docname in chain(site_map, additional_files):
         # create document
         filename = docname
-        if not any(docname.endswith(ext) for ext in {".rst", ".md"}):
+        if not any(docname.endswith(ext) for ext in (".rst", ".md")):
             filename += default_ext
         docpath = root_path.joinpath(PurePosixPath(filename))
         if docpath.exists() and not overwrite:
-            raise IOError(f"Path already exists: {docpath}")
+            raise OSError(f"Path already exists: {docpath}")
         docpath.parent.mkdir(parents=True, exist_ok=True)
 
         content = []
@@ -116,7 +117,7 @@ def create_site_map_from_path(
         root_path, suffixes, default_index, ignore_matches
     )
     if not root_index:
-        raise IOError(f"path does not contain a root file: {root_path}")
+        raise OSError(f"path does not contain a root file: {root_path}")
 
     # create root item and child folders
     root_item, indexed_folders = _doc_item_from_path(
@@ -232,7 +233,7 @@ def _assess_folder(
     :returns: (index file name, other file names, folders)
     """
     if not folder.is_dir():
-        raise IOError(f"path must be a directory: {folder}")
+        raise OSError(f"path must be a directory: {folder}")
 
     def _strip_suffix(name: str) -> str:
         for suffix in suffixes:
