@@ -1,6 +1,7 @@
 """Tests for sphinx_external_toc._compat module."""
 
 import pytest
+
 from sphinx_external_toc import _compat
 
 
@@ -248,8 +249,8 @@ class TestCompatConditionalImports:
 
     def test_compat_import_error_handling(self):
         """Test that import errors are handled gracefully."""
-        import sys
         import importlib
+        import sys
 
         if "sphinx_external_toc._compat" in sys.modules:
             del sys.modules["sphinx_external_toc._compat"]
