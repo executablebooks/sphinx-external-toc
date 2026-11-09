@@ -2,8 +2,8 @@ import os
 from pathlib import Path
 from typing import List
 
-import pytest
 from click.testing import CliRunner
+import pytest
 
 from sphinx_external_toc import __version__
 from sphinx_external_toc.cli import (
