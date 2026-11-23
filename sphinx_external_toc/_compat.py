@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import dataclasses as dc
 import re
+from re import Pattern
 import sys
-from typing import Any, Callable, Pattern, Type
+from typing import Any, Callable, Type
 
 from docutils.nodes import Element
 
@@ -93,7 +94,7 @@ def matches_re(regex: str | Pattern, flags: int = 0) -> ValidatorType:
     if fullmatch:
         match_func = pattern.fullmatch
     else:  # Python 2 fullmatch emulation (https://bugs.python.org/issue16203)
-        pattern = re.compile(r"(?:{})\Z".format(pattern.pattern), pattern.flags)
+        pattern = re.compile(rf"(?:{pattern.pattern})\Z", pattern.flags)
         match_func = pattern.match
 
     def _validator(inst, attr, value):
